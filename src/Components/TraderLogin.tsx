@@ -2,29 +2,65 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaGoogle } from 'react-icons/fa';
 import Layout from './Layout';
-import Footer from './Footer'; 
+import Footer from './Footer';
+import { GoogleAuthProvider, signInWithPopup} from "firebase/auth";
+import { auth } from '../../firebase/firebaseConfig';
+
+interface LoginFormData {
+  name: string;
+  email: string;
+  password: string;
+}
 
 export default function TraderLogin() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [accountType, setAccountType] = useState('trader');
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<LoginFormData>({
     name: '',
     email: '',
     password: '',
   });
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prevData => ({ ...prevData, [name]: value }));
   };
 
+  const handleGoogle = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Google sign-in failed:', error);
+      alert('Google sign-in failed. Please try again.');
+    }
+  }
+
+  const validateForm = () => {
+    const errors: { [key: string]: string } = {};
+    
+    if (!formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+      errors.email = 'Invalid email format';
+    }
+    
+    if (formData.password.length < 8) {
+      errors.password = 'Password must be at least 8 characters';
+    }
+    
+    return errors;
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // form validation and submission logic here
-    console.log('Form submitted:', formData);
+    setIsLoading(true);
+    setErrors({});
 
     try {
+      console.log('Form submitted:', formData);
       // Perform signup/login logic here
       // For example:
       // const response = await signUpUser(formData);
@@ -32,9 +68,16 @@ export default function TraderLogin() {
       //   // Redirect to dashboard
       navigate('/dashboard');
       // }
+      await loginUser(formData);
+      navigate('/dashboard');
     } catch (error) {
-      console.error('Signup failed:', error);
-      // Handle error
+      setErrors({
+        submit: error instanceof Error 
+          ? error.message 
+          : 'An unexpected error occurred'
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -100,6 +143,11 @@ export default function TraderLogin() {
                 />
                 <input
                   type="email"
+                  id="email-input"
+                  aria-label="Email Address"
+                  aria-required="true"
+                  aria-invalid={!!errors.email}
+                  aria-describedby="email-error"
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
@@ -107,6 +155,14 @@ export default function TraderLogin() {
                   className="w-full px-4 py-3 border border-gray-300 rounded-[15px] focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all duration-200"
                   required
                 />
+                {errors.email && (
+                  <span 
+                    id="email-error" 
+                    className="text-red-500 text-sm mt-1"
+                  >
+                    {errors.email}
+                  </span>
+                )}
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
@@ -131,7 +187,7 @@ export default function TraderLogin() {
               </form>
 
               <div className="mt-8">
-                <button className="w-full border border-gray-300 text-gray-700 py-3 rounded-[15px] hover:bg-gray-50 transition-all duration-200 flex items-center justify-center font-medium">
+                <button onClick={handleGoogle} className="w-full border border-gray-300 text-gray-700 py-3 rounded-[15px] hover:bg-gray-50 transition-all duration-200 flex items-center justify-center font-medium">
                   <FaGoogle className="mr-2" /> Sign up with Google
                 </button>
               </div>

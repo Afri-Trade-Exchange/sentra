@@ -19,7 +19,7 @@ const Navbar: React.FC = () => {
       <div className="flex justify-center items-center space-x-8 w-1/2">
         <NavItem text="I'm a Trader" to="/trader-signup" />
         <NavItem text="I'm a Customs Officer" />
-        <NavItem text="Company" />
+        <NavItem text="Company" to="/contact" />
         <NavItem text="Tracking" />
       </div>
       <div className="flex items-center justify-end space-x-4 w-1/4">

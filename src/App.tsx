@@ -38,7 +38,7 @@ export default function App() {
   )
 }
 
-function LandingPage() {
+function LandingPage () {
   const settings = {
     dots: false,
     arrows: false,
@@ -86,19 +86,19 @@ function LandingPage() {
         </svg>
       </div>
 
-      <nav className="fixed top-0 left-0 right-0 flex items-center justify-between px-40 py-4 bg-white bg-opacity-80 backdrop-blur-sm z-40">
+      <nav className="fixed top-0 left-0 right-0 flex items-center justify-between px-4 py-4 bg-white bg-opacity-80 backdrop-blur-sm z-40 md:px-40">
         <div className="flex items-center w-1/4">
           <GiAfrica className="text-2xl text-orange-500 mr-2" />
           <span className="text-xl font-bold text-gray-700">AfriTrade-Xchange</span>
         </div>
-        <div className="flex justify-center items-center space-x-8 w-1/2">
+        <div className="hidden md:flex justify-center items-center space-x-8 w-1/2">
           <NavItem text="I'm a Trader" to="/trader-signup" />
           <NavItem text="I'm a Customs Officer" />
           <NavItem text="Company" />
           <NavItem text="Tracking" />
         </div>
         <div className="flex items-center justify-end space-x-4 w-1/4">
-          <button className="px-4 py-2 text-l  text-gray-700 hover:text-orange-500">Register</button>
+          <button className="px-4 py-2 text-l text-gray-700 hover:text-orange-500">Register</button>
           <button className="px-4 py-2 text-l text-gray-700 hover:text-orange-500">Login</button>
           <button className="px-8 py-3 text-l text-white bg-orange-500 hover:bg-orange-600 rounded-[15px]">Contact Us</button>
         </div>

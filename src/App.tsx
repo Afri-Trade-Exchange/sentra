@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import { GiAfrica } from 'react-icons/gi'
 import { FiSearch } from 'react-icons/fi'
 import './index.css'
@@ -16,29 +16,34 @@ import Layout from './Components/Layout'
 import Navbar from './Components/Navbar'
 import ErrorBoundary from './Components/ErrorBoundary'
 import Dashboard from './Components/Dashboard' 
+import { useState } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { FaShip, FaTruck, FaWarehouse, FaBoxOpen } from 'react-icons/fa';
 
 export default function App() {
   return (
     <ErrorBoundary>
       <Router>
-        <div className="App">
-          <Navbar />
-          <Layout>
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/trader-signup" element={<TraderSignup />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              {/* Add other routes as needed */}
-            </Routes>
-          </Layout>
-        </div>
+        <Suspense fallback={<div>Loading...</div>}>
+          <div className="App">
+            <Navbar />
+            <Layout>
+              <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/trader-signup" element={<TraderSignup />} />
+                <Route path="/contact" element={<ContactPage />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                {/* Add other routes as needed */}
+              </Routes>
+            </Layout>
+          </div>
+        </Suspense>
       </Router>
     </ErrorBoundary>
   )
 }
 
-function LandingPage() {
+function LandingPage () {
   const settings = {
     dots: false,
     arrows: false,
@@ -66,8 +71,88 @@ function LandingPage() {
     ]
   };
 
+  const [orderNumber, setOrderNumber] = useState('');
+  const [activities, setActivities] = useState([]);
+
+  const fetchActivities = (orderNumber: string) => {
+    // Placeholder implementation - replace with actual API call or logic
+    return orderNumber ? [{ id: 1, description: `Activity for ${orderNumber}` }] : [];
+  };
+
+  const handleTrackClick = () => {
+    // Implement tracking logic here
+    console.log("Tracking:", orderNumber);
+    const activities = fetchActivities(orderNumber);
+    setActivities(activities);
+  };
+
+  const { scrollYProgress } = useScroll();
+  const scale = useTransform(scrollYProgress, [0, 0.5], [1, 1.1]);
+  const y = useTransform(scrollYProgress, [0, 0.5], [0, -50]);
+
   return (
     <div className="min-h-screen bg-gray-100 text-gray-800 font-['Comfortaa'] flex flex-col relative overflow-hidden">
+      {/* Floating Trade Icons */}
+      <motion.div 
+        className="absolute top-20 left-10 z-0 opacity-20"
+        animate={{
+          y: [0, 20, 0],
+          rotate: [0, 10, -10, 0]
+        }}
+        transition={{
+          duration: 3,
+          repeat: Infinity,
+          repeatType: "reverse"
+        }}
+      >
+        <FaShip className="text-4xl text-orange-500" />
+      </motion.div>
+
+      <motion.div 
+        className="absolute top-1/3 right-10 z-0 opacity-20"
+        animate={{
+          y: [0, -20, 0],
+          rotate: [0, -10, 10, 0]
+        }}
+        transition={{
+          duration: 4,
+          repeat: Infinity,
+          repeatType: "reverse"
+        }}
+      >
+        <FaTruck className="text-4xl text-blue-500" />
+      </motion.div>
+
+      <motion.div 
+        className="absolute bottom-20 left-1/4 z-0 opacity-20"
+        animate={{
+          scale: [1, 1.1, 1],
+          rotate: [0, 5, -5, 0]
+        }}
+        transition={{
+          duration: 3.5,
+          repeat: Infinity,
+          repeatType: "reverse"
+        }}
+      >
+        <FaWarehouse className="text-4xl text-green-500" />
+      </motion.div>
+
+      <motion.div 
+        className="absolute bottom-10 right-1/4 z-0 opacity-20"
+        animate={{
+          y: [0, 15, -15, 0],
+          x: [0, 10, -10, 0]
+        }}
+        transition={{
+          duration: 4.5,
+          repeat: Infinity,
+          repeatType: "reverse"
+        }}
+      >
+        <FaBoxOpen className="text-4xl text-purple-500" />
+      </motion.div>
+
       {/* Subtle trade-inspired background pattern */}
       <div className="absolute inset-0 z-0 opacity-5">
         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
@@ -86,21 +171,23 @@ function LandingPage() {
         </svg>
       </div>
 
-      <nav className="fixed top-0 left-0 right-0 flex items-center justify-between px-40 py-4 bg-white bg-opacity-80 backdrop-blur-sm z-40">
+      <nav className="fixed top-0 left-0 right-0 flex items-center justify-between px-4 py-4 bg-white bg-opacity-80 backdrop-blur-sm z-40 md:px-40">
         <div className="flex items-center w-1/4">
           <GiAfrica className="text-2xl text-orange-500 mr-2" />
           <span className="text-xl font-bold text-gray-700">AfriTrade-Xchange</span>
         </div>
-        <div className="flex justify-center items-center space-x-8 w-1/2">
+        <div className="hidden md:flex justify-center items-center space-x-8 w-1/2">
           <NavItem text="I'm a Trader" to="/trader-signup" />
-          <NavItem text="I'm a Customs Officer" />
-          <NavItem text="Company" />
+          <NavItem text="I'm a Customs Officer" to="/trader-signup" />
+          <NavItem text="Company" to="/contact"/>
           <NavItem text="Tracking" />
         </div>
         <div className="flex items-center justify-end space-x-4 w-1/4">
-          <button className="px-4 py-2 text-l  text-gray-700 hover:text-orange-500">Register</button>
-          <button className="px-4 py-2 text-l text-gray-700 hover:text-orange-500">Login</button>
-          <button className="px-8 py-3 text-l text-white bg-orange-500 hover:bg-orange-600 rounded-[15px]">Contact Us</button>
+          <Link to="/trader-signup">
+            <button className="px-4 py-2 text-l text-gray-700 hover:text-orange-500">Register</button>
+            <button className="px-4 py-2 text-l text-gray-700 hover:text-orange-500">Login</button>
+          </Link>
+            <button className="px-8 py-3 text-l text-white bg-orange-500 hover:bg-orange-600 rounded-[15px]">Contact Us</button>
         </div>
       </nav>
       <div className="container mx-auto px-4 py-8 pt-24 relative z-10">
@@ -112,9 +199,18 @@ function LandingPage() {
                 type="text"
                 placeholder="Tracking Number or InfoNotice®"
                 className="w-full py-4 text-base focus:outline-none"
+                value={orderNumber}
+                onChange={(e) => {
+                  setOrderNumber(e.target.value);
+                  const fetchedActivities = fetchActivities(e.target.value);
+                  setActivities(fetchedActivities);
+                }}
               />
             </div>
-            <button className="bg-orange-500 text-white px-8 py-4 text-base font-semibold hover:bg-orange-600 transition-colors">
+            <button 
+              className="bg-orange-500 text-white px-8 py-4 text-base font-semibold hover:bg-orange-600 transition-colors"
+              onClick={handleTrackClick}
+            >
               Track
             </button>
           </div>

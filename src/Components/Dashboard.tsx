@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaUpload, FaPlus, FaDownload, FaBox, FaBell, FaUser, FaSignOutAlt, FaClipboardList, FaArchive, FaFileInvoice, FaHistory, FaCog } from 'react-icons/fa';
+import { FaUpload, FaPlus, FaDownload, FaBox, FaBell, FaUser, FaSignOutAlt, FaClipboardList, FaArchive, FaFileInvoice, FaHistory, FaCog, FaApplePay, FaGooglePay } from 'react-icons/fa';
 import Footer from './Footer';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import UploadModal from './UploadModal';
@@ -36,21 +36,21 @@ export default function Dashboard() {
     }
     // Simulating fetching activities from an API
     setActivities([
-      { id: '001', category: 'Order', date: '2023-05-01', status: 'Completed', amount: 5500 },
-      { id: '002', category: 'Shipment', date: '2023-05-02', status: 'In Transit', amount: 750 },
-      { id: '003', category: 'Payment', date: '2023-05-03', status: 'Pending', amount: 1000 },
-      { id: '004', category: 'Order', date: '2023-05-04', status: 'Completed', amount: 500 },
-      { id: '005', category: 'Shipment', date: '2023-05-05', status: 'In Transit', amount: 750 },
-      { id: '006', category: 'Payment', date: '2023-05-06', status: 'Pending', amount: 1000 },
-      { id: '007', category: 'Order', date: '2023-05-07', status: 'Completed', amount: 500 },
-      { id: '008', category: 'Shipment', date: '2023-05-08', status: 'In Transit', amount: 750 },
-      { id: '009', category: 'Payment', date: '2023-05-09', status: 'Pending', amount: 1000 },
-      { id: '010', category: 'Order', date: '2023-05-10', status: 'Completed', amount: 500 },
-      { id: '011', category: 'Shipment', date: '2023-05-11', status: 'In Transit', amount: 750 },
-      { id: '012', category: 'Payment', date: '2023-05-12', status: 'Pending', amount: 1000 },
-      { id: '013', category: 'Order', date: '2023-05-13', status: 'Completed', amount: 500 },
-      { id: '014', category: 'Shipment', date: '2023-05-14', status: 'In Transit', amount: 750 },
-      { id: '015', category: 'Payment', date: '2023-05-15', status: 'Pending', amount: 1300 },
+      { id: 'ORD-001', category: 'Order', date: '2023-05-01', status: 'Completed', amount: 5500 },
+      { id: 'ORD-002', category: 'Shipment', date: '2023-05-02', status: 'In Transit', amount: 750 },
+      { id: 'ORD-003', category: 'Payment', date: '2023-05-03', status: 'Pending', amount: 1000 },
+      { id: 'ORD-004', category: 'Order', date: '2023-05-04', status: 'Completed', amount: 500 },
+      { id: 'ORD-005', category: 'Shipment', date: '2023-05-05', status: 'In Transit', amount: 750 },
+      { id: 'ORD-006', category: 'Payment', date: '2023-05-06', status: 'Pending', amount: 1000 },
+      { id: 'ORD-007', category: 'Order', date: '2023-05-07', status: 'Completed', amount: 500 },
+      { id: 'ORD-008', category: 'Shipment', date: '2023-05-08', status: 'In Transit', amount: 750 },
+      { id: 'ORD-009', category: 'Payment', date: '2023-05-09', status: 'Pending', amount: 1000 },
+      { id: 'ORD-010', category: 'Order', date: '2023-05-10', status: 'Completed', amount: 500 },
+      { id: 'ORD-011', category: 'Shipment', date: '2023-05-11', status: 'In Transit', amount: 750 },
+      { id: 'ORD-012', category: 'Payment', date: '2023-05-12', status: 'Pending', amount: 1000 },
+      { id: 'ORD-013', category: 'Order', date: '2023-05-13', status: 'Completed', amount: 500 },
+      { id: 'ORD-014', category: 'Shipment', date: '2023-05-14', status: 'In Transit', amount: 750 },
+      { id: 'ORD-015', category: 'Payment', date: '2023-05-15', status: 'Pending', amount: 1300 },
     ]);
   }, []);
 
@@ -58,6 +58,7 @@ export default function Dashboard() {
     { label: 'Current Requests', icon: FaClipboardList },
     { label: 'Closed Requests', icon: FaArchive },
     { label: 'Invoices', icon: FaFileInvoice },
+    { label: 'Payments', icon: FaApplePay },
     { label: 'Order History', icon: FaHistory },
     { label: 'Settings', icon: FaCog },
     { label: 'Sign Out', icon: FaSignOutAlt },
@@ -152,8 +153,21 @@ export default function Dashboard() {
           <button
             className="w-full mt-4 mb-14 bg-indigo-600 text-white p-3 rounded-[15px] flex items-center justify-center hover:bg-indigo-700 transition-colors"
           >
-            <FaBox className="w-5 h-5 mr-2" />
-            <span className="font-medium">Create Consignment</span>
+            {user ? (
+              <div className="flex items-center">
+                {user.name && (
+                  <div className="w-8 h-8 rounded-full bg-white text-indigo-600 flex items-center justify-center mr-2 font-bold">
+                    {user.name.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <span className="font-medium">{user.name || 'Create Consignment'}</span>
+              </div>
+            ) : (
+              <>
+                <FaBox className="w-5 h-5 mr-2" />
+                <span className="font-medium">Create Consignment</span>
+              </>
+            )}
           </button>
 
           {/* Pro upgrade card */}
@@ -167,7 +181,7 @@ export default function Dashboard() {
           <header className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
             <p className="mt-1 text-sm text-gray-600">
-              Welcome, {user?.name || 'Guest'}
+              Welcome, {user?.name || 'Wangata'}
             </p>
           </header>
 

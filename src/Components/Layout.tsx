@@ -39,9 +39,24 @@ export default function Layout({ children }: LayoutProps) {
           <a href="#">Tracking</a>
         </div>
         <div className="flex items-center justify-end space-x-4 w-1/4">
-          <button className="px-4 py-2 text-sm  text-gray-700 hover:text-orange-500">Register</button>
-          <button className="px-4 py-2 text-sm text-gray-700 hover:text-orange-500">Login</button>
-          <button className="px-8 py-3 text-sm text-white bg-orange-500 hover:bg-orange-600 rounded-[15px]">Contact Us</button>
+          <button 
+          onClick={() => navigate('/trader-signup')}
+          className="px-4 py-2 text-sm  text-gray-700 hover:text-orange-500"
+          >
+            Register
+            </button>
+          <button 
+          onClick={() => navigate('/trader-signup')}
+          className="px-4 py-2 text-sm text-gray-700 hover:text-orange-500"
+          >
+            Login
+          </button>
+          <button 
+          onClick={() => navigate('/contact')}
+          className="px-8 py-3 text-sm text-white bg-orange-500 hover:bg-orange-600 rounded-[15px]"
+          >
+            Contact Us
+          </button>
         </div>
       </nav>
       <main className="flex-grow pt-16">

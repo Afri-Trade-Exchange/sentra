@@ -7,6 +7,8 @@ import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../firebase/firebaseConfig'; 
 import { signupUser } from '../firebase/authService';
 
+type UserRole = 'trader' | 'customs';
+
 export default function TraderSignup() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);

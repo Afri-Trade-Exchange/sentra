@@ -152,7 +152,7 @@ export default function TraderLogin() {
                         ? 'bg-orange-500 text-white shadow-md'
                         : 'bg-transparent text-gray-600 hover:bg-gray-200'
                     } capitalize`}
-                    onClick={() => setUiState(prev => ({ ...prev, accountType: type }))}
+                    onClick={() => setUiState(prev => ({ ...prev, accountType: type as UserRole }))}
                   >
                     {type}
                   </button>

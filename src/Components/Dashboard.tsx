@@ -523,6 +523,7 @@ export default function Dashboard() {
               <button 
                 type="button"
                 onClick={() => setIsConsignmentModalOpen(false)}
+                aria-label="Close Consignment Modal"
                 className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
               >
                 <HeroIcons.XMarkIcon className="h-6 w-6" />
@@ -719,6 +720,7 @@ export default function Dashboard() {
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-8 relative">
               <button 
                 onClick={() => setIsRequestModalOpen(false)}
+                aria-label="Close Request Modal"
                 className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
               >
                 <HeroIcons.XMarkIcon className="h-6 w-6" />
@@ -1030,7 +1032,19 @@ export default function Dashboard() {
         onClose={() => setIsUploadModalOpen(false)}
       />
       <InvoiceDetailModal 
-        invoice={selectedInvoice || {} as Invoice} 
+        invoice={selectedInvoice ?? ({
+          id: '',
+          invoiceNumber: '',
+          customerName: '',
+          businessName: '',
+          activity: {} as Activity,
+          invoiceDate: '',
+          dueDate: '',
+          totalAmount: 0,
+          status: 'Pending',
+          items: [],
+          taxRate: 0, // Explicitly set default value
+        })} 
         isOpen={isInvoiceModalOpen}
         onClose={() => {
           setIsInvoiceModalOpen(false);

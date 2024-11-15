@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaGoogle } from 'react-icons/fa';
 import Layout from './Layout';
 import Footer from './Footer'; 
-
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { auth } from '../firebase/firebaseConfig'; 
+import { signupUser } from '../firebase/authService';
 export default function TraderSignup() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -20,22 +22,59 @@ export default function TraderSignup() {
     setFormData(prevData => ({ ...prevData, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // form validation and submission logic here
-    console.log('Form submitted:', formData);
+    
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setFormState(prev => ({ ...prev, errors: validationErrors }));
+      return;
+    }
+
+    setFormState(prev => ({ ...prev, isLoading: true }));
 
     try {
-      // Perform signup/login logic here
-      // For example:
-      // const response = await signUpUser(formData);
-      // if (response.success) {
-      //   // Redirect to dashboard
-      navigate('/dashboard');
-      // }
+      // Pass the selected account type when signing up
+      const userRole: UserRole = await signupUser({
+        ...formState.data,
+        role: accountType as UserRole
+      });
+      
+      // Navigate based on user role
+      switch(userRole) {
+        case 'trader':
+          navigate('/dashboard');
+          break;
+        case 'customs':
+          navigate('/customs-dashboard');
+          break;
+        default:
+          throw new Error('Invalid user role');
+      }
     } catch (error) {
-      console.error('Signup failed:', error);
-      // Handle error (e.g., show error message to user)
+      setFormState(prev => ({
+        ...prev,
+        errors: { 
+          submit: error instanceof Error 
+            ? error.message 
+            : 'An unexpected error occurred' 
+        }
+      }));
+    } finally {
+      setFormState(prev => ({ ...prev, isLoading: false }));
+    }
+  };
+
+  const handleGoogleSignUp = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      // User is signed in
+      console.log('Google Sign-Up Successful', result.user);
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Google Sign-Up Error', error);
+      // Handle errors (e.g., show error message)
     }
   };
 
@@ -115,6 +154,7 @@ export default function TraderSignup() {
                     value={formData.password}
                     onChange={handleInputChange}
                     placeholder="Password"
+                    autoComplete="new-password"
                     className="w-full px-4 py-3 border border-gray-300 rounded-[15px] focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all duration-200"
                     required
                   />
@@ -132,6 +172,7 @@ export default function TraderSignup() {
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
                   placeholder="Confirm Password"
+                  autoComplete="new-password"
                   className="w-full px-4 py-3 border border-gray-300 rounded-[15px] focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all duration-200"
                   required
                 />
@@ -141,7 +182,10 @@ export default function TraderSignup() {
               </form>
 
               <div className="mt-8">
-                <button className="w-full border border-gray-300 text-gray-700 py-3 rounded-[15px] hover:bg-gray-50 transition-all duration-200 flex items-center justify-center font-medium">
+                <button 
+                  onClick={handleGoogleSignUp}
+                  className="w-full border border-gray-300 text-gray-700 py-3 rounded-[15px] hover:bg-gray-50 transition-all duration-200 flex items-center justify-center font-medium"
+                >
                   <FaGoogle className="mr-2" /> Sign up with Google
                 </button>
               </div>
@@ -152,7 +196,7 @@ export default function TraderSignup() {
             </div>
           </div>
         </div>
-        <Footer /> {/* Add the Footer component here */}
+        <Footer />
       </div>
     </Layout>
   );

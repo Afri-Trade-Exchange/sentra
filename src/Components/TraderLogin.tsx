@@ -1,35 +1,105 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaGoogle } from 'react-icons/fa';
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { z } from 'zod';
+
 import Layout from './Layout';
 import Footer from './Footer';
-import { GoogleAuthProvider, signInWithPopup} from "firebase/auth";
 import { auth } from '../../firebase/firebaseConfig';
+import { loginUser, UserRole } from '../../firebase/authService';
 
-interface LoginFormData {
-  name: string;
-  email: string;
-  password: string;
-}
+const LoginSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email format"),
+  password: z.string().min(8, "Password must be at least 8 characters")
+});
+
+type LoginFormData = z.infer<typeof LoginSchema>;
 
 export default function TraderLogin() {
   const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
-  const [accountType, setAccountType] = useState('trader');
-  const [formData, setFormData] = useState<LoginFormData>({
-    name: '',
-    email: '',
-    password: '',
+  const [formState, setFormState] = useState<{
+    data: LoginFormData;
+    errors: Record<string, string>;
+    isLoading: boolean;
+  }>({
+    data: { name: '', email: '', password: '' },
+    errors: {},
+    isLoading: false
   });
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [uiState, setUiState] = useState<{
+    showPassword: boolean;
+    accountType: UserRole;
+  }>({
+    showPassword: false,
+    accountType: 'trader'
+  });
+
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prevData => ({ ...prevData, [name]: value }));
+    setFormState(prev => ({
+      ...prev,
+      data: { ...prev.data, [name]: value },
+      errors: {}
+    }));
+  }, []);
+
+  const validateForm = useCallback(() => {
+    try {
+      LoginSchema.parse(formState.data);
+      return {};
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return error.flatten().fieldErrors;
+      }
+      return {};
+    }
+  }, [formState.data]);
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setFormState(prev => ({ ...prev, errors: validationErrors }));
+      return;
+    }
+
+    setFormState(prev => ({ ...prev, isLoading: true }));
+
+    try {
+      const userRole = await loginUser({
+        ...formState.data,
+        role: uiState.accountType
+      });
+      
+      switch(userRole) {
+        case 'trader':
+          navigate('/dashboard');
+          break;
+        case 'customs':
+          navigate('/customs-dashboard');
+          break;
+        default:
+          throw new Error('Invalid user role');
+      }
+    } catch (error) {
+      setFormState(prev => ({
+        ...prev,
+        errors: { 
+          submit: error instanceof Error 
+            ? error.message 
+            : 'An unexpected error occurred' 
+        }
+      }));
+    } finally {
+      setFormState(prev => ({ ...prev, isLoading: false }));
+    }
   };
 
-  const handleGoogle = async () => {
+  const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
@@ -38,54 +108,12 @@ export default function TraderLogin() {
       console.error('Google sign-in failed:', error);
       alert('Google sign-in failed. Please try again.');
     }
-  }
-
-  const validateForm = () => {
-    const errors: { [key: string]: string } = {};
-    
-    if (!formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-      errors.email = 'Invalid email format';
-    }
-    
-    if (formData.password.length < 8) {
-      errors.password = 'Password must be at least 8 characters';
-    }
-    
-    return errors;
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setErrors({});
-
-    try {
-      console.log('Form submitted:', formData);
-      // Perform signup/login logic here
-      // For example:
-      // const response = await signUpUser(formData);
-      // if (response.success) {
-      //   // Redirect to dashboard
-      navigate('/dashboard');
-      // }
-      await loginUser(formData);
-      navigate('/dashboard');
-    } catch (error) {
-      setErrors({
-        submit: error instanceof Error 
-          ? error.message 
-          : 'An unexpected error occurred'
-      });
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   return (
     <Layout>
       <div className="flex flex-col min-h-screen">
         <div className="flex-grow flex bg-gray-100">
-          {/* Left side - Image and Quote */}
           <div className="hidden lg:block w-1/2 bg-cover bg-center relative" style={{ backgroundImage: "url('./src/assets/images/paul.png')" }}>
             <div className="absolute inset-0 bg-gradient-to-br from-orange-600 to-orange-900 bg-opacity-80 flex flex-col justify-center p-12 text-white">
               <h2 className="text-6xl font-bold mb-6 leading-tight">
@@ -108,23 +136,21 @@ export default function TraderLogin() {
             </div>
           </div>
 
-          {/* Right side - Sign Up Form */}
           <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
             <div className="max-w-md w-full bg-white shadow-2xl rounded-[15px] p-10">
               <h2 className="text-4xl font-bold mb-8 text-center text-gray-800">Login to Your Account</h2>
               <p className="text-gray-600 mb-8 text-center">Welcome Back. Please enter your details.</p>
 
-              {/* Account Type Selector */}
               <div className="flex mb-8 bg-gray-100 rounded-[15px] p-1">
                 {['trader', 'customs'].map((type) => (
                   <button
                     key={type}
                     className={`flex-1 py-3 px-4 rounded-[15px] text-sm font-medium transition-all duration-200 ${
-                      accountType === type
+                      uiState.accountType === type
                         ? 'bg-orange-500 text-white shadow-md'
                         : 'bg-transparent text-gray-600 hover:bg-gray-200'
                     } capitalize`}
-                    onClick={() => setAccountType(type)}
+                    onClick={() => setUiState(prev => ({ ...prev, accountType: type }))}
                   >
                     {type}
                   </button>
@@ -133,41 +159,43 @@ export default function TraderLogin() {
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <input
-                  type="name"
+                  type="text"
                   name="name"
-                  value={formData.name}
+                  value={formState.data.name}
                   onChange={handleInputChange}
                   placeholder="Full Name"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-[15px] focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all duration-200"
-                  required
+                  className={`w-full px-4 py-3 border rounded-[15px] ${
+                    formState.errors.name ? 'border-red-500' : 'border-gray-300'
+                  }`}
                 />
+                {formState.errors.name && (
+                  <p className="text-red-500 text-sm">{formState.errors.name}</p>
+                )}
+                
                 <input
                   type="email"
                   id="email-input"
                   aria-label="Email Address"
                   aria-required="true"
-                  aria-invalid={!!errors.email}
+                  aria-invalid={formState.errors.email ? true : false}
                   aria-describedby="email-error"
                   name="email"
-                  value={formData.email}
+                  value={formState.data.email}
                   onChange={handleInputChange}
                   placeholder="Enter Your Email"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-[15px] focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all duration-200"
-                  required
+                  className={`w-full px-4 py-3 border rounded-[15px] ${
+                    formState.errors.email ? 'border-red-500' : 'border-gray-300'
+                  }`}
                 />
-                {errors.email && (
-                  <span 
-                    id="email-error" 
-                    className="text-red-500 text-sm mt-1"
-                  >
-                    {errors.email}
-                  </span>
+                {formState.errors.email && (
+                  <p className="text-red-500 text-sm">{formState.errors.email}</p>
                 )}
+                
                 <div className="relative">
                   <input
-                    type={showPassword ? "text" : "password"}
+                    type={uiState.showPassword ? "text" : "password"}
                     name="password"
-                    value={formData.password}
+                    value={formState.data.password}
                     onChange={handleInputChange}
                     placeholder="Password"
                     className="w-full px-4 py-3 border border-gray-300 rounded-[15px] focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all duration-200"
@@ -176,19 +204,23 @@ export default function TraderLogin() {
                   <button
                     type="button"
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 rounded-[15px] text-gray-400 hover:text-gray-600 transition-colors duration-200"
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={() => setUiState(prev => ({ ...prev, showPassword: !prev.showPassword }))}
                   >
-                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    {uiState.showPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
                 </div>
-                <button type="submit" className="w-full bg-orange-500 text-white py-3 rounded-[15px] hover:bg-orange-600 transition-all duration-200 font-medium">
-                  Login Up
+                <button 
+                  type="submit"
+                  disabled={formState.isLoading}
+                  className="w-full bg-orange-500 text-white py-3 rounded-[15px] hover:bg-orange-600"
+                >
+                  {formState.isLoading ? 'Logging In...' : 'Login'}
                 </button>
               </form>
 
               <div className="mt-8">
-                <button onClick={handleGoogle} className="w-full border border-gray-300 text-gray-700 py-3 rounded-[15px] hover:bg-gray-50 transition-all duration-200 flex items-center justify-center font-medium">
-                  <FaGoogle className="mr-2" /> Sign up with Google
+                <button onClick={handleGoogleSignIn} className="w-full border border-gray-300 text-gray-700 py-3 rounded-[15px] hover:bg-gray-50 transition-all duration-200 flex items-center justify-center font-medium">
+                  <FaGoogle className="mr-2" /> Sign in with Google
                 </button>
               </div>
 
@@ -198,7 +230,7 @@ export default function TraderLogin() {
             </div>
           </div>
         </div>
-        <Footer /> {/* Add the Footer component here */}
+        <Footer />
       </div>
     </Layout>
   );

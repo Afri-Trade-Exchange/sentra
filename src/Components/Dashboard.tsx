@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { FaUpload, FaPlus, FaDownload, FaBox, FaBell, FaUser, FaSignOutAlt, FaClipboardList, FaArchive, FaFileInvoice, FaHistory, FaCog, FaApplePay, FaGooglePay } from 'react-icons/fa';
-import Footer from './Footer';
-import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { FaUpload, FaPlus, FaDownload, FaBox, FaSignOutAlt, FaArchive, FaFileInvoice, FaHistory, FaCog, FaApplePay, FaPlusCircle, } from 'react-icons/fa';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import UploadModal from './UploadModal';
+import InvoiceDetailModal from './InvoiceDetailModal';
 // import { Link } from 'react-router-dom';
 
 interface User {
@@ -18,10 +18,260 @@ interface Activity {
   amount: number;
 }
 
+interface Invoice {
+  id: string;
+  invoiceNumber: string;
+  customerName: string;
+  businessName: string;
+  activity: Activity;
+  invoiceDate: string;
+  dueDate: string;
+  totalAmount: number;
+  status: 'Paid' | 'Pending' | 'Overdue';
+  items: InvoiceItem[];
+  taxRate?: number;
+  notes?: string;
+}
+
+interface InvoiceItem {
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+}
+
+// Additional imports
+import { 
+  FaInfoCircle, 
+  FaChartLine, 
+  FaExclamationTriangle, 
+  FaClipboardCheck 
+} from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
+// import { format, parseISO } from 'date-fns';
+
+// New interfaces for enhanced data
+interface DashboardInsights {
+  totalRevenue: number;
+  pendingRequests: number;
+  completedRequests: number;
+  averageProcessingTime: number;
+}
+
+interface RiskAssessment {
+  level: 'Low' | 'Medium' | 'High';
+  description: string;
+  impactScore: number;
+}
+
+import { useNavigate } from 'react-router-dom';
+import { useForm, Controller } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as HeroIcons from '@heroicons/react/24/outline';
+
+// Consignment Creation Schema
+const ConsignmentSchema = z.object({
+  traderName: z.string().min(2, "Trader name is required"),
+  documentType: z.enum(['Import', 'Export', 'Transit', 'Temporary Entry', 'Bonded Warehouse']),
+  goodsDescription: z.string().min(10, "Description must be at least 10 characters"),
+  estimatedValue: z.number().min(0, "Value must be positive"),
+  declarationNumber: z.string().optional(),
+});
+
+type ConsignmentFormData = z.infer<typeof ConsignmentSchema>;
+
+// Add this schema for request creation
+const RequestSchema = z.object({
+  category: z.enum(['Order', 'Shipment', 'Payment']),
+  description: z.string().min(5, "Description is required"),
+  amount: z.number().min(0, "Amount must be positive"),
+});
+
+type RequestFormData = z.infer<typeof RequestSchema>;
+
+// Enum for better type safety and readability
+enum ActivityStatus {
+  Pending = 'Pending',
+  InTransit = 'In Transit',
+  Completed = 'Completed'
+}
+
+// Type guard for status
+function isValidStatus(status: string): status is ActivityStatus {
+  return Object.values(ActivityStatus).includes(status as ActivityStatus);
+}
+
+// Styled status component with Swiss design principles
+const StatusBadge: React.FC<{ 
+  status: ActivityStatus; 
+  onChange: (newStatus: ActivityStatus) => void 
+}> = ({ status, onChange }) => {
+  const statusStyles = {
+    [ActivityStatus.Pending]: 'bg-yellow-50 text-yellow-800 border-yellow-200',
+    [ActivityStatus.InTransit]: 'bg-blue-50 text-blue-800 border-blue-200',
+    [ActivityStatus.Completed]: 'bg-green-50 text-green-800 border-green-200'
+  };
+
+  return (
+    <div className="relative group">
+      <select
+        value={status}
+        onChange={(e) => {
+          const newStatus = e.target.value;
+          if (isValidStatus(newStatus)) {
+            onChange(newStatus);
+          }
+        }}
+        aria-label="Activity Status"
+        className={`
+          appearance-none 
+          w-full 
+          px-3 
+          py-1 
+          rounded-md 
+          border 
+          font-medium 
+          cursor-pointer 
+          transition-colors 
+          ${statusStyles[status]}
+          hover:opacity-80
+          focus:ring-2
+          focus:ring-opacity-50
+        `}
+      >
+        {Object.values(ActivityStatus).map((stat) => (
+          <option key={stat} value={stat}>
+            {stat}
+          </option>
+        ))}
+      </select>
+      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+        <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+          <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+        </svg>
+      </div>
+    </div>
+  );
+};
+
+// Improved invoice view button with Swiss minimalism
+const InvoiceViewButton: React.FC<{ 
+  onClick: () => void; 
+  hasInvoice: boolean 
+}> = ({ onClick, hasInvoice }) => {
+  if (!hasInvoice) return null;
+
+  return (
+    <button 
+      onClick={onClick}
+      className="
+        text-sm 
+        font-medium 
+        text-blue-600 
+        hover:text-blue-800 
+        transition-colors 
+        flex 
+        items-center 
+        gap-1
+        opacity-80 
+        hover:opacity-100
+      "
+    >
+      <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        className="h-4 w-4" 
+        fill="none" 
+        viewBox="0 0 24 24" 
+        stroke="currentColor"
+      >
+        <path 
+          strokeLinecap="round" 
+          strokeLinejoin="round" 
+          strokeWidth={2} 
+          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" 
+        />
+      </svg>
+      View Invoice
+    </button>
+  );
+};
+
+// Add this before the Dashboard component
+const generateInvoice = (activity: Activity, user?: User | null): Invoice => ({
+  id: `INV-${activity.id}`,
+  invoiceNumber: `INV-${activity.id}`,
+  customerName: user?.name || 'Customer',
+  businessName: 'Afritrade',
+  activity: activity,
+  invoiceDate: activity.date,
+  dueDate: new Date(new Date(activity.date).setDate(new Date(activity.date).getDate() + 30)).toISOString().split('T')[0],
+  totalAmount: activity.amount,
+  status: 'Pending',
+  items: [{
+    description: `${activity.category} Service`,
+    quantity: 1,
+    unitPrice: activity.amount,
+    total: activity.amount
+  }],
+  taxRate: 0.16,
+  notes: `Invoice for ${activity.category} - ${activity.id}`
+});
+
 export default function Dashboard() {
-  const [user, setUser] = useState<User | null>(null);
+  const navigate = useNavigate();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [showAllInvoices, setShowAllInvoices] = useState(false);
+  const [insights, setInsights] = useState<DashboardInsights | null>(null);
+  const [riskAssessment, setRiskAssessment] = useState<RiskAssessment | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [isConsignmentModalOpen, setIsConsignmentModalOpen] = useState(false);
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+
+  // Move calculateInsights outside of useEffect to make it accessible
+  const calculateInsights = (activityList: Activity[]) => {
+    const totalRevenue = activityList.reduce((sum, activity) => sum + activity.amount, 0);
+    const pendingRequests = activityList.filter(a => a.status === 'Pending').length;
+    const completedRequests = activityList.filter(a => a.status === 'Completed').length;
+    
+    const insightsData: DashboardInsights = {
+      totalRevenue,
+      pendingRequests,
+      completedRequests,
+      averageProcessingTime: calculateAverageProcessingTime(activityList)
+    };
+    
+    // Risk assessment logic
+    const pendingPercentage = (insightsData.pendingRequests / activityList.length) * 100;
+    
+    let riskLevel: RiskAssessment = {
+      level: 'Low',
+      description: 'Operations are running smoothly',
+      impactScore: 1
+    };
+
+    if (pendingPercentage > 30) {
+      riskLevel = {
+        level: 'Medium',
+        description: 'High number of pending requests detected',
+        impactScore: 5
+      };
+    }
+
+    if (pendingPercentage > 50) {
+      riskLevel = {
+        level: 'High',
+        description: 'Critical backlog of requests',
+        impactScore: 8
+      };
+    }
+
+    return { insightsData, riskLevel };
+  };
 
   useEffect(() => {
     // Get user data from localStorage
@@ -34,8 +284,9 @@ export default function Dashboard() {
         console.error('Error parsing user data:', error);
       }
     }
+
     // Simulating fetching activities from an API
-    setActivities([
+    const initialActivities = [
       { id: 'ORD-001', category: 'Order', date: '2023-05-01', status: 'Completed', amount: 5500 },
       { id: 'ORD-002', category: 'Shipment', date: '2023-05-02', status: 'In Transit', amount: 750 },
       { id: 'ORD-003', category: 'Payment', date: '2023-05-03', status: 'Pending', amount: 1000 },
@@ -51,17 +302,43 @@ export default function Dashboard() {
       { id: 'ORD-013', category: 'Order', date: '2023-05-13', status: 'Completed', amount: 500 },
       { id: 'ORD-014', category: 'Shipment', date: '2023-05-14', status: 'In Transit', amount: 750 },
       { id: 'ORD-015', category: 'Payment', date: '2023-05-15', status: 'Pending', amount: 1300 },
-    ]);
+    ];
+    setActivities(initialActivities);
+
+    // Calculate dashboard insights
+    const { insightsData, riskLevel } = calculateInsights(initialActivities);
+    setInsights(insightsData);
+    setRiskAssessment(riskLevel);
+
+    // Generate invoices for ALL activities
+    const generatedInvoices: Invoice[] = initialActivities.map(activity => generateInvoice(activity, user));
+    setInvoices(generatedInvoices);
   }, []);
 
+  useEffect(() => {
+    const { insightsData, riskLevel } = calculateInsights(activities);
+    setInsights(insightsData);
+    setRiskAssessment(riskLevel);
+  }, [activities]);
+
+  // Add a sign out function
+  const handleSignOut = () => {
+
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    
+    // Navigate back to home page
+    navigate('/');
+  };
+
   const navItems = [
-    { label: 'Current Requests', icon: FaClipboardList },
+    { label: 'Current Requests', icon: FaPlusCircle },
     { label: 'Closed Requests', icon: FaArchive },
     { label: 'Invoices', icon: FaFileInvoice },
     { label: 'Payments', icon: FaApplePay },
     { label: 'Order History', icon: FaHistory },
     { label: 'Settings', icon: FaCog },
-    { label: 'Sign Out', icon: FaSignOutAlt },
+    { label: 'Sign Out', icon: FaSignOutAlt, action: handleSignOut },
   ];
 
   const orderData = [
@@ -97,173 +374,576 @@ export default function Dashboard() {
     window.URL.revokeObjectURL(url);
   };
 
-  return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
-      Top Navigation Bar
-      <nav className="bg-white shadow-md fixed w-full z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex">
-              <div className="flex-shrink-0 flex items-center">
-                <img className="h-8 w-auto" src="/src/assets/images/africa.png" alt="Afritrade-Xchange Logo" />
-              </div>
-            </div>
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <button type="button" className="p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                  <FaBell className="h-6 w-6" />
-                </button>
-              </div>
-              <div className="ml-3 relative">
+  const viewInvoiceDetails = (invoice: Invoice) => {
+    setSelectedInvoice(invoice);
+    setIsInvoiceModalOpen(true);
+  };
+
+  // Render additional insights section
+  const renderInsightsSection = () => (
+    <div className="grid grid-cols-3 gap-4">
+      {/* Total Revenue Insight */}
+      <motion.div 
+        whileHover={{ scale: 1.05 }}
+        className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-5 flex items-center space-x-4"
+      >
+        <FaChartLine className="text-4xl text-green-500" />
+        <div>
+          <h3 className="text-lg font-semibold text-gray-700">Total Revenue</h3>
+          <p className="text-2xl font-bold text-green-600">
+            ${insights?.totalRevenue.toLocaleString() || 0}
+          </p>
+        </div>
+      </motion.div>
+
+      {/* Request Status Insight */}
+      <motion.div 
+        whileHover={{ scale: 1.05 }}
+        className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-5 flex items-center space-x-4"
+      >
+        <FaClipboardCheck className="text-4xl text-blue-500" />
+        <div>
+          <h3 className="text-lg font-semibold text-gray-700">Requests</h3>
+          <p className="text-2xl font-bold text-blue-600">
+            {insights?.completedRequests} / {activities.length}
+          </p>
+        </div>
+      </motion.div>
+
+      {/* Risk Assessment */}
+      <motion.div 
+        whileHover={{ scale: 1.05 }}
+        className={`bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-5 flex items-center space-x-4 ${
+          riskAssessment?.level === 'High' ? 'border-2 border-red-500' : 
+          riskAssessment?.level === 'Medium' ? 'border-2 border-yellow-500' : ''
+        }`}
+      >
+        <FaExclamationTriangle 
+          className={`text-4xl ${
+            riskAssessment?.level === 'High' ? 'text-red-500' : 
+            riskAssessment?.level === 'Medium' ? 'text-yellow-500' : 'text-green-500'
+          }`} 
+        />
+        <div>
+          <h3 className="text-lg font-semibold text-gray-700">Risk Level</h3>
+          <p className={`text-xl font-bold ${
+            riskAssessment?.level === 'High' ? 'text-red-600' : 
+            riskAssessment?.level === 'Medium' ? 'text-yellow-600' : 'text-green-600'
+          }`}>
+            {riskAssessment?.level}
+          </p>
+          <p className="text-xs text-gray-500">{riskAssessment?.description}</p>
+        </div>
+      </motion.div>
+    </div>
+  );
+
+  // Contextual Help Tooltip Component
+  const ContextualHelp = ({ content }: { content: string }) => (
+    <div className="group relative inline-block">
+      <FaInfoCircle className="text-blue-500 cursor-help" />
+      <div className="absolute z-10 p-2 -mt-2 text-sm text-white bg-gray-800 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 -left-full w-64">
+        {content}
+      </div>
+    </div>
+  );
+
+  // Add this to your existing navItems or quick action cards
+  const createConsignmentHandler = () => {
+    setIsConsignmentModalOpen(true);
+  };
+
+  // Consignment Creation Modal Component
+  const ConsignmentCreationModal = () => {
+    const [isSubmitted, setIsSubmitted] = useState(false);
+
+    const { 
+      control, 
+      handleSubmit, 
+      formState: { errors }, 
+      reset 
+    } = useForm<ConsignmentFormData>({
+      resolver: zodResolver(ConsignmentSchema),
+      defaultValues: {
+        traderName: '',
+        documentType: 'Import',
+        goodsDescription: '',
+        estimatedValue: 0,
+      }
+    });
+
+    const onSubmit = (data: ConsignmentFormData) => {
+      console.log('Consignment Data:', data);
+      
+      // Set submitted state and show animation
+      setIsSubmitted(true);
+
+      // Close modal and reset after animation
+      setTimeout(() => {
+        setIsConsignmentModalOpen(false);
+        setIsSubmitted(false);
+        reset();
+      }, 2000);
+    };
+
+    if (isSubmitted) {
+      return (
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+        >
+          <div className="bg-white rounded-2xl p-8 text-center">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className="flex flex-col items-center"
+            >
+              <FaClipboardCheck className="h-20 w-20 text-green-500" />
+              <h2 className="text-2xl font-bold mt-4 text-green-600">
+                Consignment Created Successfully!
+              </h2>
+            </motion.div>
+          </div>
+        </motion.div>
+      );
+    }
+
+    return (
+      <AnimatePresence>
+        {isConsignmentModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-8 relative"
+            >
+              <button 
+                type="button"
+                onClick={() => setIsConsignmentModalOpen(false)}
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+              >
+                <HeroIcons.XMarkIcon className="h-6 w-6" />
+              </button>
+
+              <h2 className="text-2xl font-bold mb-6 text-gray-800 flex items-center">
+                <HeroIcons.DocumentIcon className="h-8 w-8 mr-3 text-blue-500" />
+                Create New Consignment
+              </h2>
+
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div>
-                  <button className="flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    <FaUser className="h-8 w-8 rounded-full" />
+                  <label className="block text-sm font-medium text-gray-700">
+                    Trader Name
+                  </label>
+                  <Controller
+                    name="traderName"
+                    control={control}
+                    render={({ field }) => (
+                      <input 
+                        {...field}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                        placeholder="Enter trader name"
+                      />
+                    )}
+                  />
+                  {errors.traderName && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.traderName.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Document Type
+                  </label>
+                  <Controller
+                    name="documentType"
+                    control={control}
+                    render={({ field }) => (
+                      <select 
+                        {...field}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                      >
+                        <option value="Import">Import</option>
+                        <option value="Export">Export</option>
+                        <option value="Transit">Transit</option>
+                        <option value="Temporary Entry">Temporary Entry</option>
+                        <option value="Bonded Warehouse">Bonded Warehouse</option>
+                      </select>
+                    )}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Goods Description
+                  </label>
+                  <Controller
+                    name="goodsDescription"
+                    control={control}
+                    render={({ field }) => (
+                      <textarea 
+                        {...field}
+                        rows={3}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                        placeholder="Describe the goods in detail"
+                      />
+                    )}
+                  />
+                  {errors.goodsDescription && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.goodsDescription.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Estimated Value
+                  </label>
+                  <Controller
+                    name="estimatedValue"
+                    control={control}
+                    render={({ field: { onChange, ...field } }) => (
+                      <input 
+                        {...field}
+                        type="number"
+                        onChange={(e) => onChange(Number(e.target.value))}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                        placeholder="Enter estimated value"
+                      />
+                    )}
+                  />
+                  {errors.estimatedValue && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.estimatedValue.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex justify-end space-x-4 pt-4">
+                  <button 
+                    type="button"
+                    onClick={() => setIsConsignmentModalOpen(false)}
+                    className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit"
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center"
+                  >
+                    <FaClipboardCheck className="h-5 w-5 mr-2" />
+                    Create Consignment
                   </button>
                 </div>
-              </div>
-            </div>
+              </form>
+            </motion.div>
           </div>
-        </div>
-      </nav>
+        )}
+      </AnimatePresence>
+    );
+  };
 
-      <div className="flex flex-1 pt-16">
-        {/* Sidebar */}
-        <aside className="w-64 bg-gray-900 shadow-md fixed h-full left-0 top-16 overflow-y-auto p-4 flex flex-col">
-          {/* Existing logo section */}
-          <div className="flex items-center gap-2 mb-8">
-            <img className="h-8 w-8" src="/src/assets/images/africa.png" alt="Dabang" />
-            <span className="text-xl font-semibold">Dabang</span>
-          </div>
+  // This Method is used to generate a new activity and invoice
+  const createNewRequest = (data: RequestFormData) => {
+    const newActivity: Activity = {
+      id: `ORD-${activities.length + 1}`,
+      category: data.category,
+      date: new Date().toISOString().split('T')[0],
+      status: 'Pending',
+      amount: data.amount
+    };
 
-          {/* Main navigation */}
-          <nav className="space-y-2 flex-1">
-            {navItems.map((item) => (
-              <a
-                key={item.label}
-                href="#"
-                className="flex items-center w-full p-3 text-white hover:text-indigo-600 hover:bg-indigo-50 rounded-[15px] transition-all duration-200 group"
-              >
-                <item.icon className="w-5 h-5 mr-3 text-current" />
-                <span className="text-sm font-medium">{item.label}</span>
-              </a>
-            ))}
-          </nav>
+    const newInvoice: Invoice = {
+      id: `INV-${newActivity.id}`,
+      invoiceNumber: `INV-${newActivity.id}`,
+      customerName: user?.name || 'Customer',
+      businessName: 'Afritrade',
+      activity: newActivity,
+      invoiceDate: newActivity.date,
+      dueDate: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString().split('T')[0],
+      totalAmount: newActivity.amount,
+      status: 'Pending',
+      items: [{
+        description: `${data.description}`,
+        quantity: 1,
+        unitPrice: newActivity.amount,
+        total: newActivity.amount
+      }],
+      taxRate: 0.16
+    };
 
-          {/* Create Consignment button */}
-          <button
-            className="w-full mt-4 mb-14 bg-indigo-600 text-white p-3 rounded-[15px] flex items-center justify-center hover:bg-indigo-700 transition-colors"
+    // Update activities and invoices
+    setActivities(prev => [newActivity, ...prev]);
+    setInvoices(prev => [newInvoice, ...prev]);
+    
+    // Close modal
+    setIsRequestModalOpen(false);
+  };
+
+  // Create Request Modal Component
+  const CreateRequestModal = () => {
+    const { 
+      control, 
+      handleSubmit, 
+      formState: { errors }, 
+      reset 
+    } = useForm<RequestFormData>({
+      resolver: zodResolver(RequestSchema),
+      defaultValues: {
+        category: 'Order',
+        description: '',
+        amount: 0
+      }
+    });
+
+    const onSubmit = (data: RequestFormData) => {
+      createNewRequest(data);
+      reset();
+    };
+
+    return (
+      <AnimatePresence>
+        {isRequestModalOpen && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
           >
-            {user ? (
-              <div className="flex items-center">
-                {user.name && (
-                  <div className="w-8 h-8 rounded-full bg-white text-indigo-600 flex items-center justify-center mr-2 font-bold">
-                    {user.name.charAt(0).toUpperCase()}
-                  </div>
-                )}
-                <span className="font-medium">{user.name || 'Create Consignment'}</span>
-              </div>
-            ) : (
-              <>
-                <FaBox className="w-5 h-5 mr-2" />
-                <span className="font-medium">Create Consignment</span>
-              </>
-            )}
-          </button>
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-8 relative">
+              <button 
+                onClick={() => setIsRequestModalOpen(false)}
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+              >
+                <HeroIcons.XMarkIcon className="h-6 w-6" />
+              </button>
 
-          {/* Pro upgrade card */}
-          <div className="p-4 bg-indigo-600 rounded-[15px] text-center text-white">
-            {/* ... existing Pro card content ... */}
-          </div>
-        </aside>
+              <h2 className="text-2xl font-bold mb-6 text-gray-800 flex items-center">
+                Create New Request
+              </h2>
 
-        {/* Main content */}
-        <main className="flex-1 p-8 ml-64">
-          <header className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-            <p className="mt-1 text-sm text-gray-600">
-              Welcome, {user?.name || 'Wangata'}
-            </p>
-          </header>
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Category
+                  </label>
+                  <Controller
+                    name="category"
+                    control={control}
+                    render={({ field }) => (
+                      <select 
+                        {...field}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                      >
+                        <option value="Order">Order</option>
+                        <option value="Shipment">Shipment</option>
+                        <option value="Payment">Payment</option>
+                      </select>
+                    )}
+                  />
+                </div>
 
-          {/* Quick Actions */}
-          <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <button
-              onClick={() => setIsUploadModalOpen(true)}
-              className="bg-blue-500 text-white p-4 rounded-lg shadow hover:shadow-lg transition duration-300 flex items-center justify-center"
-            >
-              <FaUpload className="mr-2" />
-              Upload Documents
-            </button>
-            <button
-              className="bg-green-500 text-white p-4 rounded-lg shadow hover:shadow-lg transition duration-300 flex items-center justify-center"
-            >
-              <FaPlus className="mr-2" />
-              Create Request
-            </button>
-            <button
-              onClick={downloadActivitiesReport}
-              className="bg-yellow-500 text-white p-4 rounded-lg shadow hover:shadow-lg transition duration-300 flex items-center justify-center"
-            >
-              <FaDownload className="mr-2" />
-              Download Report
-            </button>
-            <button
-              className="bg-purple-500 text-white p-4 rounded-lg shadow hover:shadow-lg transition duration-300 flex items-center justify-center"
-            >
-              <FaBox className="mr-2" />
-              Create Consignment
-            </button>
-          </section>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Description
+                  </label>
+                  <Controller
+                    name="description"
+                    control={control}
+                    render={({ field }) => (
+                      <input 
+                        {...field}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                        placeholder="Enter request description"
+                      />
+                    )}
+                  />
+                  {errors.description && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.description.message}
+                    </p>
+                  )}
+                </div>
 
-          {/* Orders Database */}
-          <section className="bg-white p-6 rounded-lg shadow-md mb-8">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">Orders Database</h2>
-              <span className="text-red-500 font-medium">5 pending consignments</span>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Amount
+                  </label>
+                  <Controller
+                    name="amount"
+                    control={control}
+                    render={({ field: { onChange, ...field } }) => (
+                      <input 
+                        {...field}
+                        type="number"
+                        onChange={(e) => onChange(Number(e.target.value))}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                        placeholder="Enter amount"
+                      />
+                    )}
+                  />
+                  {errors.amount && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.amount.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex justify-end space-x-4 pt-4">
+                  <button 
+                    type="button"
+                    onClick={() => setIsRequestModalOpen(false)}
+                    className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit"
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center"
+                  >
+                    <FaClipboardCheck className="h-5 w-5 mr-2" />
+                    Create Request
+                  </button>
+                </div>
+              </form>
             </div>
-            <div className="h-64 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={orderData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Area type="monotone" dataKey="orders" stroke="#8884d8" fill="#8884d8" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </section>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    );
+  };
 
-          {/* Analytic View */}
-          <section className="bg-white p-6 rounded-lg shadow-md mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Analytic View</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={orderData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
+  const updateActivityStatus = (
+    activityId: string, 
+    newStatus: ActivityStatus
+  ) => {
+    setActivities(prevActivities => 
+      prevActivities.map(activity => 
+        activity.id === activityId 
+          ? { ...activity, status: newStatus } 
+          : activity
+      )
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 text-gray-800">
+      <div className="container mx-auto px-4 pt-20 space-y-6">
+        {/* Insights Section */}
+        {renderInsightsSection()}
+
+        {/* Main Dashboard Content */}
+        <div className="grid grid-cols-12 gap-4">
+          {/* Sidebar */}
+          <aside className="col-span-2">
+            {navItems.map((item) => (
+              <button 
+                key={item.label} 
+                onClick={item.action}
+                className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-colors group"
+              >
+                <item.icon className="text-base text-gray-600 group-hover:text-blue-600 transition-colors" />
+                <span className="text-sm font-medium">{item.label}</span>
+              </button>
+            ))}
+          </aside>
+
+          {/* Main Content */}
+          <main className="col-span-10 space-y-6">
+            {/* Quick Action Cards */}
+            <section className="grid grid-cols-4 gap-4">
+              {[
+                { 
+                  icon: FaUpload, 
+                  label: 'Upload', 
+                  color: 'bg-blue-500', 
+                  action: () => setIsUploadModalOpen(true) 
+                },
+                { 
+                  icon: FaPlus, 
+                  label: 'Create Request', 
+                  color: 'bg-green-500',
+                  action: () => setIsRequestModalOpen(true)
+                },
+                { 
+                  icon: FaDownload, 
+                  label: 'Download Report', 
+                  color: 'bg-yellow-500', 
+                  action: downloadActivitiesReport 
+                },
+                { 
+                  icon: FaBox, 
+                  label: 'Create Consignment', 
+                  color: 'bg-purple-500', 
+                  action: createConsignmentHandler 
+                }
+              ].map((card) => (
+                <button 
+                  key={card.label}
+                  onClick={card.action}
+                  className={`${card.color} text-white p-4 rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all flex flex-col items-center justify-center space-y-2`}
+                >
+                  <card.icon className="text-2xl" />
+                  <span className="text-sm font-medium">{card.label}</span>
+                </button>
+              ))}
+            </section>
+
+            {/* Analytics Section - Modern Card Design */}
+            <div className="grid grid-cols-2 gap-4">
+              {/* Orders Chart */}
+              <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-5">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-semibold">Order Trends</h2>
+                  <span className="text-sm text-red-500">5 Pending</span>
+                </div>
+                <ResponsiveContainer width="100%" height={250}>
+                  <AreaChart data={orderData}>
+                    <defs>
+                      <linearGradient id="colorOrders" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <XAxis dataKey="month" axisLine={false} tickLine={false} />
+                    <YAxis axisLine={false} tickLine={false} />
                     <Tooltip />
-                    <Bar dataKey="orders" fill="#82ca9d" />
-                  </BarChart>
+                    <Area 
+                      type="monotone" 
+                      dataKey="orders" 
+                      stroke="#3b82f6" 
+                      fillOpacity={1} 
+                      fill="url(#colorOrders)" 
+                    />
+                  </AreaChart>
                 </ResponsiveContainer>
               </div>
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
+
+              {/* Category Distribution */}
+              <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-5">
+                <h2 className="text-xl font-semibold mb-4">Category Distribution</h2>
+                <ResponsiveContainer width="100%" height={250}>
                   <PieChart>
                     <Pie
                       data={categoryData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={80}
+                      innerRadius={60}
+                      outerRadius={90}
                       fill="#8884d8"
+                      paddingAngle={5}
                       dataKey="value"
                     >
                       {categoryData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        <Cell 
+                          key={`cell-${index}`} 
+                          fill={COLORS[index % COLORS.length]} 
+                          className="hover:opacity-80 transition-opacity"
+                        />
                       ))}
                     </Pie>
                     <Tooltip />
@@ -271,51 +951,100 @@ export default function Dashboard() {
                 </ResponsiveContainer>
               </div>
             </div>
-          </section>
 
-          {/* Recent Activities */}
-          <section className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Recent Activities</h2>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-gray-50">
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {activities.map((activity) => (
-                    <tr key={activity.id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{activity.id}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{activity.category}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{activity.date}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          activity.status === 'Completed' ? 'bg-green-100 text-green-800' :
-                          activity.status === 'In Transit' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-red-100 text-red-800'
-                        }`}>
-                          {activity.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${activity.amount}</td>
+            {/* Enhanced Recent Activities with More Context */}
+            <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-5">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold flex items-center">
+                  Recent Activities
+                  <ContextualHelp 
+                    content="This section shows your most recent business activities, including orders, shipments, and payments." 
+                  />
+                </h2>
+                <button 
+                  onClick={() => setShowAllInvoices(!showAllInvoices)}
+                  className="text-base text-blue-500 hover:text-blue-700 transition-colors"
+                >
+                  {showAllInvoices ? 'Show Recent' : 'View All'}
+                </button>
+              </div>
+              
+              <div className="overflow-x-auto">
+                <table className="w-full text-base">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      {['Order ID', 'Category', 'Date', 'Status', 'Amount', 'Action'].map((header) => (
+                        <th 
+                          key={header} 
+                          className="px-4 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          {header}
+                        </th>
+                      ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {activities.map((activity) => {
+                      // Ensure an invoice exists, create one if not
+                      const correspondingInvoice = invoices.find(
+                        inv => inv.activity?.id === activity.id
+                      ) || generateInvoice(activity, user);
+
+                      return (
+                        <tr 
+                          key={activity.id} 
+                          className="hover:bg-gray-50 transition-colors border-b last:border-b-0"
+                        >
+                          <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{activity.id}</td>
+                          <td className="px-4 py-3 whitespace-nowrap text-base text-gray-500">{activity.category}</td>
+                          <td className="px-4 py-3 whitespace-nowrap text-base text-gray-500">{activity.date}</td>
+                          <td className="px-4 py-3 whitespace-nowrap text-base text-gray-500">
+                            <StatusBadge 
+                              status={activity.status as ActivityStatus}
+                              onChange={(newStatus) => 
+                                updateActivityStatus(activity.id, newStatus)
+                              }
+                            />
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap text-base text-gray-500">${activity.amount}</td>
+                          <td className="px-4 py-3 whitespace-nowrap text-base text-gray-500 space-x-2">
+                            <InvoiceViewButton 
+                              onClick={() => viewInvoiceDetails(correspondingInvoice)}
+                              hasInvoice={true} // Always true now
+                            />
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </section>
-        </main>
+          </main>
+        </div>
       </div>
-      <Footer />
+
+      {/* Modals */}
       <UploadModal 
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}
       />
+      <InvoiceDetailModal 
+        invoice={selectedInvoice || {} as Invoice} 
+        isOpen={isInvoiceModalOpen}
+        onClose={() => {
+          setIsInvoiceModalOpen(false);
+          setSelectedInvoice(null);
+        }}
+      />
+      <ConsignmentCreationModal />
+      <CreateRequestModal />
     </div>
   );
 }
+// Utility Functions
+function calculateAverageProcessingTime(activities: Activity[]): number {
+  // Implement logic to calculate average processing time
+  return activities.length * 0.5; // Placeholder
+}
+

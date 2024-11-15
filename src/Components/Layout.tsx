@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { GiAfrica } from 'react-icons/gi';
 // import NavItem from './NavItem';
 
@@ -7,17 +8,33 @@ interface LayoutProps {
 }
 
 export default function Layout({ children }: LayoutProps) {
+  const navigate = useNavigate();
+
   return (
     <div className="flex flex-col min-h-screen">
       <nav className="fixed top-0 left-0 right-0 flex items-center justify-between px-40 py-4 bg-white bg-opacity-80 backdrop-blur-sm z-20">
         <div className="flex items-center w-1/4">
-          <GiAfrica className="text-2xl text-orange-500 mr-2" />
-          <span className="text-xl font-bold text-gray-700">AfriTrade-Xchange</span>
+          <div 
+            className="logo cursor-pointer" 
+            onClick={() => navigate('/')}
+          >
+            <GiAfrica className="text-2xl text-orange-500 mr-2" />
+          </div>
+          <span 
+            className="text-xl font-bold text-gray-700 cursor-pointer"
+            onClick={() => navigate('/')}
+          >
+            AfriTrade-Xchange
+          </span>
         </div>
         <div className="flex justify-center items-center space-x-8 w-1/2">
-          {/* Temporarily replace NavItem components with simple anchors */}
           <a href="/trader-signup">I'm a Trader</a>
-          <a href="#">I'm a Customs Officer</a>
+          <button 
+            onClick={() => navigate('/trader-signup')} 
+            className="hover:text-orange-500"
+          >
+            I'm a Customs Officer
+          </button>
           <a href="#">Company</a>
           <a href="#">Tracking</a>
         </div>

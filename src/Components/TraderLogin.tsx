@@ -3,11 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaGoogle } from 'react-icons/fa';
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { z } from 'zod';
-
 import Layout from './Layout';
 import Footer from './Footer';
-import { auth } from '../../firebase/firebaseConfig';
-import { loginUser, UserRole } from '../../firebase/authService';
+import { auth } from '../firebase/firebaseConfig';
+import { loginUser, UserRole } from '../firebase/authService';
 
 const LoginSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -52,7 +51,10 @@ export default function TraderLogin() {
       return {};
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return error.flatten().fieldErrors;
+        return Object.fromEntries(
+          Object.entries(error.flatten().fieldErrors)
+            .map(([key, value]) => [key, value?.[0] || ''])
+        ) as Record<string, string>;
       }
       return {};
     }
@@ -177,7 +179,7 @@ export default function TraderLogin() {
                   id="email-input"
                   aria-label="Email Address"
                   aria-required="true"
-                  aria-invalid={formState.errors.email ? true : false}
+                  aria-invalid={formState.errors.email ? 'true' : 'false'}
                   aria-describedby="email-error"
                   name="email"
                   value={formState.data.email}

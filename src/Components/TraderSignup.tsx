@@ -17,10 +17,29 @@ export default function TraderSignup() {
     password: '',
     confirmPassword: '',
   });
+  const [formState, setFormState] = useState({
+    data: formData,
+    errors: {},
+    isLoading: false
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prevData => ({ ...prevData, [name]: value }));
+  };
+
+  const validateForm = () => {
+    const errors: { [key: string]: string } = {};
+
+    if (formData.password !== formData.confirmPassword) {
+      errors.confirmPassword = 'Passwords do not match';
+    }
+
+    if (formData.password.length < 6) {
+      errors.password = 'Password must be at least 6 characters';
+    }
+
+    return errors;
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {

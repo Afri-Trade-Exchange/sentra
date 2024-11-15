@@ -8,7 +8,7 @@ import "slick-carousel/slick/slick-theme.css"
 import { FaFacebookF, FaLinkedinIn, FaInstagram } from 'react-icons/fa'
 import { MdEmail, MdPhone, MdLocationOn } from 'react-icons/md'
 import TraderSignup from './Components/TraderSignup'
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Routes, Link, useNavigate } from 'react-router-dom'
 import ContactPage from './Components/ContactPage'
 import Layout from './Components/Layout'
 import Navbar from './Components/Navbar'
@@ -18,6 +18,12 @@ import { useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { FaShip, FaTruck, FaWarehouse, FaBoxOpen } from 'react-icons/fa';
 import CustomsDashboard from './Components/CustomsDashboard';
+
+// Define an interface for the activity type
+interface Activity {
+  id: number;
+  description: string;
+}
 
 export default function App() {
   return (
@@ -44,6 +50,7 @@ export default function App() {
 }
 
 function LandingPage () {
+  const navigate = useNavigate();
   const settings = {
     dots: false,
     arrows: false,
@@ -72,15 +79,14 @@ function LandingPage () {
   };
 
   const [orderNumber, setOrderNumber] = useState('');
-  const [activities, setActivities] = useState([]);
+  const [activities, setActivities] = useState<Activity[]>([]);
 
-  const fetchActivities = (orderNumber: string) => {
-    // Placeholder implementation - replace with actual API call or logic
+  const fetchActivities = (orderNumber: string): Activity[] => {
+    // Placeholder implementation - will replace with actual API call or logic later
     return orderNumber ? [{ id: 1, description: `Activity for ${orderNumber}` }] : [];
   };
 
   const handleTrackClick = () => {
-    // Implement tracking logic here
     console.log("Tracking:", orderNumber);
     const activities = fetchActivities(orderNumber);
     setActivities(activities);
@@ -91,64 +97,85 @@ function LandingPage () {
   const y = useTransform(scrollYProgress, [0, 0.5], [0, -50]);
 
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-800 font-['Comfortta'] flex flex-col relative overflow-hidden">
+    <div 
+      style={{ 
+        transform: `scale(${scale.get()}) translateY(${y.get()}px)` 
+      }}
+      className="min-h-screen bg-gray-100 text-gray-800 font-['Comfortaa'] flex flex-col relative overflow-hidden"
+    >
       {/* Floating Trade Icons */}
       <motion.div 
-        className="absolute top-20 left-10 z-0 opacity-20"
-        animate={{
+        style={{ scale }}
+        animate={{ 
           y: [0, 20, 0],
-          rotate: [0, 10, -10, 0]
+          x: [0, 10, -10, 0],
+          rotate: [0, 10, -10, 0],
+          opacity: [0.2, 0.3, 0.2]
         }}
         transition={{
           duration: 3,
           repeat: Infinity,
-          repeatType: "reverse"
+          repeatType: "reverse",
+          ease: "easeInOut"
         }}
+        className="absolute top-20 left-10 z-0"
       >
         <FaShip className="text-4xl text-orange-500" />
       </motion.div>
 
       <motion.div 
-        className="absolute top-1/3 right-10 z-0 opacity-20"
-        animate={{
+        initial={{ opacity: 0.2 }}
+        animate={{ 
           y: [0, -20, 0],
-          rotate: [0, -10, 10, 0]
+          scale: [1, 1.1, 1],
+          rotate: [0, -10, 10, 0],
+          opacity: [0.2, 0.3, 0.2]
         }}
         transition={{
           duration: 4,
           repeat: Infinity,
-          repeatType: "reverse"
+          repeatType: "reverse",
+          type: "tween"
         }}
+        className="absolute top-1/3 right-10 z-0"
       >
         <FaTruck className="text-4xl text-blue-500" />
       </motion.div>
 
       <motion.div 
-        className="absolute bottom-20 left-1/4 z-0 opacity-20"
-        animate={{
-          scale: [1, 1.1, 1],
-          rotate: [0, 5, -5, 0]
+        initial={{ opacity: 0.2 }}
+        animate={{ 
+          rotate: [0, 360],
+          scale: [1, 1.2, 1],
+          x: [0, 20, -20, 0],
+          opacity: [0.2, 0.3, 0.2]
         }}
         transition={{
-          duration: 3.5,
+          duration: 5,
           repeat: Infinity,
-          repeatType: "reverse"
+          repeatType: "loop",
+          ease: "circInOut"
         }}
+        className="absolute bottom-20 left-1/4 z-0"
       >
         <FaWarehouse className="text-4xl text-green-500" />
       </motion.div>
 
       <motion.div 
-        className="absolute bottom-10 right-1/4 z-0 opacity-20"
-        animate={{
+        initial={{ opacity: 0.2 }}
+        animate={{ 
           y: [0, 15, -15, 0],
-          x: [0, 10, -10, 0]
+          x: [0, 10, -10, 0],
+          opacity: [0.2, 0.5, 0.2]
         }}
         transition={{
           duration: 4.5,
           repeat: Infinity,
-          repeatType: "reverse"
+          repeatType: "reverse",
+          type: "spring",
+          stiffness: 50
         }}
+        className="absolute bottom-10 right-1/4 z-0"
       >
         <FaBoxOpen className="text-4xl text-purple-500" />
       </motion.div>
@@ -212,7 +239,10 @@ function LandingPage () {
             <p className="text-gray-600 mb-6">
               Making customs processes faster and smoother for businesses across Africa.
             </p>
-            <button className="px-12 py-3 text-white bg-orange-500 rounded-[15px] hover:bg-orange-600">
+            <button 
+              onClick={() => navigate('/trader-signup')} 
+              className="px-12 py-3 text-white bg-orange-500 rounded-[15px] hover:bg-orange-600"
+            >
               Get Started
             </button>
           </div>
@@ -268,6 +298,16 @@ function LandingPage () {
             </div>
           </div>
         </section>
+        {activities.length > 0 && (
+          <div className="mt-4">
+            <h3 className="text-lg font-semibold">Order Activities:</h3>
+            {activities.map(activity => (
+              <div key={activity.id} className="text-gray-600">
+                {activity.description}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
       <footer className="bg-gradient-to-r from-gray-800 to-gray-900 text-white mt-auto relative z-10">
         <div className="container mx-auto px-6 py-12">
@@ -330,18 +370,6 @@ function LandingPage () {
           </div>
         </div>
       </footer>
-    </div>
-  )
-}
-
-function NavItem({ text, to }: { text: string; to?: string }) {
-  return (
-    <div className="cursor-pointer hover:text-orange-500 transition-colors">
-      {to ? (
-        <Link to={to}>{text}</Link>
-      ) : (
-        <span>{text}</span>
-      )}
     </div>
   )
 }

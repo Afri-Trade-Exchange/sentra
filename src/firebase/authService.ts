@@ -5,18 +5,21 @@ import { doc, setDoc, getDoc } from 'firebase/firestore';
 // Define user roles
 export type UserRole = 'trader' | 'customs';
 
-// Update login function to return role
-export const loginUser = async (userData: {
+// Update the loginUser function type definition
+export type LoginUserParams = {
   email: string;
   password: string;
   name: string;
-}) => {
+  role: UserRole;
+};
+
+export async function loginUser(params: LoginUserParams) {
   try {
     // Sign in the user
     const userCredential = await signInWithEmailAndPassword(
       auth, 
-      userData.email, 
-      userData.password
+      params.email, 
+      params.password
     );
     
     // Fetch user document to get role
@@ -66,4 +69,11 @@ export const signupUser = async (userData: {
     console.error('Signup error:', error);
     throw error;
   }
+}; 
+
+// Keep only the email validation function for potential reuse
+export const isValidEmail = (email: string): boolean => {
+  // More comprehensive email regex that matches Firebase's validation
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return emailRegex.test(email.trim());
 }; 

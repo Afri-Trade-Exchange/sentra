@@ -1,75 +1,147 @@
-# AfriTradeXchange
+# 🌍 AfriTradeXchange
 
-## Project Overview
-AfriTradeXchange is a web application designed to streamline trade customs processes and reduce wait time by 50%
+## 📝 Project Overview
+AfriTradeXchange is an innovative web application designed to revolutionize trade customs processes across Africa, reducing wait times and streamlining invoice management for businesses.
 
-## Tech Stack
-- React
+## 🚀 Key Objectives
+- Reduce trade processing time by 50%
+- Simplify cross-border invoice management
+- Provide real-time tracking of trade documents
+
+## 🛠 Tech Stack
+### Frontend
+- React (v18+)
 - TypeScript
 - Vite
-- [Add any other key technologies]
+- React Router
+- Tailwind CSS
 
-## Prerequisites
+### State Management
+- Redux Toolkit
+- React Query
+
+### Authentication
+- Firebase Authentication
+- JWT Token Management
+
+## 💻 Development Environment
+
+### Prerequisites
 - Node.js (v18+ recommended)
-- npm or yarn
+- npm (v8+) or yarn (v1.22+)
+- Git
 
-## Getting Started
+### Local Setup
 
-### 1. Clone the Repository
+#### 1. Clone the Repository
 ```bash
+# HTTPS
 git clone https://github.com/[your-username]/AfriTradeXchange.git
+
+# SSH
+git clone git@github.com:[your-username]/AfriTradeXchange.git
+
 cd AfriTradeXchange
 ```
 
-### 2. Install Dependencies
+#### 2. Install Dependencies
 ```bash
+# Using npm
 npm install
-# or
+
+# Using yarn
 yarn install
 ```
 
-### 3. Environment Setup
-Create a `.env` file in the root directory with the following variables:
-- `VITE_API_URL=`
-- `VITE_AUTH_TOKEN=`
+#### 3. Environment Configuration
+Create a `.env` file in the root directory:
+```bash
+# API Configuration
+VITE_API_URL=https://your-backend-api.com
+VITE_AUTH_TOKEN=your_auth_token
 
-### 4. Run the Application
+# Firebase Configuration
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+```
+
+#### 4. Run the Application
 ```bash
 # Development mode
 npm run dev
 # or
 yarn dev
 
-# Build for production
+# Production build
 npm run build
 yarn build
+
+# Run tests
+npm test
+yarn test
 ```
 
-## Project Structure
+## 📂 Project Structure
 ```
-src/
-├── Components/       # Reusable React components
-├── Pages/            # Page-level components
-├── Services/         # API and data fetching logic
-├── Types/            # TypeScript type definitions
-├── Utils/            # Utility functions
-└── Assets/           # Static assets
+AfriTradeXchange/
+├── src/
+│   ├── Components/       # Reusable React components
+│   ├── Pages/            # Page-level components
+│   ├── Services/         # API and data fetching logic
+│   ├── Types/            # TypeScript type definitions
+│   ├── Utils/            # Utility functions
+│   ├── Hooks/            # Custom React hooks
+│   ├── Context/          # React context providers
+│   └── Assets/           # Static assets
+├── tests/                # Unit and integration tests
+├── public/               # Public assets
+└── config/               # Configuration files
 ```
 
-## Key Features
-- Invoice Management
-- User Authentication
-- [List other main features]
+## ✨ Key Features
+- 📄 Invoice Management System
+- 🔐 Secure User Authentication
+- 📊 Real-time Trade Tracking
+- 💱 Multi-currency Support
+- 📈 Detailed Analytics Dashboard
+- 
 
-## Contributing
+## 🤝 Contributing Guidelines
+
+### Branch Strategy
+- `main`: Stable production code
+- `develop`: Active development branch
+- `feature/`: New feature branches
+- `bugfix/`: Bug resolution branches
+
+### Contribution Steps
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+2. Create a feature branch 
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+3. Commit changes with descriptive messages
+   ```bash
+   git commit -m "feat: Add user authentication flow"
+   ```
+4. Push to your branch
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+5. Open a Pull Request to `develop` branch
 
-## Design Reference
-Figma Design: [Figma Link](https://www.figma.com/design/vlRSgTtDI16oqmczgsBs9N/AfriTradeXchange)
+### Code Quality
+- Follow TypeScript best practices
+- Write unit tests for new features
+- Ensure code passes linting checks
+- Maintain consistent code formatting
 
-## License
+## 🔍 Design Reference
+- **Figma Design**: [AfriTradeXchange Design](https://www.figma.com/design/vlRSgTtDI16oqmczgsBs9N/AfriTradeXchange)
+
+## 📜 License
 [Specify your license, e.g., MIT]
+
+## 📞 Support
+For issues or questions, please open a GitHub issue or contact martinwangata@gmail.com

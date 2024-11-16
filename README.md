@@ -1,58 +1,147 @@
-<<<<<<< HEAD
+# 🌍 AfriTradeXchange
 
-Figma File:
-https://www.figma.com/design/vlRSgTtDI16oqmczgsBs9N/AfriTradeXchange?node-id=0-1&t=LkLTt0aIYJZgZITL-0
+## 📝 Project Overview
+AfriTradeXchange is an innovative web application designed to revolutionize trade customs processes across Africa, reducing wait times and streamlining invoice management for businesses.
 
-# Afritrade-Xchange
-=======
-# React + TypeScript + Vite
+## 🚀 Key Objectives
+- Reduce trade processing time by 50%
+- Simplify cross-border invoice management
+- Provide real-time tracking of trade documents
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 🛠 Tech Stack
+### Frontend
+- React (v18+)
+- TypeScript
+- Vite
+- React Router
+- Tailwind CSS
 
-Currently, two official plugins are available:
+### State Management
+- Redux Toolkit
+- React Query
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Authentication
+- Firebase Authentication
+- JWT Token Management
 
-## Expanding the ESLint configuration
+## 💻 Development Environment
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Prerequisites
+- Node.js (v18+ recommended)
+- npm (v8+) or yarn (v1.22+)
+- Git
 
-- Configure the top-level `parserOptions` property like this:
+### Local Setup
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+#### 1. Clone the Repository
+```bash
+# HTTPS
+git clone https://github.com/[your-username]/AfriTradeXchange.git
+
+# SSH
+git clone git@github.com:[your-username]/AfriTradeXchange.git
+
+cd AfriTradeXchange
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+#### 2. Install Dependencies
+```bash
+# Using npm
+npm install
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+# Using yarn
+yarn install
 ```
->>>>>>> 6d1fe16 (landing page with subtle trade-themed background)
+
+#### 3. Environment Configuration
+Create a `.env` file in the root directory:
+```bash
+# API Configuration
+VITE_API_URL=https://your-backend-api.com
+VITE_AUTH_TOKEN=your_auth_token
+
+# Firebase Configuration
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+```
+
+#### 4. Run the Application
+```bash
+# Development mode
+npm run dev
+# or
+yarn dev
+
+# Production build
+npm run build
+yarn build
+
+# Run tests
+npm test
+yarn test
+```
+
+## 📂 Project Structure
+```
+AfriTradeXchange/
+├── src/
+│   ├── Components/       # Reusable React components
+│   ├── Pages/            # Page-level components
+│   ├── Services/         # API and data fetching logic
+│   ├── Types/            # TypeScript type definitions
+│   ├── Utils/            # Utility functions
+│   ├── Hooks/            # Custom React hooks
+│   ├── Context/          # React context providers
+│   └── Assets/           # Static assets
+├── tests/                # Unit and integration tests
+├── public/               # Public assets
+└── config/               # Configuration files
+```
+
+## ✨ Key Features
+- 📄 Invoice Management System
+- 🔐 Secure User Authentication
+- 📊 Real-time Trade Tracking
+- 💱 Multi-currency Support
+- 📈 Detailed Analytics Dashboard
+- 
+
+## 🤝 Contributing Guidelines
+
+### Branch Strategy
+- `main`: Stable production code
+- `develop`: Active development branch
+- `feature/`: New feature branches
+- `bugfix/`: Bug resolution branches
+
+### Contribution Steps
+1. Fork the repository
+2. Create a feature branch 
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+3. Commit changes with descriptive messages
+   ```bash
+   git commit -m "feat: Add user authentication flow"
+   ```
+4. Push to your branch
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+5. Open a Pull Request to `develop` branch
+
+### Code Quality
+- Follow TypeScript best practices
+- Write unit tests for new features
+- Ensure code passes linting checks
+- Maintain consistent code formatting
+
+## 🔍 Design Reference
+- **Figma Design**: [AfriTradeXchange Design](https://www.figma.com/design/vlRSgTtDI16oqmczgsBs9N/AfriTradeXchange)
+
+## 📜 License
+[Specify your license, e.g., MIT]
+
+## 📞 Support
+For issues or questions, please open a GitHub issue or contact martinwangata@gmail.com

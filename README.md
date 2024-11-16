@@ -1,58 +1,75 @@
-<<<<<<< HEAD
+# AfriTradeXchange
 
-Figma File:
-https://www.figma.com/design/vlRSgTtDI16oqmczgsBs9N/AfriTradeXchange?node-id=0-1&t=LkLTt0aIYJZgZITL-0
+## Project Overview
+AfriTradeXchange is a web application designed to streamline trade customs processes and reduce wait time by 50%
 
-# Afritrade-Xchange
-=======
-# React + TypeScript + Vite
+## Tech Stack
+- React
+- TypeScript
+- Vite
+- [Add any other key technologies]
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Prerequisites
+- Node.js (v18+ recommended)
+- npm or yarn
 
-Currently, two official plugins are available:
+## Getting Started
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 1. Clone the Repository
+```bash
+git clone https://github.com/[your-username]/AfriTradeXchange.git
+cd AfriTradeXchange
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+### 2. Install Dependencies
+```bash
+npm install
+# or
+yarn install
 ```
->>>>>>> 6d1fe16 (landing page with subtle trade-themed background)
+
+### 3. Environment Setup
+Create a `.env` file in the root directory with the following variables:
+- `VITE_API_URL=`
+- `VITE_AUTH_TOKEN=`
+
+### 4. Run the Application
+```bash
+# Development mode
+npm run dev
+# or
+yarn dev
+
+# Build for production
+npm run build
+yarn build
+```
+
+## Project Structure
+```
+src/
+├── Components/       # Reusable React components
+├── Pages/            # Page-level components
+├── Services/         # API and data fetching logic
+├── Types/            # TypeScript type definitions
+├── Utils/            # Utility functions
+└── Assets/           # Static assets
+```
+
+## Key Features
+- Invoice Management
+- User Authentication
+- [List other main features]
+
+## Contributing
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## Design Reference
+Figma Design: [Figma Link](https://www.figma.com/design/vlRSgTtDI16oqmczgsBs9N/AfriTradeXchange)
+
+## License
+[Specify your license, e.g., MIT]

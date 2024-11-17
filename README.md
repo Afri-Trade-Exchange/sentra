@@ -169,7 +169,7 @@ SOFTWARE.
 - Features may be incomplete or subject to change
 - Bugs and issues are expected
 - Data persistence and stability are not guaranteed
-- Production use is at your own risk
+- Not ready for production
 
 ## 📞 Support
 For issues or questions, please open a GitHub issue or contact martinwangata@gmail.com

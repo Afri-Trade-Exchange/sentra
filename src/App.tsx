@@ -222,18 +222,17 @@ function LandingPage () {
             </button>
           </div>
           <div className="text-center mt-3">
-            <a href="./src/assets/components/contact" className="text-sm text-gray-600 hover:text-orange-500">Need Help?</a>
+            <a href="./contact" className="text-sm text-gray-600 hover:text-orange-500">Need Help?</a>
           </div>
         </div>
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="md:w-1/2 mb-8 md:mb-0">
             <h2 className="text-orange-500 text-xl mb-2">Digital Trade, Simplified</h2>
             <h1 className="text-5xl font-bold mb-4 leading-tight">
-              Streamline African trade,<br />
-              Eliminate customs delays<br />
-              with our <span className="text-orange-500">digital solutions</span><br />
-              faster, smoother<br />
-              transactions.
+              Streamline trade, cut customs processes by <span className="text-orange-500">50%</span> <br />
+               with our <span className="text-orange-500">digital solutions</span><br />
+              Experience faster, more efficient
+              transactions for cross-border trade.
             </h1>
             <p className="text-gray-600 mb-6">
               Making customs processes faster and smoother for businesses across Africa.

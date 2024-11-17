@@ -1,5 +1,7 @@
 # 🌍 AfriTradeXchange
 
+> ⚠️ **BETA NOTICE**: This software is currently in beta and should be considered a Minimum Viable Product (MVP). While functional, it may contain bugs and features might change significantly during development. Use in production environments is not recommended at this stage.
+
 ## 📝 Project Overview
 AfriTradeXchange is an innovative web application designed to revolutionize trade customs processes across Africa, reducing wait times and streamlining invoice management for businesses.
 
@@ -141,7 +143,33 @@ AfriTradeXchange/
 - **Figma Design**: [AfriTradeXchange Design](https://www.figma.com/design/vlRSgTtDI16oqmczgsBs9N/AfriTradeXchange)
 
 ## 📜 License
-[Specify your license, e.g., MIT]
+MIT License
+
+Copyright (c) 2024 AfriTradeXchange
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+**Beta Software Disclaimer**: This software is provided as a Minimum Viable Product (MVP) and is still in beta testing phase. Users should be aware that:
+- Features may be incomplete or subject to change
+- Bugs and issues are expected
+- Data persistence and stability are not guaranteed
+- Production use is at your own risk
 
 ## 📞 Support
 For issues or questions, please open a GitHub issue or contact martinwangata@gmail.com

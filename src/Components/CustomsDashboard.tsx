@@ -21,6 +21,7 @@ import {
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement } from 'chart.js';
 import { Pie, Line } from 'react-chartjs-2';
 import Footer from './Footer';
+import { useAuth } from './AuthContext';
 
 // Register ChartJS components
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement);
@@ -73,7 +74,7 @@ interface NotificationType {
 
 // Add this near the top of the file where other interfaces are defined
 interface User {
-  displayName: string;
+  displayName: string | null;
 }
 
 // State Interface
@@ -414,8 +415,21 @@ const generateMockTimelineEvents = (): TimelineEvent[] => {
 };
 
 // Main Dashboard Component
+// Add to imports at top
+import { useNavigate } from 'react-router-dom';
+
 export const CustomsDashboard: React.FC = () => {
-  const user: User = { displayName: "John Doe" }; // Replace with actual user data
+  const { user, signOut } = useAuth();  // Add signOut from useAuth
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      navigate('/');  // Redirect to home page
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
   // Initial State Setup
   const initialState: DashboardState = {
@@ -946,13 +960,22 @@ export const CustomsDashboard: React.FC = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <div className="flex-grow px-6 py-8 max-w-7xl mx-auto w-full">
         {/* Header Section */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Welcome, {user.displayName}
-          </h1>
-          <p className="text-sm text-gray-600">
-            Manage and track customs declarations and documents
-          </p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              Welcome, {user?.displayName || user?.email?.split('@')[0] || 'Guest'}
+            </h1>
+            <p className="text-sm text-gray-600">
+              Manage and track customs declarations and documents
+            </p>
+          </div>
+          
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+          >
+            Logout
+          </button>
         </div>
 
         {/* Quick Actions */}

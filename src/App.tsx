@@ -17,6 +17,7 @@ import { useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { FaShip, FaTruck, FaWarehouse, FaBoxOpen } from 'react-icons/fa';
 import CustomsDashboard from './Components/CustomsDashboard';
+import { AuthProvider } from './Components/AuthContext';
 
 // Define an interface for the activity type
 interface Activity {
@@ -26,25 +27,27 @@ interface Activity {
 
 export default function App() {
   return (
-    <ErrorBoundary>
-      <Router>
-        <Suspense fallback={<div>Loading...</div>}>
-          <div className="App">
-            <Navbar />
-            <Layout>
-              <Routes>
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/trader-signup" element={<TraderSignup />} />
-                <Route path="/contact" element={<ContactPage />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/customs-dashboard" element={<CustomsDashboard />} />
-                {/* Add other routes as needed */}
-              </Routes>
-            </Layout>
-          </div>
-        </Suspense>
-      </Router>
-    </ErrorBoundary>
+    <AuthProvider>
+      <ErrorBoundary>
+        <Router>
+          <Suspense fallback={<div>Loading...</div>}>
+            <div className="App">
+              <Navbar />
+              <Layout>
+                <Routes>
+                  <Route path="/" element={<LandingPage />} />
+                  <Route path="/trader-signup" element={<TraderSignup />} />
+                  <Route path="/contact" element={<ContactPage />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/customs-dashboard" element={<CustomsDashboard />} />
+                  {/* Add other routes as needed */}
+                </Routes>
+              </Layout>
+            </div>
+          </Suspense>
+        </Router>
+      </ErrorBoundary>
+    </AuthProvider>
   )
 }
 

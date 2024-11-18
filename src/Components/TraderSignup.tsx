@@ -176,7 +176,7 @@ export default function TraderSignup() {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  placeholder="Enter Your Email"
+                  placeholder="johndoe@gmail.com"
                   className="w-full px-4 py-3 border border-gray-300 rounded-[15px] focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all duration-200"
                   required
                 />

@@ -415,17 +415,16 @@ const generateMockTimelineEvents = (): TimelineEvent[] => {
 };
 
 // Main Dashboard Component
-// Add to imports at top
 import { useNavigate } from 'react-router-dom';
 
 export const CustomsDashboard: React.FC = () => {
-  const { user, signOut } = useAuth();  // Add signOut from useAuth
+  const { user, signOut } = useAuth(); 
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
       await signOut();
-      navigate('/');  // Redirect to home page
+      navigate('/');  // Redirects to home page
     } catch (error) {
       console.error('Logout failed:', error);
     }
@@ -456,7 +455,7 @@ export const CustomsDashboard: React.FC = () => {
     timelineEvents: generateMockTimelineEvents()
   };
 
-  // Use Reducer for State Management
+  // Using Reducer for State Management
   const [state, dispatch] = useReducer(dashboardReducer, initialState);
 
   // Pagination Calculations

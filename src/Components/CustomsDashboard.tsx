@@ -955,6 +955,22 @@ export const CustomsDashboard: React.FC = () => {
     }
   }, [state.selectedItems]);
 
+  const updateActivityStatus = (activityId: string, newStatus: ActivityStatus) => {
+    // Ensure only customs can update the status
+    setActivities(prevActivities => 
+      prevActivities.map(activity => 
+        activity.id === activityId 
+          ? { ...activity, status: newStatus } 
+          : activity
+      )
+    );
+  };
+
+  // Add a button to approve the status
+<button onClick={() => updateActivityStatus(activity.id, 'Approved')}>
+  Approve
+</button>
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <div className="flex-grow px-6 py-8 max-w-7xl mx-auto w-full">

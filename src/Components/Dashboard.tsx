@@ -1001,12 +1001,11 @@ export default function Dashboard() {
                           <td className="px-4 py-3 whitespace-nowrap text-base text-gray-500">{activity.category}</td>
                           <td className="px-4 py-3 whitespace-nowrap text-base text-gray-500">{activity.date}</td>
                           <td className="px-4 py-3 whitespace-nowrap text-base text-gray-500">
-                            <StatusBadge 
-                              status={activity.status as ActivityStatus}
-                              onChange={(newStatus) => 
-                                updateActivityStatus(activity.id, newStatus)
-                              }
-                            />
+                            {activity.status === 'Approved' ? (
+                              <span className="text-green-500">{activity.status}</span>
+                            ) : (
+                              <span className="text-gray-500">Pending Approval</span>
+                            )}
                           </td>
                           <td className="px-4 py-3 whitespace-nowrap text-base text-gray-500">${activity.amount}</td>
                           <td className="px-4 py-3 whitespace-nowrap text-base text-gray-500 space-x-2">
@@ -1037,7 +1036,7 @@ export default function Dashboard() {
           invoiceNumber: '',
           customerName: '',
           businessName: '',
-          activity: {} as Activity,
+          activity: {} as Activity,                                                                                                                                               
           invoiceDate: '',
           dueDate: '',
           totalAmount: 0,

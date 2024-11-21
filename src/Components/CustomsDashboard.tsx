@@ -22,6 +22,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearSca
 import { Pie, Line } from 'react-chartjs-2';
 import Footer from './Footer';
 import { useAuth } from './AuthContext';
+import TraderDetailsModal from './TraderDetailsModal';
 
 // Register ChartJS components
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement);
@@ -44,6 +45,7 @@ enum ActivityStatus {
 interface Consignment {
   id: string;
   traderName: string;
+  traderEmail: string;
   documentType: string;
   status: ConsignmentStatus;
   uploadDate: Timestamp;
@@ -51,6 +53,8 @@ interface Consignment {
     declarationNumber?: string;
     description?: string;
     estimatedValue?: number;
+    goodsOrdered?: string[];
+    goodsStatus?: string;
   };
 }
 
@@ -234,28 +238,31 @@ const generateMockConsignments = (): Consignment[] => {
   const statuses = Object.values(ConsignmentStatus);
   const documentTypes = ['Import', 'Export', 'Transit'];
   const traderNames = [
-    'John Oludhe',
-    'Josephine Wangari',
-    'Charles Ouko',
-    'Diana Opiyo',
-    'Ethan Ouma',
-    'Fiona Njoki',
-    'George Kioko',
-    'Hannah Nduta',
-    'Ian Malcolm',
-    'Jessica Peters'
+    { name: 'John Oludhe', email: 'Oludhe@example.com' },
+    { name: 'Bob Smith', email: 'bob@example.com' },
+    { name: 'Cynthia Wanjiru', email: 'cynthia@example.com' },
+    { name: 'Diana Induli', email: 'diana@example.com' },
+    { name: 'Ethan Kajala', email: 'ethan@example.com' },
+    { name: 'Fiona Wangari', email: 'fiona@example.com' },
+    { name: 'George Ouko', email: 'george@example.com' },
+    { name: 'Hannah Aoko', email: 'hannah@example.com' },
+    { name: 'Ian Malcolm', email: 'ian@example.com' },
+    { name: 'Jessica Wambui', email: 'jessica@example.com' }
   ];
   
   return Array.from({ length: 20 }).map((_, index) => ({
     id: `consignment-${index + 1}`,
-    traderName: traderNames[index % traderNames.length],
+    traderName: traderNames[index % traderNames.length].name,
+    traderEmail: traderNames[index % traderNames.length].email,
     documentType: documentTypes[index % documentTypes.length],
     status: statuses[index % statuses.length] as ConsignmentStatus,
     uploadDate: Timestamp.now(),
     details: {
       declarationNumber: `DCL-${index + 1000}`,
       description: 'Commercial goods',
-      estimatedValue: Math.floor(Math.random() * 100000)
+      estimatedValue: Math.floor(Math.random() * 100000),
+      goodsOrdered: ['Item A', 'Item B', 'Item C'],
+      goodsStatus: 'In Transit'
     }
   }));
 };
@@ -496,11 +503,17 @@ export const CustomsDashboard: React.FC = () => {
   }, []);
 
   // Handler for selecting consignment details
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTrader, setSelectedTrader] = useState<{ name: string; email: string; goodsOrdered: string[]; goodsStatus: string } | null>(null);
+
   const handleViewDetails = useCallback((consignment: Consignment) => {
-    dispatch({
-      type: 'SELECT_CONSIGNMENT',
-      payload: consignment
+    setSelectedTrader({
+      name: consignment.traderName,
+      email: consignment.traderEmail,
+      goodsOrdered: consignment.details?.goodsOrdered || [],
+      goodsStatus: consignment.details?.goodsStatus || ''
     });
+    setIsModalOpen(true);
   }, []);
 
   // Enhanced Search Input Component
@@ -1106,6 +1119,15 @@ export const CustomsDashboard: React.FC = () => {
 
       {/* Footer */}
       <Footer />
+
+      <TraderDetailsModal
+        traderName={selectedTrader?.name || ''}
+        traderEmail={selectedTrader?.email || ''}
+        goodsOrdered={selectedTrader?.goodsOrdered || []}
+        goodsStatus={selectedTrader?.goodsStatus || ''}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 };

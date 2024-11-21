@@ -43,7 +43,7 @@ const TraderDetailsModal: React.FC<TraderDetailsModalProps> = ({
           title="Select the status of goods" 
           className={`mt-2 mb-4 p-2 border rounded ${status === 'delivered' ? 'bg-green-200' : status === 'pending' ? 'bg-yellow-200' : 'bg-gray-200'}`}
         >
-          <option value="intransit">In Transit</option>
+          <option value="in_transit">In Transit</option>
           <option value="delivered">Delivered</option>
           <option value="pending">Pending</option>
         </select>

@@ -33,6 +33,13 @@ enum ConsignmentStatus {
   Rejected = 'Rejected'
 }
 
+// Add this enum definition
+enum ActivityStatus {
+  Pending = 'Pending',
+  Completed = 'Completed',
+  Failed = 'Failed'
+}
+
 // Interfaces
 interface Consignment {
   id: string;
@@ -226,10 +233,22 @@ const filterConsignments = (
 const generateMockConsignments = (): Consignment[] => {
   const statuses = Object.values(ConsignmentStatus);
   const documentTypes = ['Import', 'Export', 'Transit'];
+  const traderNames = [
+    'John Oludhe',
+    'Josephine Wangari',
+    'Charles Ouko',
+    'Diana Opiyo',
+    'Ethan Ouma',
+    'Fiona Njoki',
+    'George Kioko',
+    'Hannah Nduta',
+    'Ian Malcolm',
+    'Jessica Peters'
+  ];
   
   return Array.from({ length: 20 }).map((_, index) => ({
     id: `consignment-${index + 1}`,
-    traderName: `Trader ${index + 1}`,
+    traderName: traderNames[index % traderNames.length],
     documentType: documentTypes[index % documentTypes.length],
     status: statuses[index % statuses.length] as ConsignmentStatus,
     uploadDate: Timestamp.now(),

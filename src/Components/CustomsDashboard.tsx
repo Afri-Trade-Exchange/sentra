@@ -238,16 +238,16 @@ const generateMockConsignments = (): Consignment[] => {
   const statuses = Object.values(ConsignmentStatus);
   const documentTypes = ['Import', 'Export', 'Transit'];
   const traderNames = [
-    { name: 'John Oludhe', email: 'Oludhe@example.com' },
-    { name: 'Bob Smith', email: 'bob@example.com' },
-    { name: 'Cynthia Wanjiru', email: 'cynthia@example.com' },
-    { name: 'Diana Induli', email: 'diana@example.com' },
-    { name: 'Ethan Kajala', email: 'ethan@example.com' },
-    { name: 'Fiona Wangari', email: 'fiona@example.com' },
-    { name: 'George Ouko', email: 'george@example.com' },
-    { name: 'Hannah Aoko', email: 'hannah@example.com' },
-    { name: 'Ian Malcolm', email: 'ian@example.com' },
-    { name: 'Jessica Wambui', email: 'jessica@example.com' }
+    { name: 'John Oludhe', email: 'Oludhe@gmail.com' },
+    { name: 'Bob Smith', email: 'bob@gmail.com' },
+    { name: 'Cynthia Wanjiru', email: 'cynthia@gmail.com' },
+    { name: 'Diana Induli', email: 'diana@gmail.com' },
+    { name: 'Ethan Kajala', email: 'ethan@gmail.com' },
+    { name: 'Fiona Wangari', email: 'fiona@gmail.com' },
+    { name: 'George Ouko', email: 'george@gmail.com' },
+    { name: 'Hannah Aoko', email: 'hannah@gmail.com' },
+    { name: 'Ian Malcolm', email: 'ian@gmail.com' },
+    { name: 'Jessica Wambui', email: 'jessica@gmail.com' }
   ];
   
   return Array.from({ length: 20 }).map((_, index) => ({

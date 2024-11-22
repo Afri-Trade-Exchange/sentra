@@ -256,7 +256,7 @@ function LandingPage () {
           </div>
         </div>
         <div className="mt-16">
-          <h3 className="text-center text-xl text-gray-600 mb-6">Trusted by Leading Companies</h3>
+          <h3 className="text-center text-xl text-gray-600 mb-6">Trusted by Leading Logistics Companies</h3>
           <Slider {...settings}>
             <div className="px-2">
               <img src="/src/assets/images/acceler.png" alt="Acceler" className="h-12 mx-auto" />

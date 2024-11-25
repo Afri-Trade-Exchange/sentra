@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaFacebook, FaLinkedin, FaInstagram } from 'react-icons/fa';
+import { FaFacebook, FaLinkedin, FaInstagram, FaGooglePlay, FaApple } from 'react-icons/fa';
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -51,11 +51,15 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="text-white text-md font-semibold mb-4">Download Our App</h4>
             <div className="flex space-x-4">
-              <a href="https://play.google.com/store/apps/details?id=com.yourapp" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors duration-300">
-                <img src="/path/to/google-play-badge.png" alt="Download on Google Play" className="h-10" />
+              <a href="https://play.google.com/store/apps/details?id=com.yourapp" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors duration-300" aria-label="Download on Google Play">
+                <span aria-hidden="true">
+                  <FaGooglePlay className="h-10" />
+                </span>
               </a>
-              <a href="https://apps.apple.com/app/idyourappid" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors duration-300">
-                <img src="/path/to/app-store-badge.png" alt="Download on the App Store" className="h-10" />
+              <a href="https://apps.apple.com/app/idyourappid" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors duration-300" aria-label="Download on the App Store">
+                <span aria-hidden="true">
+                  <FaApple className="h-10" />
+                </span>
               </a>
             </div>
           </div>

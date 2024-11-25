@@ -4,7 +4,7 @@ import './index.css'
 import Slider from 'react-slick'
 import "slick-carousel/slick/slick.css"
 import "slick-carousel/slick/slick-theme.css"
-import { FaFacebookF, FaLinkedinIn, FaInstagram } from 'react-icons/fa'
+import { FaFacebookF, FaLinkedinIn, FaInstagram, FaApple, FaGooglePlay } from 'react-icons/fa'
 import { MdEmail, MdPhone, MdLocationOn } from 'react-icons/md'
 import TraderSignup from './Components/TraderSignup'
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom'
@@ -18,6 +18,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { FaShip, FaTruck, FaWarehouse, FaBoxOpen } from 'react-icons/fa';
 import CustomsDashboard from './Components/CustomsDashboard';
 import { AuthProvider } from './Components/AuthContext';
+
 
 // Define an interface for the activity type
 interface Activity {
@@ -348,6 +349,17 @@ function LandingPage () {
                 </li>
               </ul>
             </div>
+            <div>
+            <h4 className="text-white text-md font-semibold mb-4">Download Our App</h4>
+            <div className="flex space-x-4">
+              <a href="https://play.google.com/store/apps/details?id=com.yourapp" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors duration-300">
+                <FaGooglePlay className="h-10" />
+              </a>
+              <a href="https://apps.apple.com/app/idyourappid" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors duration-300">
+                <FaApple className="h-10" />
+              </a>
+            </div>
+          </div>
             <div>
               <h5 className="text-xl font-bold mb-4">Newsletter</h5>
               <p className="text-gray-300 mb-4">Stay updated with our latest news and offers.</p>

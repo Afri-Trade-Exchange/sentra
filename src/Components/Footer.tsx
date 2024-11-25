@@ -49,6 +49,17 @@ const Footer: React.FC = () => {
             </ul>
           </div>
           <div>
+            <h4 className="text-white text-md font-semibold mb-4">Download Our App</h4>
+            <div className="flex space-x-4">
+              <a href="https://play.google.com/store/apps/details?id=com.yourapp" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors duration-300">
+                <img src="/path/to/google-play-badge.png" alt="Download on Google Play" className="h-10" />
+              </a>
+              <a href="https://apps.apple.com/app/idyourappid" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors duration-300">
+                <img src="/path/to/app-store-badge.png" alt="Download on the App Store" className="h-10" />
+              </a>
+            </div>
+          </div>
+          <div>
             <h4 className="text-white text-md font-semibold mb-4">Contact Us</h4>
             <p className="text-sm mb-2">Email: info@afritradexchange.com</p>
             <p className="text-sm mb-2">Phone: +254 123 456 789</p>

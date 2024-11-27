@@ -282,12 +282,6 @@ export default function InvoiceDetailModal({
             allowTaint: true,
             backgroundColor: '#ffffff',
             imageTimeout: 15000,
-            onclone: (documentClone) => {
-              const imgs = documentClone.getElementsByTagName('img');
-              for (let i = 0; i < imgs.length; i++) {
-                imgs[i].crossOrigin = 'anonymous';
-              }
-            }
           });
 
           const imgData = canvas.toDataURL('image/png');

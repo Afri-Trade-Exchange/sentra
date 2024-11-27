@@ -84,9 +84,9 @@ interface NotificationType {
 }
 
 // Add this near the top of the file where other interfaces are defined
-interface User {
-  displayName: string | null;
-}
+// interface User {
+//   displayName: string | null;
+// }
 
 // State Interface
 interface DashboardState {
@@ -122,7 +122,8 @@ type DashboardAction =
   | { type: 'UPDATE_CONSIGNMENT_STATUS'; payload: { id: string; status: ConsignmentStatus } }
   | { type: 'SET_SELECTED_ITEMS'; payload: string[] }
   | { type: 'BULK_UPDATE_STATUS'; payload: { ids: string[]; status: ConsignmentStatus } }
-  | { type: 'TOGGLE_SELECTED_ITEM'; payload: string };
+  | { type: 'TOGGLE_SELECTED_ITEM'; payload: string }
+  | { type: 'UPDATE_ACTIVITY_STATUS'; payload: { activityId: string; newStatus: ActivityStatus } };
 
 // Reducer Function
 const dashboardReducer = (state: DashboardState, action: DashboardAction): DashboardState => {
@@ -988,20 +989,23 @@ export const CustomsDashboard: React.FC = () => {
   }, [state.selectedItems]);
 
   const updateActivityStatus = (activityId: string, newStatus: ActivityStatus) => {
-    // Ensure only customs can update the status
-    setActivities(prevActivities => 
-      prevActivities.map(activity => 
-        activity.id === activityId 
-          ? { ...activity, status: newStatus } 
-          : activity
-      )
-    );
+    dispatch({
+      type: 'UPDATE_ACTIVITY_STATUS',
+      payload: { activityId, newStatus }
+    });
   };
 
-  // Add a button to approve the status
-<button onClick={() => updateActivityStatus(activity.id, 'Approved')}>
-  Approve
-</button>
+  // Call updateActivityStatus when needed, for example, in a button click handler
+  const handleActivityStatusChange = (activityId: string, newStatus: ActivityStatus) => {
+    updateActivityStatus(activityId, newStatus);
+  };
+
+  // Example usage in a button click (add this where appropriate)
+  {state.activities.map(activity => (
+    <button key={activity.id} onClick={() => handleActivityStatusChange(activity.id, ActivityStatus.Completed)}>
+      Mark as Completed
+    </button>
+  ))}
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">

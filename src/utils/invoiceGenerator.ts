@@ -1,6 +1,7 @@
 import { format } from 'date-fns';
 import { v4 as uuidv4 } from 'uuid';
 import { Activity } from '../types/activity';
+import { InvoiceItem } from '../types/invoiceItem';
 
 export function generateInvoice(activity: Activity): Invoice {
   const taxRate = 0.16; // 16% tax rate(For Kenya)

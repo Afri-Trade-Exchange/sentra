@@ -104,7 +104,7 @@ function LandingPage () {
       style={{ 
         transform: `scale(${scale.get()}) translateY(${y.get()}px)` 
       }}
-      className="min-h-screen bg-gray-100 text-gray-800 font-['Comfortaa'] flex flex-col relative overflow-hidden"
+      className="min-h-screen bg-gray-100 text-gray-800 font-['Urbanist'] flex flex-col relative overflow-hidden"
     >
       {/* Floating Trade Icons */}
       <motion.div 

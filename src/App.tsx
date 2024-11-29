@@ -239,7 +239,7 @@ function LandingPage () {
               transactions for cross-border trade.
             </h1>
             <p className="text-gray-600 mb-6">
-              Making customs processes faster and smoother for businesses across Africa.
+              Making customs processes faster and smoother for businesses across the Globe.
             </p>
             <button 
               onClick={() => navigate('/trader-signup')} 

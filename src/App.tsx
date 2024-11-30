@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react'
+import { Suspense } from 'react'
 import { FiSearch } from 'react-icons/fi'
 import './index.css'
 import Slider from 'react-slick'

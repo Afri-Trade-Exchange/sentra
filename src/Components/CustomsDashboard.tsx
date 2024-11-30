@@ -23,6 +23,7 @@ import { Pie, Line } from 'react-chartjs-2';
 import Footer from './Footer';
 import { useAuth } from './AuthContext';
 import TraderDetailsModal from './TraderDetailsModal';
+import QrScanner from 'react-qr-scanner';
 
 // Register ChartJS components
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement);
@@ -1007,6 +1008,35 @@ export const CustomsDashboard: React.FC = () => {
     </button>
   ))}
 
+  // Add a new state for handling QR code data
+  const [qrData, setQrData] = useState<string | null>(null);
+
+  // QR Code Scanner Component
+  const QrCodeScanner: React.FC = () => {
+    const handleScan = (data: string | null) => {
+      if (data) {
+        setQrData(data); // Set the scanned QR code data
+        console.log('Scanned QR Code:', data); // Handle the scanned data
+      }
+    };
+
+    const handleError = (err: unknown) => {
+      console.error(err); // Handle any errors
+    };
+
+    return (
+      <div className="bg-white p-4 rounded-lg shadow-md">
+        <h3 className="text-lg font-semibold mb-2">Scan QR Code</h3>
+        <QrScanner
+          onError={handleError}
+          onScan={handleScan}
+          style={{ width: '100%' }}
+        />
+        {qrData && <p className="mt-2">Scanned Data: {qrData}</p>}
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <div className="flex-grow px-6 py-8 max-w-7xl mx-auto w-full">
@@ -1132,6 +1162,10 @@ export const CustomsDashboard: React.FC = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />
+
+      <div className="mb-8">
+        <QrCodeScanner />
+      </div>
     </div>
   );
 };

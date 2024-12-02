@@ -226,7 +226,7 @@ function LandingPage () {
             </button>
           </div>
           <div className="text-center mt-3">
-            <a href="./contact" className="text-sm text-gray-600 hover:text-orange-500">Need Help?</a>
+            <a href="./contact" className="text-sm text-gray-800 hover:text-orange-500">Need Help?</a>
           </div>
         </div>
         <div className="flex flex-col md:flex-row justify-between items-center">

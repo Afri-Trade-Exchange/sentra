@@ -117,10 +117,10 @@ export default function TraderLogin() {
       <div className="flex flex-col min-h-screen">
         <div className="flex-grow flex bg-gray-100">
           <div className="hidden lg:block w-1/2 bg-cover bg-center relative" style={{ backgroundImage: "url('./src/assets/images/paul.png')" }}>
-            <div className="absolute inset-0 bg-gradient-to-br from-orange-600 to-orange-900 bg-opacity-80 flex flex-col justify-center p-12 text-white">
+            <div className="absolute inset-0 bg-gradient-to-br from-teal-600 to-teal-900 bg-opacity-80 flex flex-col justify-center p-12 text-white">
               <h2 className="text-6xl font-bold mb-6 leading-tight">
                 Streamline Your <br />
-                <span className="text-orange-300">Customs Process</span>
+                <span className="text-teal-300">Customs Process</span>
               </h2>
               <p className="text-2xl mb-12 font-light">Unleash efficiency. Save time. Grow your business.</p>
               <blockquote className="bg-white bg-opacity-10 p-8 rounded-2xl shadow-lg backdrop-blur-sm">
@@ -131,7 +131,7 @@ export default function TraderLogin() {
                   <img src="./src/assets/images/paul.png" alt="Paul Ondiso" className="w-12 h-12 rounded-full mr-4" />
                   <div>
                     <p className="font-bold">Paul Ondiso</p>
-                    <p className="text-sm text-orange-300">Trader</p>
+                    <p className="text-sm text-teal-300">Trader</p>
                   </div>
                 </footer>
               </blockquote>
@@ -149,7 +149,7 @@ export default function TraderLogin() {
                     key={type}
                     className={`flex-1 py-3 px-4 rounded-[15px] text-sm font-medium transition-all duration-200 ${
                       uiState.accountType === type
-                        ? 'bg-orange-500 text-white shadow-md'
+                        ? 'bg-teal-500 text-white shadow-md'
                         : 'bg-transparent text-gray-600 hover:bg-gray-200'
                     } capitalize`}
                     onClick={() => setUiState(prev => ({ ...prev, accountType: type as UserRole }))}
@@ -200,7 +200,7 @@ export default function TraderLogin() {
                     value={formState.data.password}
                     onChange={handleInputChange}
                     placeholder="Password"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-[15px] focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all duration-200"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-[15px] focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-200"
                     required
                   />
                   <button
@@ -214,7 +214,7 @@ export default function TraderLogin() {
                 <button 
                   type="submit"
                   disabled={formState.isLoading}
-                  className="w-full bg-orange-500 text-white py-3 rounded-[15px] hover:bg-orange-600"
+                  className="w-full bg-teal-500 text-white py-3 rounded-[15px] hover:bg-teal-600"
                 >
                   {formState.isLoading ? 'Logging In...' : 'Login'}
                 </button>
@@ -227,7 +227,7 @@ export default function TraderLogin() {
               </div>
 
               <p className="mt-8 text-center text-gray-600">
-                Don't have an account? <Link to="/login" className="text-orange-500 hover:underline font-medium">Sign Up</Link>
+                Don't have an account? <Link to="/login" className="text-teal-500 hover:underline font-medium">Sign Up</Link>
               </p>
             </div>
           </div>

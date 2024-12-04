@@ -713,7 +713,7 @@ export const CustomsDashboard: React.FC = () => {
                   <FaUserCircle className="w-5 h-5 text-purple-500" />
                 )}
                 {activity.type === 'review' && (
-                  <FaEye className="w-5 h-5 text-orange-500" />
+                  <FaEye className="w-5 h-5 text-teal-500" />
                 )}
               </div>
               <div className="flex-1">
@@ -1009,7 +1009,7 @@ export const CustomsDashboard: React.FC = () => {
   ))}
 
   // Add a new state for handling QR code data
-  const [qrData, setQrData] = useState<string | null>(null);
+  // const [qrData, setQrData] = useState<string | null>(null);
 
   // QR Code Scanner Component
   // const QrCodeScanner: React.FC = () => {

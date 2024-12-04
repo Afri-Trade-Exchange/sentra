@@ -104,7 +104,7 @@ function LandingPage () {
       style={{ 
         transform: `scale(${scale.get()}) translateY(${y.get()}px)` 
       }}
-      className="min-h-screen bg-gray-100 text-gray-800 font-['Urbanist'] flex flex-col relative overflow-hidden"
+      className="min-h-screen bg-gray-100 text-gray-800 font-['Montserrat'] flex flex-col relative overflow-hidden"
     >
       {/* Floating Trade Icons */}
       <motion.div 
@@ -123,7 +123,7 @@ function LandingPage () {
         }}
         className="absolute top-20 left-10 z-0"
       >
-        <FaShip className="text-4xl text-orange-500" />
+        <FaShip className="text-4xl text-teal-500" />
       </motion.div>
 
       <motion.div 
@@ -219,22 +219,22 @@ function LandingPage () {
               />
             </div>
             <button 
-              className="bg-orange-500 text-white px-8 py-4 text-base font-semibold hover:bg-orange-600 transition-colors"
+              className="bg-teal-500 text-white px-8 py-4 text-base font-semibold hover:bg-teal-600 transition-colors"
               onClick={handleTrackClick}
             >
               Track
             </button>
           </div>
           <div className="text-center mt-3">
-            <a href="./contact" className="text-sm text-gray-800 hover:text-orange-500">Need Help?</a>
+            <a href="./contact" className="text-sm text-gray-800 hover:text-teal-500">Need Help?</a>
           </div>
         </div>
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="md:w-1/2 mb-8 md:mb-0">
-            <h2 className="text-orange-500 text-xl mb-2">Digital Trade, Simplified</h2>
+            <h2 className="text-teal-500 text-xl mb-2">Digital Trade, Simplified</h2>
             <h1 className="text-5xl font-bold mb-4 leading-tight">
-              Streamline trade, cut customs processes by <span className="text-orange-500">50%</span> <br />
-               with our <span className="text-orange-500">digital solutions</span><br />
+              Streamline trade, cut customs processes by <span className="text-teal-500">50%</span> <br />
+               with our <span className="text-teal-500">digital solutions</span><br />
               Experience faster, more efficient
               transactions for cross-border trade.
             </h1>
@@ -243,7 +243,7 @@ function LandingPage () {
             </p>
             <button 
               onClick={() => navigate('/trader-signup')} 
-              className="px-12 py-3 text-white bg-orange-500 rounded-[15px] hover:bg-orange-600"
+              className="px-12 py-3 text-white bg-teal-500 rounded-[15px] hover:bg-teal-600"
             >
               Get Started
             </button>
@@ -290,7 +290,7 @@ function LandingPage () {
                 { step: 4, title: "Clear", description: "Receive customs clearance" }
               ].map((step, index) => (
                 <div key={index} className="flex flex-col items-center mb-8 md:mb-0">
-                  <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-4">
+                  <div className="w-16 h-16 bg-teal-500 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-4">
                     {step.step}
                   </div>
                   <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
@@ -318,34 +318,34 @@ function LandingPage () {
               <h5 className="text-2xl font-bold mb-4">AfriTrade-Xchange</h5>
               <p className="text-gray-300 mb-4">Streamlining African trade with innovative digital solutions.</p>
               <div className="flex space-x-4">
-                <a href="#" className="text-gray-300 hover:text-orange-500 transition-colors"><FaFacebookF size={20} /></a>
-                <a href="#" className="text-gray-300 hover:text-orange-500 transition-colors"><FaLinkedinIn size={20} /></a>
-                <a href="#" className="text-gray-300 hover:text-orange-500 transition-colors"><FaInstagram size={20} /></a>
+                <a href="#" className="text-gray-300 hover:text-teal-500 transition-colors"><FaFacebookF size={20} /></a>
+                <a href="#" className="text-gray-300 hover:text-teal-500 transition-colors"><FaLinkedinIn size={20} /></a>
+                <a href="#" className="text-gray-300 hover:text-teal-500 transition-colors"><FaInstagram size={20} /></a>
               </div>
             </div>
             <div>
               <h5 className="text-xl font-bold mb-4">Quick Links</h5>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-300 hover:text-orange-500 transition-colors">About Us</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-orange-500 transition-colors">Our Services</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-orange-500 transition-colors">Contact</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-orange-500 transition-colors">FAQ</a></li>
+                <li><a href="#" className="text-gray-300 hover:text-teal-500 transition-colors">About Us</a></li>
+                <li><a href="#" className="text-gray-300 hover:text-teal-500 transition-colors">Our Services</a></li>
+                <li><a href="#" className="text-gray-300 hover:text-teal-500 transition-colors">Contact</a></li>
+                <li><a href="#" className="text-gray-300 hover:text-teal-500 transition-colors">FAQ</a></li>
               </ul>
             </div>
             <div>
               <h5 className="text-xl font-bold mb-4">Contact Us</h5>
               <ul className="space-y-2">
                 <li className="flex items-center">
-                  <MdLocationOn className="mr-2 text-orange-500" />
+                  <MdLocationOn className="mr-2 text-teal-500" />
                   <span className="text-gray-300">123 Trade Street, Nairobi, Kenya</span>
                 </li>
                 <li className="flex items-center">
-                  <MdEmail className="mr-2 text-orange-500" />
-                  <a href="mailto:info@afritrade.com" className="text-gray-300 hover:text-orange-500 transition-colors">info@afritrade.com</a>
+                  <MdEmail className="mr-2 text-teal-500" />
+                  <a href="mailto:info@afritrade.com" className="text-gray-300 hover:text-teal-500 transition-colors">info@afritrade.com</a>
                 </li>
                 <li className="flex items-center">
-                  <MdPhone className="mr-2 text-orange-500" />
-                  <a href="tel:+254123456789" className="text-gray-300 hover:text-orange-500 transition-colors">+254 123 456 789</a>
+                  <MdPhone className="mr-2 text-teal-500" />
+                  <a href="tel:+254123456789" className="text-gray-300 hover:text-teal-500 transition-colors">+254 123 456 789</a>
                 </li>
               </ul>
             </div>
@@ -367,11 +367,11 @@ function LandingPage () {
                 <input 
                   type="email" 
                   placeholder="Enter your email" 
-                  className="bg-gray-700 text-white px-4 py-2 rounded-l-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="bg-gray-700 text-white px-4 py-2 rounded-l-md focus:outline-none focus:ring-2 focus:ring-teal-500"
                 />
                 <button 
                   type="submit" 
-                  className="bg-orange-500 text-white px-4 py-2 rounded-r-md hover:bg-orange-600 transition-colors"
+                  className="bg-teal-500 text-white px-4 py-2 rounded-r-md hover:bg-teal-600 transition-colors"
                 >
                   Subscribe
                 </button>

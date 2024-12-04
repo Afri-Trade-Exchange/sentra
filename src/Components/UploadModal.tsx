@@ -152,7 +152,7 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
           // Add important notice
           pdf.setFillColor(255, 250, 240); // Light yellow background
           pdf.rect(20, 230, 170, 20, 'F');
-          pdf.setTextColor(200, 100, 0); // Orange text
+          pdf.setTextColor(200, 100, 0); // teal text
           pdf.setFontSize(11);
           pdf.text(
             'IMPORTANT: This QR code is your digital key to access your uploaded documents.',

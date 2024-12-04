@@ -328,7 +328,7 @@ function LandingPage () {
               <ul className="space-y-2">
                 <li><a href="#" className="text-gray-300 hover:text-teal-500 transition-colors">About Us</a></li>
                 <li><a href="#" className="text-gray-300 hover:text-teal-500 transition-colors">Our Services</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-teal-500 transition-colors">Contact</a></li>
+                <li><a href="#" className="text-gray-300 hover:text-teal-500 transition-colors">Contact Us</a></li>
                 <li><a href="#" className="text-gray-300 hover:text-teal-500 transition-colors">FAQ</a></li>
               </ul>
             </div>
@@ -350,7 +350,7 @@ function LandingPage () {
               </ul>
             </div>
             <div>
-            <h4 className="text-white text-md font-semibold mb-4">Download Our App</h4>
+            <h4 className="text-white text-md font-semibold mb-6">Download Our App</h4>
             <div className="flex space-x-4">
               <a href="https://play.google.com/store/apps/details?id=com.yourapp" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors duration-300">
                 <FaGooglePlay className="h-10" />

@@ -3,6 +3,7 @@ import { FaUpload, FaPlus, FaDownload, FaBox, FaSignOutAlt, FaArchive, FaFileInv
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import UploadModal from './UploadModal';
 import InvoiceDetailModal from './InvoiceDetailModal';
+import Footer from './Footer';
 // import { Link } from 'react-router-dom';
 
 interface User {
@@ -1054,4 +1055,7 @@ function calculateAverageProcessingTime(activities: Activity[]): number {
   // Implement logic to calculate average processing time
   return activities.length * 0.5; // Placeholder
 }
+
+{/* Footer */}
+<Footer />
 

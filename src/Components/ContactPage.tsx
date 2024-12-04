@@ -50,13 +50,13 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer }) => {
         onClick={() => setIsOpen(!isOpen)}
         type="button"
       >
-        <span className="text-lg font-medium text-gray-900 group-hover:text-orange-500 transition-colors">
+        <span className="text-lg font-medium text-gray-900 group-hover:text-teal-500 transition-colors">
           {question}
         </span>
         <motion.span
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2 }}
-          className="text-orange-500"
+          className="text-teal-500"
         >
           <svg 
             className="w-5 h-5" 
@@ -124,14 +124,14 @@ const ContactPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-100 to-orange-200 text-gray-800 font-['Comfortaa']">
+    <div className="min-h-screen bg-gradient-to-br from-teal-100 to-teal-200 text-gray-800 font-['Comfortaa']">
       <div className="container mx-auto px-4 py-16">
-        <h1 className="text-5xl font-bold text-center mb-12 text-orange-600">Contact Us</h1>
+        <h1 className="text-5xl font-bold text-center mb-12 text-teal-600">Contact Us</h1>
         
         {/* Existing contact form and info sections */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
           <div className="bg-white rounded-xl shadow-2xl p-8 transform hover:scale-105 transition-transform duration-300">
-            <h2 className="text-3xl font-semibold mb-6 text-orange-500">Get in Touch</h2>
+            <h2 className="text-3xl font-semibold mb-6 text-teal-500">Get in Touch</h2>
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
                 <label htmlFor="name" className="block text-gray-700 mb-2">Name *</label>
@@ -141,16 +141,16 @@ const ContactPage: React.FC = () => {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500" 
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500" 
                 />
               </div>
               <div className="mb-4">
                 <label htmlFor="email" className="block text-gray-700 mb-2">Email</label>
-                <input type="email" id="email" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                <input type="email" id="email" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500" />
               </div>
               <div className="mb-4">
                 <label htmlFor="message" className="block text-gray-700 mb-2">Message</label>
-                <textarea id="message" rows={4} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
+                <textarea id="message" rows={4} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"></textarea>
               </div>
               <button 
                 type="submit" 
@@ -158,7 +158,7 @@ const ContactPage: React.FC = () => {
                 className={`w-full py-3 px-4 rounded-lg text-lg font-semibold shadow-md 
                   ${isSubmitting 
                     ? 'bg-gray-400 cursor-not-allowed' 
-                    : 'bg-orange-500 hover:bg-orange-600 text-white hover:shadow-lg'
+                    : 'bg-teal-500 hover:bg-teal-600 text-white hover:shadow-lg'
                   } transition-all`}
               >
                 {isSubmitting ? 'Sending...' : 'Send Message'}
@@ -186,38 +186,38 @@ const ContactPage: React.FC = () => {
             </form>
           </div>
           <div className="bg-white rounded-xl shadow-2xl p-8 transform hover:scale-105 transition-transform duration-300">
-            <h2 className="text-3xl font-semibold mb-6 text-orange-500">Contact Information</h2>
+            <h2 className="text-3xl font-semibold mb-6 text-teal-500">Contact Information</h2>
             <div className="space-y-6">
               <div className="flex items-center">
-                <MdLocationOn className="text-orange-500 text-3xl mr-4" />
+                <MdLocationOn className="text-teal-500 text-3xl mr-4" />
                 <p className="text-lg">123 Trade Street, Nairobi, Kenya</p>
               </div>
               <div className="flex items-center">
-                <MdPhone className="text-orange-500 text-3xl mr-4" />
+                <MdPhone className="text-teal-500 text-3xl mr-4" />
                 <p className="text-lg">+254 123 456 789</p>
               </div>
               <div className="flex items-center">
-                <MdEmail className="text-orange-500 text-3xl mr-4" />
+                <MdEmail className="text-teal-500 text-3xl mr-4" />
                 <p className="text-lg">info@afritrade.com</p>
               </div>
             </div>
             <div className="mt-12">
-              <h3 className="text-2xl font-semibold mb-4 text-orange-500">Follow Us</h3>
+              <h3 className="text-2xl font-semibold mb-4 text-teal-500">Follow Us</h3>
               <div className="flex space-x-6">
-                <a href="#" className="text-gray-600 hover:text-orange-500 transition-colors">
+                <a href="#" className="text-gray-600 hover:text-teal-500 transition-colors">
                   <FaFacebookF className="w-8 h-8" />
                 </a>
-                <a href="#" className="text-gray-600 hover:text-orange-500 transition-colors">
+                <a href="#" className="text-gray-600 hover:text-teal-500 transition-colors">
                   <FaInstagram className="w-8 h-8" />
                 </a>
-                <a href="#" className="text-gray-600 hover:text-orange-500 transition-colors">
+                <a href="#" className="text-gray-600 hover:text-teal-500 transition-colors">
                   <FaTwitter className="w-8 h-8" />
                 </a>
               </div>
             </div>
             {/* Add business hours */}
             <div className="mt-8">
-              <h3 className="text-2xl font-semibold mb-4 text-orange-500">Business Hours</h3>
+              <h3 className="text-2xl font-semibold mb-4 text-teal-500">Business Hours</h3>
               <div className="space-y-2">
                 <p className="flex justify-between">
                   <span>Monday - Friday:</span>
@@ -238,7 +238,7 @@ const ContactPage: React.FC = () => {
 
         {/* Modernized FAQ Section */}
         <div className="max-w-3xl mx-auto mb-20">
-          <h2 className="text-3xl font-semibold mb-8 text-orange-500 text-center">
+          <h2 className="text-3xl font-semibold mb-8 text-teal-500 text-center">
             Frequently Asked Questions
           </h2>
           <motion.div
@@ -259,7 +259,7 @@ const ContactPage: React.FC = () => {
         <div className="text-center mb-12">
           <Link 
             to="/" 
-            className="inline-flex items-center text-orange-500 hover:text-orange-600 transition-colors text-lg font-semibold"
+            className="inline-flex items-center text-teal-500 hover:text-teal-600 transition-colors text-lg font-semibold"
           >
             <svg 
               className="w-5 h-5 mr-2" 

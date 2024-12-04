@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 
 function NavItem({ text, to }: { text: string; to: string }) {
   return (
-    <Link to={to} className="cursor-pointer hover:text-orange-500 transition-colors">
+    <Link to={to} className="cursor-pointer hover:text-teal-500 transition-colors">
       <span>{text}</span>
     </Link>
   )

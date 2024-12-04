@@ -24,7 +24,7 @@ export default function TraderSignup() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-orange-100 to-orange-200">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-teal-100 to-teal-200">
       <div className="flex-grow flex flex-col md:flex-row items-center justify-center px-4 py-12">
         <div className="w-full md:w-1/2 max-w-md bg-white rounded-[20px] shadow-2xl overflow-hidden">
           <div className="p-8">
@@ -36,7 +36,7 @@ export default function TraderSignup() {
                   key={type}
                   className={`flex-1 py-2 px-4 rounded-[15px] text-sm font-medium transition-all duration-200 ${
                     accountType === type
-                      ? 'bg-orange-500 text-white shadow-md'
+                      ? 'bg-teal-500 text-white shadow-md'
                       : 'text-gray-600 hover:bg-gray-200'
                   } capitalize`}
                   onClick={() => setAccountType(type)}
@@ -53,7 +53,7 @@ export default function TraderSignup() {
                   value={formData.email}
                   onChange={handleInputChange}
                   placeholder="Email"
-                  className="w-full px-4 py-3 rounded-[15px] bg-gray-100 border-transparent focus:border-orange-500 focus:bg-white focus:ring-0 text-sm"
+                  className="w-full px-4 py-3 rounded-[15px] bg-gray-100 border-transparent focus:border-teal-500 focus:bg-white focus:ring-0 text-sm"
                   required
                 />
               </div>
@@ -64,7 +64,7 @@ export default function TraderSignup() {
                   value={formData.password}
                   onChange={handleInputChange}
                   placeholder="Password"
-                  className="w-full px-4 py-3 rounded-[15px] bg-gray-100 border-transparent focus:border-orange-500 focus:bg-white focus:ring-0 text-sm"
+                  className="w-full px-4 py-3 rounded-[15px] bg-gray-100 border-transparent focus:border-teal-500 focus:bg-white focus:ring-0 text-sm"
                   required
                 />
                 <button
@@ -82,11 +82,11 @@ export default function TraderSignup() {
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
                   placeholder="Confirm Password"
-                  className="w-full px-4 py-3 rounded-[15px] bg-gray-100 border-transparent focus:border-orange-500 focus:bg-white focus:ring-0 text-sm"
+                  className="w-full px-4 py-3 rounded-[15px] bg-gray-100 border-transparent focus:border-teal-500 focus:bg-white focus:ring-0 text-sm"
                   required
                 />
               </div>
-              <button type="submit" className="w-full bg-orange-500 text-white py-3 rounded-[15px] hover:bg-orange-600 transition-colors duration-200 text-sm font-semibold">
+              <button type="submit" className="w-full bg-teal-500 text-white py-3 rounded-[15px] hover:bg-teal-600 transition-colors duration-200 text-sm font-semibold">
                 Create Account
               </button>
             </form>
@@ -96,7 +96,7 @@ export default function TraderSignup() {
               </button>
             </div>
             <p className="mt-8 text-center text-sm text-gray-600">
-              Already have an account? <Link to="/login" className="text-orange-500 hover:underline font-medium">Log in</Link>
+              Already have an account? <Link to="/login" className="text-teal-500 hover:underline font-medium">Log in</Link>
             </p>
           </div>
         </div>

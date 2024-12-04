@@ -29,7 +29,7 @@ const Footer: React.FC = () => {
             <ul className="space-y-2">
               {['Home', 'About', 'Services', 'Contact'].map((item) => (
                 <li key={item}>
-                  <Link to={`/${item.toLowerCase()}`} className="text-sm hover:text-orange-500 transition-colors duration-300">
+                  <Link to={`/${item.toLowerCase()}`} className="text-sm hover:text-teal-500 transition-colors duration-300">
                     {item}
                   </Link>
                 </li>
@@ -41,7 +41,7 @@ const Footer: React.FC = () => {
             <ul className="space-y-2">
               {['Trade Finance', 'Customs Clearance', 'Logistics', 'Market Intelligence'].map((item) => (
                 <li key={item}>
-                  <Link to={`/services/${item.toLowerCase().replace(' ', '-')}`} className="text-sm hover:text-orange-500 transition-colors duration-300">
+                  <Link to={`/services/${item.toLowerCase().replace(' ', '-')}`} className="text-sm hover:text-teal-500 transition-colors duration-300">
                     {item}
                   </Link>
                 </li>

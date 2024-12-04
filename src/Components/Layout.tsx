@@ -18,7 +18,7 @@ export default function Layout({ children }: LayoutProps) {
             className="logo cursor-pointer" 
             onClick={() => navigate('/')}
           >
-            <GiAfrica className="text-2xl text-orange-500 mr-2" />
+            <GiAfrica className="text-2xl text-teal-500 mr-2" />
           </div>
           <span 
             className="text-xl font-bold text-gray-700 cursor-pointer"
@@ -31,7 +31,7 @@ export default function Layout({ children }: LayoutProps) {
           <a href="/trader-signup">I'm a Trader</a>
           <button 
             onClick={() => navigate('/trader-signup')} 
-            className="hover:text-orange-500"
+            className="hover:text-teal-500"
           >
             I'm a Customs Officer
           </button>
@@ -41,19 +41,19 @@ export default function Layout({ children }: LayoutProps) {
         <div className="flex items-center justify-end space-x-4 w-1/4">
           <button 
           onClick={() => navigate('/trader-signup')}
-          className="px-4 py-2 text-sm  text-gray-700 hover:text-orange-500"
+          className="px-4 py-2 text-sm  text-gray-700 hover:text-teal-500"
           >
             Register
             </button>
           <button 
           onClick={() => navigate('/trader-signup')}
-          className="px-4 py-2 text-sm text-gray-700 hover:text-orange-500"
+          className="px-4 py-2 text-sm text-gray-700 hover:text-teal-500"
           >
             Login
           </button>
           <button 
           onClick={() => navigate('/contact')}
-          className="px-8 py-3 text-sm text-white bg-orange-500 hover:bg-orange-600 rounded-[15px]"
+          className="px-8 py-3 text-sm text-white bg-teal-500 hover:bg-teal-600 rounded-[15px]"
           >
             Contact Us
           </button>

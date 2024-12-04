@@ -338,7 +338,7 @@ export default function Dashboard() {
     { label: 'Payments', icon: FaApplePay },
     { label: 'Order History', icon: FaHistory },
     { label: 'Settings', icon: FaCog },
-    { label: 'Sign Out', icon: FaSignOutAlt, action: handleSignOut },
+    { label: 'Log Out', icon: FaSignOutAlt, action: handleSignOut },
   ];
 
   const orderData = [
@@ -868,23 +868,18 @@ export default function Dashboard() {
                   action: () => setIsUploadModalOpen(true) 
                 },
                 { 
-                  icon: FaPlus, 
-                  label: 'Create Request', 
-                  color: 'bg-green-500',
-                  action: () => setIsRequestModalOpen(true)
+                  icon: FaBox, 
+                  label: 'Create Consignment', 
+                  color: 'bg-purple-500', 
+                  action: createConsignmentHandler 
                 },
                 { 
                   icon: FaDownload, 
                   label: 'Download Report', 
                   color: 'bg-yellow-500', 
                   action: downloadActivitiesReport 
-                },
-                { 
-                  icon: FaBox, 
-                  label: 'Create Consignment', 
-                  color: 'bg-purple-500', 
-                  action: createConsignmentHandler 
                 }
+
               ].map((card) => (
                 <button 
                   key={card.label}

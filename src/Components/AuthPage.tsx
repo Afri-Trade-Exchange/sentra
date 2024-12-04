@@ -49,7 +49,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-orange-100 to-orange-200">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-teal-100 to-teal-200">
       <div className="flex-grow flex flex-col md:flex-row items-center justify-center px-4 py-12">
         <div className="w-full md:w-1/2 max-w-md bg-white rounded-[20px] shadow-2xl overflow-hidden">
           <div className="p-8">
@@ -65,7 +65,7 @@ export default function AuthPage() {
                   key={type}
                   className={`flex-1 py-2 px-4 rounded-[15px] text-sm font-medium transition-all duration-200 ${
                     userType === type
-                      ? 'bg-orange-500 text-white shadow-md'
+                      ? 'bg-teal-500 text-white shadow-md'
                       : 'text-gray-600 hover:bg-gray-200'
                   } capitalize`}
                   onClick={() => toggleUserType(type as UserType)}
@@ -83,7 +83,7 @@ export default function AuthPage() {
                   value={formData.email}
                   onChange={handleInputChange}
                   placeholder="Email"
-                  className="w-full pl-10 pr-4 py-3 rounded-[15px] bg-gray-100 border-2 border-transparent focus:border-orange-500 focus:bg-white focus:ring-0 text-sm transition-all duration-200"
+                  className="w-full pl-10 pr-4 py-3 rounded-[15px] bg-gray-100 border-2 border-transparent focus:border-teal-500 focus:bg-white focus:ring-0 text-sm transition-all duration-200"
                   required
                 />
               </div>
@@ -95,7 +95,7 @@ export default function AuthPage() {
                   value={formData.password}
                   onChange={handleInputChange}
                   placeholder="Password"
-                  className="w-full pl-10 pr-10 py-3 rounded-[15px] bg-gray-100 border-2 border-transparent focus:border-orange-500 focus:bg-white focus:ring-0 text-sm transition-all duration-200"
+                  className="w-full pl-10 pr-10 py-3 rounded-[15px] bg-gray-100 border-2 border-transparent focus:border-teal-500 focus:bg-white focus:ring-0 text-sm transition-all duration-200"
                   required
                 />
                 <button
@@ -115,18 +115,18 @@ export default function AuthPage() {
                     value={formData.confirmPassword}
                     onChange={handleInputChange}
                     placeholder="Confirm Password"
-                    className="w-full pl-10 pr-4 py-3 rounded-[15px] bg-gray-100 border-2 border-transparent focus:border-orange-500 focus:bg-white focus:ring-0 text-sm transition-all duration-200"
+                    className="w-full pl-10 pr-4 py-3 rounded-[15px] bg-gray-100 border-2 border-transparent focus:border-teal-500 focus:bg-white focus:ring-0 text-sm transition-all duration-200"
                     required
                   />
                 </div>
               )}
-              <button type="submit" className="w-full bg-orange-500 text-white py-3 rounded-[15px] hover:bg-orange-600 transition-colors duration-200 text-sm font-semibold">
+              <button type="submit" className="w-full bg-teal-500 text-white py-3 rounded-[15px] hover:bg-teal-600 transition-colors duration-200 text-sm font-semibold">
                 {authMode === 'signup' ? 'Create Account' : 'Log In'}
               </button>
             </form>
             <div className="mt-6">
-              <button className="w-full border-2 border-gray-300 text-gray-700 bg-white py-3 rounded-[15px] hover:bg-gray-50 hover:border-orange-500 transition-all duration-200 text-sm font-medium flex items-center justify-center group">
-                <FaGoogle className="mr-2 text-gray-500 group-hover:text-orange-500" /> 
+              <button className="w-full border-2 border-gray-300 text-gray-700 bg-white py-3 rounded-[15px] hover:bg-gray-50 hover:border-teal-500 transition-all duration-200 text-sm font-medium flex items-center justify-center group">
+                <FaGoogle className="mr-2 text-gray-500 group-hover:text-teal-500" /> 
                 {authMode === 'signup' ? 'Sign up' : 'Log in'} with Google
               </button>
             </div>
@@ -134,7 +134,7 @@ export default function AuthPage() {
               {authMode === 'signup' ? 'Already have an account?' : 'Don\'t have an account?'}
               <button 
                 onClick={() => toggleAuthMode(authMode === 'signup' ? 'login' : 'signup')} 
-                className="text-orange-500 hover:underline font-medium ml-1"
+                className="text-teal-500 hover:underline font-medium ml-1"
               >
                 {authMode === 'signup' ? 'Log in' : 'Sign up'}
               </button>

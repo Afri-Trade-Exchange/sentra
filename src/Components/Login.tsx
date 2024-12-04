@@ -1,7 +1,7 @@
 // After successful login/signup
 const userData = {
-  name: 'User Name',  // Replace with actual user name from form/response
-  email: 'user@example.com'  // Replace with actual email
+  name: 'User Name',
+  email: 'user@example.com'
 };
 
 localStorage.setItem('user', JSON.stringify(userData));

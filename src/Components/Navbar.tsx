@@ -18,10 +18,10 @@ const Navbar: React.FC = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 flex items-center justify-between px-40 py-4 bg-white bg-opacity-80 backdrop-blur-sm z-200">
-      <Link to="App" className="flex items-center w-1/4 hover:text-teal-500 transition-colors">
+      {/* <Link to="App" className="flex items-center w-1/4 hover:text-teal-500 transition-colors">
         <GiAfrica className="text-2xl text-teal-500 mr-2" />
         <span className="text-xl font-bold text-gray-700">AfriTrade-Xchange</span>
-      </Link>
+      </Link> */}
       {/* <button onClick={toggleNavbar} className="md:hidden flex items-center" type="button" aria-label="Toggle navigation">
         <div className="w-hamburger h-hamburger bg-gray-700"></div>
       </button> */}

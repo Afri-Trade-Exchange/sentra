@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useReducer, useCallback } from 'react';
 import { Timestamp } from 'firebase/firestore';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, color } from 'framer-motion';
 import { 
   FaSearch, 
   FaFilter, 
@@ -16,7 +16,8 @@ import {
   FaChartBar,
   FaHistory,
   FaBell,
-  FaClock
+  FaClock,
+  FaBox
 } from 'react-icons/fa';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement } from 'chart.js';
 import { Pie, Line } from 'react-chartjs-2';
@@ -593,7 +594,7 @@ export const CustomsDashboard: React.FC = () => {
 
   const QuickActions: React.FC = () => {
     const handleNewConsignment = () => {
-      // Implement new consignment creation logic
+      
     };
 
     const handleExportData = () => {

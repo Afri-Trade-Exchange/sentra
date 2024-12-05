@@ -113,7 +113,7 @@ const ContactPage: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      // Add your API call here
+      // will API call here
       await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
       setSubmitStatus('success');
     } catch {

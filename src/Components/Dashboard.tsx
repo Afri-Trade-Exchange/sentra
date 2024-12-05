@@ -1037,7 +1037,7 @@ export default function Dashboard() {
           totalAmount: 0,
           status: 'Pending',
           items: [],
-          taxRate: 0.16,
+          taxRate: 0.16, //This is specifically for Kenya
         })} 
         isOpen={isInvoiceModalOpen}
         onClose={() => {

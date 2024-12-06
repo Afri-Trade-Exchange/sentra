@@ -231,7 +231,7 @@ export default function TraderSignup() {
               </div>
 
               <p className="mt-8 text-center text-gray-600">
-                Already have an account? <Link to="/trader-login" className="text-teal-500 hover:underline font-medium">Login</Link>
+                Already have an account? <Link to="/login" className="text-teal-500 hover:underline font-medium">Login</Link>
               </p>
             </div>
           </div>

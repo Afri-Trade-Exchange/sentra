@@ -35,25 +35,28 @@ export default function Layout({ children }: LayoutProps) {
           >
             I'm a Customs Officer
           </button>
-          <a href="#">Company</a>
-          <a href="#">Tracking</a>
+          <a href="/contact">Company</a>
+          <a href="/contact">Tracking</a>
         </div>
-        <div className="flex items-center justify-end space-x-4 w-1/4">
+        <div className="flex items-center 
+        justify-end space-x-4 w-1/4
+        hover:text-teal-500"
+        >
           <button 
           onClick={() => navigate('/trader-signup')}
-          className="px-4 py-2 text-sm  text-gray-700 hover:text-teal-500"
+          className="px-4 py-2 text-l  text-gray-700 hover:text-teal-500"
           >
             Register
             </button>
           <button 
           onClick={() => navigate('/trader-signup')}
-          className="px-4 py-2 text-sm text-gray-700 hover:text-teal-500"
+          className="px-4 py-2 text-l text-gray-700 hover:text-teal-500"
           >
             Login
           </button>
           <button 
           onClick={() => navigate('/contact')}
-          className="px-8 py-3 text-sm text-white bg-teal-500 hover:bg-teal-600 rounded-[15px]"
+          className="px-8 py-3 text-l text-white bg-teal-500 hover:bg-teal-600 rounded-[15px]"
           >
             Contact Us
           </button>

@@ -243,7 +243,7 @@ function LandingPage () {
             </p>
             <button 
               onClick={() => navigate('/trader-signup')} 
-              className="px-12 py-3 text-white bg-teal-500 rounded-[15px] hover:bg-teal-600"
+              className="px-12 py-3 text-white  bg-teal-500 rounded-[15px] hover:bg-teal-600"
             >
               Get Started
             </button>
@@ -256,6 +256,29 @@ function LandingPage () {
             />
           </div>
         </div>
+
+        
+        {/* <div className="lasg__illustration">
+          {[
+            { src: "/src/assets/images/acceler.png", alt: "Road Illustration", className: "lasg__illustration__road" },
+            { src: "/static/media/buildings.773cd879c2b2585717b29d44d886a769.svg", alt: "Buildings Illustration", className: "lasg__illustration__theatre" },
+            { src: "/static/media/water.a22d392ad8366afd67d52c8793f6af5d.svg", alt: "Water Illustration", className: "lasg__illustration__water" },
+            { src: "/static/media/eko.bdb0bc37172e7013e436fdb8a1af62dd.svg", alt: "Eko Illustration", className: "lasg__illustration__eko" },
+            { src: "/static/media/train__station.9b37d3d5a4bee970212c6a3db563947e.svg", alt: "Train Station Illustration", className: "lasg__illustration__station" },
+            { src: "/static/media/lasg__blueline__rail.a0174585d6cf2ae259efb6c728b852aa.svg", alt: "Train Illustration", className: "lasg__illustration__train" },
+            { src: "/static/media/eyo.eb5452e21e6687503d18ca8331a49943.svg", alt: "Eyo Illustration", className: "lasg__illustration__eyo" },
+            { src: "/static/media/brt.eacc3cf894ece6a28ee365c04ae1e333.svg", alt: "BRT Illustration", className: "motion__illustration brt" },
+            { src: "/static/media/lasumbus.98b624fb71e00c98fe5a7ba9232b9053.svg", alt: "Lasumbus Illustration", className: "motion__illustration lasumbus" },
+            { src: "/static/media/lagosride.2049e78edde6c9ef97c9fba174bcb3c4.svg", alt: "Lagos Ride Illustration", className: "motion__illustration lagride" },
+            { src: "/static/media/danfo.c98079c79960f7354d192431a74143c9.svg", alt: "Danfo Illustration", className: "motion__illustration__2 danfo" },
+          ].map((image, index) => (
+            <div key={index} className={image.className}>
+              <img src={image.src} alt={image.alt} loading="lazy" />
+            </div>
+          ))}
+        </div> */}
+
+
         <div className="mt-16">
           <h3 className="text-center text-xl text-gray-600 mb-6">Trusted by Leading Logistics Companies</h3>
           <Slider {...settings}>

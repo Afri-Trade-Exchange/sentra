@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useReducer, useCallback } from 'react';
 import { Timestamp } from 'firebase/firestore';
-import { motion, AnimatePresence, color } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FaSearch, 
   FaFilter, 
@@ -17,7 +17,6 @@ import {
   FaHistory,
   FaBell,
   FaClock,
-  FaBox
 } from 'react-icons/fa';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement } from 'chart.js';
 import { Pie, Line } from 'react-chartjs-2';

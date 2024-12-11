@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaUpload, FaPlus, FaDownload, FaBox, FaSignOutAlt, FaArchive, FaFileInvoice, FaHistory, FaCog, FaApplePay, FaPlusCircle, } from 'react-icons/fa';
+import { FaUpload, FaDownload, FaBox, FaSignOutAlt, FaArchive, FaFileInvoice, FaHistory, FaCog, FaApplePay, FaPlusCircle, } from 'react-icons/fa';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import UploadModal from './UploadModal';
 import InvoiceDetailModal from './InvoiceDetailModal';
@@ -511,6 +511,7 @@ export default function Dashboard() {
       );
     }
 
+    // Consignment Popup
     return (
       <AnimatePresence>
         {isConsignmentModalOpen && (
@@ -1037,7 +1038,7 @@ export default function Dashboard() {
           totalAmount: 0,
           status: 'Pending',
           items: [],
-          taxRate: 0.16, //This is specifically for Kenya
+          taxRate: 0
         })} 
         isOpen={isInvoiceModalOpen}
         onClose={() => {

@@ -403,7 +403,7 @@ const ConsignmentCard: React.FC<{
           onClick={() => onViewDetails(consignment)}
           className="text-blue-500 hover:text-blue-700 flex items-center"
         >
-          <FaEye className="h-5 w-5 mr-1" />
+          <FaEye className="h-5 w-5 mr-1 border-radius-15" />
           View Details
         </button>
       </div>
@@ -606,7 +606,7 @@ export const CustomsDashboard: React.FC = () => {
 
     return (
       <div className="flex flex-wrap gap-4 mb-8">
-        <button 
+        <button
           onClick={handleNewConsignment}
           className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >

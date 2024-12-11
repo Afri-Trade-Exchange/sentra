@@ -1,13 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { FaQrcode, FaFileAlt, FaClock, FaCheckCircle } from 'react-icons/fa';
+
+interface Document {
+  type: string;
+  file: File | null;
+}
 
 interface Request {
   id: string;
   timestamp: string;
   status: string;
   documentCount: number;
-  documents: Record<string, any>;
-  qrCode: any;
+  documents: Record<string, Document>;
+  qrCode: string;
 }
 
 export default function CurrentRequests() {
@@ -65,8 +70,8 @@ export default function CurrentRequests() {
 
               <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
                 {Object.entries(request.documents)
-                  .filter(([_, doc]) => doc.file !== null)
-                  .map(([key, doc]: [string, any]) => (
+                  .filter(([, doc]: [string, Document]) => doc.file !== null)
+                  .map(([key, doc]: [string, Document]) => (
                     <div key={key} className="flex items-center gap-2 text-gray-600">
                       <FaCheckCircle className="text-green-500" />
                       {doc.type}

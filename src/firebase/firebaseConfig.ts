@@ -6,7 +6,6 @@ import { getFirestore } from 'firebase/firestore';
 const firebaseConfig = {
   apiKey: "AIzaSyBP5Sidb2-STGpvL3jnh5QFKyCoRKfn858",
   authDomain: "afritrade-4ed4c.firebaseapp.com",
-
   projectId: "afritrade-4ed4c",
   storageBucket: "afritrade-4ed4c.firebasestorage.app",
   messagingSenderId: "604766264109",
@@ -14,5 +13,6 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+export const db = getFirestore(app);
 export const auth = getAuth(app);
 export const firestore = getFirestore(app); 

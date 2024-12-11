@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useReducer, useCallback } from 'react';
+import React, { useState, useMemo, useReducer, useCallback, useEffect } from 'react';
 import { Timestamp } from 'firebase/firestore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -17,6 +17,7 @@ import {
   FaHistory,
   FaBell,
   FaClock,
+  FaQrcode,
 } from 'react-icons/fa';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement } from 'chart.js';
 import { Pie, Line } from 'react-chartjs-2';
@@ -24,6 +25,12 @@ import Footer from './Footer';
 import { useAuth } from './AuthContext';
 import TraderDetailsModal from './TraderDetailsModal';
 // import QrScanner from 'react-qr-scanner';
+import { saveAs } from 'file-saver';
+import * as XLSX from 'xlsx';
+import NewConsignmentModal from './NewConsignmentModal';
+import { Html5QrcodeScanner } from 'html5-qrcode';
+// import { db } from '../firebase-config'; // Ensure this is set up
+import { doc, getDoc } from 'firebase/firestore';
 
 // Register ChartJS components
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement);
@@ -445,6 +452,104 @@ const generateMockTimelineEvents = (): TimelineEvent[] => {
 // Main Dashboard Component
 import { useNavigate } from 'react-router-dom';
 
+interface NewConsignmentFormData {
+  traderName: string;
+  traderEmail: string;
+  documentType: string;
+  description: string;
+  estimatedValue: number;
+  goodsOrdered: string[];
+  goodsStatus: string;
+}
+
+// Add new interface for QR data
+interface QrScannerData {
+  consignmentId: string;
+  traderName: string;
+  traderEmail: string;
+  documentType: string;
+  goodsStatus: string;
+  goodsOrdered: string[];
+  estimatedValue: number;
+  description: string;
+}
+
+// Updated QR Scanner Modal component
+const QrScannerModal: React.FC<{
+  isOpen: boolean;
+  onClose: () => void;
+  onScanSuccess: (data: QrScannerData) => void;
+}> = ({ isOpen, onClose, onScanSuccess }) => {
+  const [error, setError] = useState<string>('');
+  
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const scanner = new Html5QrcodeScanner(
+      "qr-reader", 
+      { 
+        fps: 10,
+        qrbox: { width: 250, height: 250 },
+      },
+      false
+    );
+
+    scanner.render(
+      async (decodedText) => {
+        try {
+          const qrData = JSON.parse(decodedText);
+          const consignmentDoc = await getDoc(doc(db, 'consignments', qrData.consignmentId));
+          if (consignmentDoc.exists()) {
+            const consignmentData = consignmentDoc.data() as QrScannerData;
+            onScanSuccess(consignmentData);
+            scanner.clear();
+            onClose();
+          } else {
+            setError('Consignment not found');
+          }
+        } catch (err) {
+          setError(err instanceof Error ? err.message : 'Invalid QR code');
+        }
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+
+    return () => {
+      scanner.clear().catch(console.error);
+    };
+  }, [isOpen, onClose, onScanSuccess]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="bg-white rounded-xl p-6 max-w-md w-full">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold">Scan QR Code</h3>
+          <button 
+            type="button" 
+            onClick={onClose}
+            aria-label="Close QR code scanner"
+            className="text-gray-500 hover:text-gray-700"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div id="qr-reader" className="w-full"></div>
+        
+        {error && (
+          <p className="mt-2 text-red-500 text-sm">{error}</p>
+        )}
+      </div>
+    </div>
+  );
+};
+
 export const CustomsDashboard: React.FC = () => {
   const { user, signOut } = useAuth(); 
   const navigate = useNavigate();
@@ -592,39 +697,157 @@ export const CustomsDashboard: React.FC = () => {
   };
 
   const QuickActions: React.FC = () => {
+    const [showNewConsignmentModal, setShowNewConsignmentModal] = useState(false);
+    const [showScanner, setShowScanner] = useState(false);
+    const [scannedData, setScannedData] = useState<QrScannerData | null>(null);
+    const [formData, setFormData] = useState<NewConsignmentFormData>({
+      traderName: '',
+      traderEmail: '',
+      documentType: '',
+      description: '',
+      estimatedValue: 0,
+      goodsOrdered: [],
+      goodsStatus: ''
+    });
+
     const handleNewConsignment = () => {
-      
+      setShowNewConsignmentModal(true);
     };
 
     const handleExportData = () => {
-      // Implement export functionality
+      // Convert consignments to Excel
+      const worksheet = XLSX.utils.json_to_sheet(state.consignments.map(c => ({
+        'Trader Name': c.traderName,
+        'Email': c.traderEmail,
+        'Document Type': c.documentType,
+        'Status': c.status,
+        'Upload Date': c.uploadDate.toDate().toLocaleDateString(),
+        'Declaration Number': c.details?.declarationNumber,
+        'Description': c.details?.description,
+        'Estimated Value': c.details?.estimatedValue,
+        'Goods Status': c.details?.goodsStatus
+      })));
+
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Consignments');
+      
+      // Generate Excel file
+      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+      const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      
+      // Download file
+      saveAs(data, `consignments_${new Date().toISOString().split('T')[0]}.xlsx`);
     };
 
     const handleGenerateReport = () => {
-      // Implement report generation
+      // Create a summary report
+      const report = {
+        totalConsignments: state.consignments.length,
+        statusBreakdown: {
+          pending: state.consignments.filter(c => c.status === ConsignmentStatus.Pending).length,
+          approved: state.consignments.filter(c => c.status === ConsignmentStatus.Approved).length,
+          rejected: state.consignments.filter(c => c.status === ConsignmentStatus.Rejected).length,
+        },
+        averageValue: state.consignments.reduce((acc, c) => acc + (c.details?.estimatedValue || 0), 0) / state.consignments.length,
+        documentTypes: state.consignments.reduce((acc, c) => {
+          acc[c.documentType] = (acc[c.documentType] || []).concat(c);
+          return acc;
+        }, {} as Record<string, Consignment[]>),
+      };
+
+      // Convert to PDF format
+      const reportContent = `
+        Consignments Report
+        Generated on: ${new Date().toLocaleDateString()}
+        
+        Summary:
+        - Total Consignments: ${report.totalConsignments}
+        - Status Breakdown:
+          * Pending: ${report.statusBreakdown.pending}
+          * Approved: ${report.statusBreakdown.approved}
+          * Rejected: ${report.statusBreakdown.rejected}
+        - Average Value: $${report.averageValue.toFixed(2)}
+      `;
+
+      // Create and download PDF
+      const blob = new Blob([reportContent], { type: 'text/plain' });
+      saveAs(blob, `report_${new Date().toISOString().split('T')[0]}.txt`);
+    };
+
+    const handleScanSuccess = (data: QrScannerData) => {
+      setScannedData(data);
+      // You can also auto-populate a form or display the data in a modal
+      setFormData({
+        traderName: data.traderName,
+        traderEmail: data.traderEmail,
+        documentType: data.documentType,
+        goodsStatus: data.goodsStatus,
+        goodsOrdered: data.goodsOrdered,
+        estimatedValue: data.estimatedValue,
+        description: data.description
+      });
     };
 
     return (
-      <div className="flex flex-wrap gap-4 mb-8">
-        <button
-          onClick={handleNewConsignment}
-          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <FaPlus className="mr-2" /> New Consignment
-        </button>
-        <button 
-          onClick={handleExportData}
-          className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-        >
-          <FaFileExport className="mr-2" /> Export Data
-        </button>
-        <button 
-          onClick={handleGenerateReport}
-          className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-        >
-          <FaChartBar className="mr-2" /> Generate Report
-        </button>
-      </div>
+      <>
+        <div className="flex flex-wrap gap-4 mb-8">
+          <button
+            onClick={handleNewConsignment}
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <FaPlus className="mr-2" /> New Consignment
+          </button>
+          <button 
+            onClick={handleExportData}
+            className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          >
+            <FaFileExport className="mr-2" /> Export Data
+          </button>
+          <button 
+            onClick={handleGenerateReport}
+            className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            <FaChartBar className="mr-2" /> Generate Report
+          </button>
+          <button
+            onClick={() => setShowScanner(true)}
+            className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            <FaQrcode className="mr-2" /> Scan Document
+          </button>
+        </div>
+
+        {/* New Consignment Modal */}
+        <NewConsignmentModal 
+          isOpen={showNewConsignmentModal}
+          onClose={() => setShowNewConsignmentModal(false)}
+          onSubmit={handleSubmitNewConsignment}
+        />
+
+        <QrScannerModal
+          isOpen={showScanner}
+          onClose={() => setShowScanner(false)}
+          onScanSuccess={handleScanSuccess}
+        />
+
+        {/* Display scanned data */}
+        {scannedData && (
+          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h3 className="text-lg font-semibold mb-4">Scanned Document Details</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Trader Name</p>
+                <p className="mt-1">{scannedData.traderName}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Document Type</p>
+                <p className="mt-1">{scannedData.documentType}</p>
+              </div>
+              {/* Add more fields as needed */}
+            </div>
+          </div>
+        )}
+      </>
     );
   };
 
@@ -1036,6 +1259,12 @@ export const CustomsDashboard: React.FC = () => {
   //     </div>
   //   );
   // };
+
+  const handleSubmitNewConsignment = (formData: NewConsignmentFormData) => {
+    // Handle the new consignment submission
+    console.log('New consignment:', formData);
+    // Add implementation details here
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">

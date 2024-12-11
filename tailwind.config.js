@@ -16,8 +16,8 @@ export default {
     extend: {
       keyframes: {
         fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
+          '0%': { opacity: '0', transform: 'scale(0.95)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
         },
         slideIn: {
           '0%': { transform: 'translateX(10px)', opacity: '0' },

@@ -18,12 +18,33 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { FaShip, FaTruck, FaWarehouse, FaBoxOpen } from 'react-icons/fa';
 import CustomsDashboard from './Components/CustomsDashboard';
 import { AuthProvider } from './Components/AuthContext';
+import Typewriter from 'typewriter-effect';
+import { Dialog } from '@headlessui/react'
 
 
-// Define an interface for the activity type
-interface Activity {
-  id: number;
-  description: string;
+// // Define an interface for the activity type
+// interface Activity {
+//   id: number;
+//   description: string;
+// }
+
+// Add this interface for order information
+interface OrderInfo {
+  orderNumber: string;
+  status: 'In Transit' | 'Delivered' | 'Pending';
+  location: string;
+  lastUpdate: string;
+  packageType?: string;
+  estimatedDelivery?: string;
+  sender?: string;
+  origin?: string;
+  recipient?: string;
+  destination?: string;
+  trackingHistory?: Array<{
+    status: string;
+    location: string;
+    timestamp: string;
+  }>;
 }
 
 export default function App() {
@@ -54,6 +75,11 @@ export default function App() {
 
 function LandingPage () {
   const navigate = useNavigate();
+  const [orderNumber, setOrderNumber] = useState('');
+  const [orderInfo, setOrderInfo] = useState<OrderInfo | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const settings = {
     dots: false,
     arrows: false,
@@ -81,30 +107,34 @@ function LandingPage () {
     ]
   };
 
-  const [orderNumber, setOrderNumber] = useState('');
-  const [activities, setActivities] = useState<Activity[]>([]);
-
-  const fetchActivities = (orderNumber: string): Activity[] => {
-    // Placeholder implementation - will replace with actual API call or logic later
-    return orderNumber ? [{ id: 1, description: `Activity for ${orderNumber}` }] : [];
+  const fetchOrderInfo = async (orderNumber: string) => {
+    setIsSearching(true);
+    // Simulate API call - replace with actual API call
+    if (orderNumber.match(/^ORD-\d{3}$/)) {
+      return {
+        orderNumber,
+        status: "In Transit" as const,
+        location: "Mombasa Port",
+        lastUpdate: new Date().toLocaleDateString()
+      };
+    }
+    return null;
   };
 
-  const handleTrackClick = () => {
-    console.log("Tracking:", orderNumber);
-    const activities = fetchActivities(orderNumber);
-    setActivities(activities);
+  const handleSearch = async () => {
+    const info = await fetchOrderInfo(orderNumber);
+    setOrderInfo(info);
+    setIsSearching(false);
+    if (info) setIsModalOpen(true);
   };
 
   const { scrollYProgress } = useScroll();
   const scale = useTransform(scrollYProgress, [0, 0.5], [1, 1.1]);
-  const y = useTransform(scrollYProgress, [0, 0.5], [0, -50]);
+  // const y = useTransform(scrollYProgress, [0, 0.5], [0, -50]);
 
   return (
     <div 
-      style={{ 
-        transform: `scale(${scale.get()}) translateY(${y.get()}px)` 
-      }}
-      className="min-h-screen bg-gray-100 text-gray-800 font-['Montserrat'] flex flex-col relative overflow-hidden"
+      className={`min-h-screen bg-gray-100 text-gray-800 font-['Montserrat'] flex flex-col relative overflow-hidden landing-page-container`}
     >
       {/* Floating Trade Icons */}
       <motion.div 
@@ -202,28 +232,79 @@ function LandingPage () {
       </div>
 
       <div className="container mx-auto px-4 py-8 pt-24 relative z-10">
-        <div className="max-w-4xl mx-auto mb-12">                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
-          <div className="flex items-center bg-white rounded-full shadow-md overflow-hidden">
-            <div className="flex-grow flex items-center px-6">
-              <FiSearch className="text-gray-400 text-xl mr-3" />
-              <input
-                type="text"
-                placeholder="Tracking Number or InfoNotice®"
-                className="w-full py-4 text-base focus:outline-none"
-                value={orderNumber}
-                onChange={(e) => {
-                  setOrderNumber(e.target.value);
-                  const fetchedActivities = fetchActivities(e.target.value);
-                  setActivities(fetchedActivities);
-                }}
-              />
+        <div className="max-w-4xl mx-auto mb-12">
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center bg-white rounded-[15px] shadow-md overflow-hidden border border-gray-200">
+              <div className="flex-grow flex items-center px-6 relative">
+                <FiSearch className="text-gray-400 text-xl mr-3" aria-hidden="true" />
+                <input
+                  type="text"
+                  className="w-full py-4 text-base focus:outline-none"
+                  aria-label="Search orders"
+                  value={orderNumber}
+                  onChange={(e) => setOrderNumber(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                />
+                {!orderNumber && (
+                  <div className="absolute left-16 top-1/2 -translate-y-1/2 text-gray-400">
+                    <Typewriter
+                      options={{
+                        strings: ['Search Order e.g., ORD-001', 'Track Your Shipment', 'Check Order Status'],
+                        autoStart: true,
+                        loop: true,
+                        delay: 75,
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+              <button 
+                type="button"
+                className="bg-teal-500 text-white px-8 py-4 flex items-center gap-2 hover:bg-teal-600 transition-colors rounded-r-[15px]"
+                onClick={handleSearch}
+              >
+                <span>Track Your Shipment</span>
+                <svg width="1.5em" height="1.5em" viewBox="0 0 24 24" strokeWidth="1.5" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6.00005 19L19 5.99996M19 5.99996V18.48M19 5.99996H6.52005" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
             </div>
-            <button 
-              className="bg-teal-500 text-white px-8 py-4 text-base font-semibold hover:bg-teal-600 transition-colors"
-              onClick={handleTrackClick}
-            >
-              Track
-            </button>
+
+            {/* Order Information Display */}
+            {isSearching && (
+              <div className="text-center text-gray-600">
+                Searching...
+              </div>
+            )}
+            
+            <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)} className="relative z-50">
+              <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" aria-hidden="true" />
+              <div className="fixed inset-0 flex items-center justify-center p-4">
+                <Dialog.Panel className="bg-white rounded-lg p-6 shadow-xl max-w-md w-full">
+                  <h3 className="text-xl font-semibold mb-4">Order Information</h3>
+                  {orderInfo && (
+                    <div className="space-y-2">
+                      <p><span className="font-medium">Order Number:</span> {orderInfo.orderNumber}</p>
+                      <p><span className="font-medium">Status:</span> {orderInfo.status}</p>
+                      <p><span className="font-medium">Location:</span> {orderInfo.location}</p>
+                      <p><span className="font-medium">Last Update:</span> {orderInfo.lastUpdate}</p>
+                    </div>
+                  )}
+                  <button 
+                    onClick={() => setIsModalOpen(false)}
+                    className="mt-4 px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600"
+                  >
+                    Close
+                  </button>
+                </Dialog.Panel>
+              </div>
+            </Dialog>
+
+            {orderNumber && !orderInfo && !isSearching && (
+              <div className="text-center text-red-500">
+                No order found with the specified number.
+              </div>
+            )}
           </div>
           <div className="text-center mt-3">
             <a href="./contact" className="text-sm text-gray-800 hover:text-teal-500">Need Help?</a>
@@ -233,7 +314,7 @@ function LandingPage () {
           <div className="md:w-1/2 mb-8 md:mb-0">
             <h2 className="text-teal-500 text-xl mb-2">Digital Trade, Simplified</h2>
             <h1 className="text-5xl font-bold mb-4 leading-tight">
-              Streamline trade, cut customs processes by <span className="text-teal-500">50%</span> <br />
+              Simplify trade, cut customs processes by <span className="text-teal-500">50%</span> <br />
                with our <span className="text-teal-500">digital solutions</span><br />
               Experience faster, more efficient
               transactions for cross-border trade.
@@ -323,16 +404,6 @@ function LandingPage () {
             </div>
           </div>
         </section>
-        {activities.length > 0 && (
-          <div className="mt-4">
-            <h3 className="text-lg font-semibold">Order Activities:</h3>
-            {activities.map(activity => (
-              <div key={activity.id} className="text-gray-600">
-                {activity.description}
-              </div>
-            ))}
-          </div>
-        )}
       </div>
       <footer className="bg-gradient-to-r from-gray-800 to-gray-900 text-white mt-auto relative z-10">
         <div className="container mx-auto px-6 py-12">
@@ -341,9 +412,9 @@ function LandingPage () {
               <h5 className="text-2xl font-bold mb-4">AfriTrade-Xchange</h5>
               <p className="text-gray-300 mb-4">Streamlining African trade with innovative digital solutions.</p>
               <div className="flex space-x-4">
-                <a href="#" className="text-gray-300 hover:text-teal-500 transition-colors"><FaFacebookF size={20} /></a>
-                <a href="#" className="text-gray-300 hover:text-teal-500 transition-colors"><FaLinkedinIn size={20} /></a>
-                <a href="#" className="text-gray-300 hover:text-teal-500 transition-colors"><FaInstagram size={20} /></a>
+                <a href="#" aria-label="Facebook" className="text-gray-300 hover:text-teal-500 transition-colors"><FaFacebookF size={20} /></a>
+                <a href="#" aria-label="LinkedIn" className="text-gray-300 hover:text-teal-500 transition-colors"><FaLinkedinIn size={20} /></a>
+                <a href="#" aria-label="Instagram" className="text-gray-300 hover:text-teal-500 transition-colors"><FaInstagram size={20} /></a>
               </div>
             </div>
             <div>
@@ -375,10 +446,22 @@ function LandingPage () {
             <div>
             <h4 className="text-white text-md font-semibold mb-6">Download Our App</h4>
             <div className="flex space-x-4">
-              <a href="https://play.google.com/store/apps/details?id=com.yourapp" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors duration-300">
+              <a 
+                href="https://play.google.com/store/apps/details?id=com.yourapp" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-gray-400 hover:text-white transition-colors duration-300"
+                aria-label="Download on Google Play Store"
+              >
                 <FaGooglePlay className="h-10" />
               </a>
-              <a href="https://apps.apple.com/app/idyourappid" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors duration-300">
+              <a 
+                href="https://apps.apple.com/app/idyourappid" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-gray-400 hover:text-white transition-colors duration-300"
+                aria-label="Download on Apple App Store"
+              >
                 <FaApple className="h-10" />
               </a>
             </div>

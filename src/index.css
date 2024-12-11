@@ -14,5 +14,9 @@ body, html {
 }
 
 body {
-  font-family: 'Comfortaa', sans-serif;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.landing-page-container {
+  transform: scale(var(--scale)) translateY(var(--translate-y));
 }

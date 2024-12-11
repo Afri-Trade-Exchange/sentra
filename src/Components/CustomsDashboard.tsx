@@ -24,12 +24,11 @@ import { Pie, Line } from 'react-chartjs-2';
 import Footer from './Footer';
 import { useAuth } from './AuthContext';
 import TraderDetailsModal from './TraderDetailsModal';
-// import QrScanner from 'react-qr-scanner';
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
 import NewConsignmentModal from './NewConsignmentModal';
 import { Html5QrcodeScanner } from 'html5-qrcode';
-// import { db } from '../firebase-config'; // Ensure this is set up
+import { db } from '../firebase/firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
 
 // Register ChartJS components
@@ -700,15 +699,6 @@ export const CustomsDashboard: React.FC = () => {
     const [showNewConsignmentModal, setShowNewConsignmentModal] = useState(false);
     const [showScanner, setShowScanner] = useState(false);
     const [scannedData, setScannedData] = useState<QrScannerData | null>(null);
-    const [formData, setFormData] = useState<NewConsignmentFormData>({
-      traderName: '',
-      traderEmail: '',
-      documentType: '',
-      description: '',
-      estimatedValue: 0,
-      goodsOrdered: [],
-      goodsStatus: ''
-    });
 
     const handleNewConsignment = () => {
       setShowNewConsignmentModal(true);
@@ -777,15 +767,6 @@ export const CustomsDashboard: React.FC = () => {
     const handleScanSuccess = (data: QrScannerData) => {
       setScannedData(data);
       // You can also auto-populate a form or display the data in a modal
-      setFormData({
-        traderName: data.traderName,
-        traderEmail: data.traderEmail,
-        documentType: data.documentType,
-        goodsStatus: data.goodsStatus,
-        goodsOrdered: data.goodsOrdered,
-        estimatedValue: data.estimatedValue,
-        description: data.description
-      });
     };
 
     return (

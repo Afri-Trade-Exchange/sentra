@@ -179,7 +179,7 @@ export default function TraderLogin() {
                   id="email-input"
                   aria-label="Email Address"
                   aria-required="true"
-                  aria-invalid={formState.errors.email ? 'true' : 'false'}
+                  aria-invalid={formState.errors.email ? "true" : "false"}
                   aria-describedby="email-error"
                   name="email"
                   value={formState.data.email}

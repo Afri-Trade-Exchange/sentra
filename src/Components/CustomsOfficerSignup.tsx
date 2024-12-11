@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaGoogle } from 'react-icons/fa';
-import Footer from '../Components/Footer'; // Import the Footer component
+import Footer from '../Components/Footer';
 
 export default function TraderSignup() {
   const [showPassword, setShowPassword] = useState(false);

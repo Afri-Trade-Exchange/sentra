@@ -30,7 +30,7 @@ interface Invoice {
   totalAmount: number;
   status: 'Paid' | 'Pending' | 'Overdue';
   items: InvoiceItem[];
-  taxRate?: number;
+  taxRate: number;
   notes?: string;
 }
 
@@ -63,6 +63,13 @@ interface RiskAssessment {
   level: 'Low' | 'Medium' | 'High';
   description: string;
   impactScore: number;
+}
+
+interface StatusUpdate {
+  activityId: string;
+  status: ActivityStatus;
+  updatedBy: string;
+  timestamp: Date;
 }
 
 import { useNavigate } from 'react-router-dom';
@@ -102,59 +109,6 @@ enum ActivityStatus {
 function isValidStatus(status: string): status is ActivityStatus {
   return Object.values(ActivityStatus).includes(status as ActivityStatus);
 }
-
-// Styled status component with Swiss design principles
-const StatusBadge: React.FC<{ 
-  status: ActivityStatus; 
-  onChange: (newStatus: ActivityStatus) => void 
-}> = ({ status, onChange }) => {
-  const statusStyles = {
-    [ActivityStatus.Pending]: 'bg-yellow-50 text-yellow-800 border-yellow-200',
-    [ActivityStatus.InTransit]: 'bg-blue-50 text-blue-800 border-blue-200',
-    [ActivityStatus.Completed]: 'bg-green-50 text-green-800 border-green-200'
-  };
-
-  return (
-    <div className="relative group">
-      <select
-        value={status}
-        onChange={(e) => {
-          const newStatus = e.target.value;
-          if (isValidStatus(newStatus)) {
-            onChange(newStatus);
-          }
-        }}
-        aria-label="Activity Status"
-        className={`
-          appearance-none 
-          w-full 
-          px-3 
-          py-1 
-          rounded-md 
-          border 
-          font-medium 
-          cursor-pointer 
-          transition-colors 
-          ${statusStyles[status]}
-          hover:opacity-80
-          focus:ring-2
-          focus:ring-opacity-50
-        `}
-      >
-        {Object.values(ActivityStatus).map((stat) => (
-          <option key={stat} value={stat}>
-            {stat}
-          </option>
-        ))}
-      </select>
-      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-        <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-          <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-        </svg>
-      </div>
-    </div>
-  );
-};
 
 // Improved invoice view button with Swiss minimalism
 const InvoiceViewButton: React.FC<{ 
@@ -219,6 +173,33 @@ const generateInvoice = (activity: Activity, user?: User | null): Invoice => ({
   notes: `Invoice for ${activity.category} - ${activity.id}`
 });
 
+// Add this utility function before the StatusBadge component
+const getStatusStyles = (status: ActivityStatus) => {
+  switch (status) {
+    case ActivityStatus.Completed:
+      return 'bg-green-100 text-green-800 border-green-200';
+    case ActivityStatus.InTransit:
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    case ActivityStatus.Pending:
+      return 'bg-gray-100 text-gray-800 border-gray-200';
+    default:
+      return 'bg-gray-100 text-gray-800 border-gray-200';
+  }
+};
+
+const getStatusColor = (status: ActivityStatus) => {
+  switch (status) {
+    case ActivityStatus.Completed:
+      return 'bg-green-500';
+    case ActivityStatus.InTransit:
+      return 'bg-yellow-500';
+    case ActivityStatus.Pending:
+      return 'bg-gray-500';
+    default:
+      return 'bg-gray-500';
+  }
+};
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -232,6 +213,9 @@ export default function Dashboard() {
   const [user, setUser] = useState<User | null>(null);
   const [isConsignmentModalOpen, setIsConsignmentModalOpen] = useState(false);
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+  const [statusHistory, setStatusHistory] = useState<StatusUpdate[]>([]);
+  const [statusUpdateNotification, setStatusUpdateNotification] = useState<string | null>(null);
+  const [showStatusHistory, setShowStatusHistory] = useState(false);
 
   // Move calculateInsights outside of useEffect to make it accessible
   const calculateInsights = (activityList: Activity[]) => {
@@ -511,7 +495,6 @@ export default function Dashboard() {
       );
     }
 
-    // Consignment Popup
     return (
       <AnimatePresence>
         {isConsignmentModalOpen && (
@@ -827,6 +810,13 @@ export default function Dashboard() {
     activityId: string, 
     newStatus: ActivityStatus
   ) => {
+    const update: StatusUpdate = {
+      activityId,
+      status: newStatus,
+      updatedBy: user?.name || 'Unknown Officer',
+      timestamp: new Date()
+    };
+
     setActivities(prevActivities => 
       prevActivities.map(activity => 
         activity.id === activityId 
@@ -834,10 +824,109 @@ export default function Dashboard() {
           : activity
       )
     );
+
+    setStatusHistory(prev => [update, ...prev]);
+    
+    // Show notification
+    setStatusUpdateNotification(`Status updated to ${newStatus} by ${update.updatedBy}`);
+    setTimeout(() => setStatusUpdateNotification(null), 3000);
+  };
+
+  // Add this StatusBadge enhancement
+  const StatusBadge: React.FC<{ 
+    status: ActivityStatus; 
+    onChange: (newStatus: ActivityStatus) => void;
+    lastUpdated?: Date;
+    updatedBy?: string;
+  }> = ({ status, onChange, lastUpdated, updatedBy }) => {
+    return (
+      <div className="relative group">
+        <select
+          value={status}
+          aria-label="Update activity status"
+          onChange={(e) => {
+            const newStatus = e.target.value;
+            if (isValidStatus(newStatus)) {
+              onChange(newStatus);
+            }
+          }}
+          className={`
+            appearance-none 
+            w-full 
+            px-3 
+            py-1 
+            rounded-md 
+            border 
+            font-medium 
+            cursor-pointer 
+            transition-all
+            duration-200
+            ${getStatusStyles(status)}
+            hover:ring-2
+            hover:ring-opacity-50
+            focus:outline-none
+            focus:ring-2
+            focus:ring-blue-500
+          `}
+        >
+          {Object.values(ActivityStatus).map((stat) => (
+            <option key={stat} value={stat}>{stat}</option>
+          ))}
+        </select>
+        
+        {/* Status update tooltip */}
+        {lastUpdated && (
+          <div className="absolute z-10 -top-12 left-0 w-48 p-2 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            Last updated: {lastUpdated.toLocaleString()}
+            <br />
+            By: {updatedBy}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Add this StatusNotification component
+  const StatusNotification: React.FC<{ message: string | null }> = ({ message }) => {
+    if (!message) return null;
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 50 }}
+        className="fixed bottom-4 right-4 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg"
+      >
+        {message}
+      </motion.div>
+    );
+  };
+
+  // Add this StatusTimeline component
+  const StatusTimeline: React.FC<{ updates: StatusUpdate[] }> = ({ updates }) => {
+    return (
+      <div className="mt-4 space-y-3">
+        {updates.map((update, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center space-x-3 text-sm"
+          >
+            <div className={`w-2 h-2 rounded-full ${getStatusColor(update.status)}`} />
+            <span className="font-medium">{update.status}</span>
+            <span className="text-gray-500">by {update.updatedBy}</span>
+            <span className="text-gray-400">
+              {update.timestamp.toLocaleString()}
+            </span>
+          </motion.div>
+        ))}
+      </div>
+    );
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 text-gray-800">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="container mx-auto px-4 pt-20 space-y-6">
         {/* Insights Section */}
         {renderInsightsSection()}
@@ -1027,19 +1116,25 @@ export default function Dashboard() {
         onClose={() => setIsUploadModalOpen(false)}
       />
       <InvoiceDetailModal 
-        invoice={selectedInvoice ?? ({
+        invoice={selectedInvoice ?? {
           id: '',
           invoiceNumber: '',
           customerName: '',
           businessName: '',
-          activity: {} as Activity,
+          activity: {
+            id: '',
+            category: '',
+            date: '',
+            status: '',
+            amount: 0
+          },
           invoiceDate: '',
           dueDate: '',
           totalAmount: 0,
-          status: 'Pending',
+          status: 'Pending' as const,  // Use type assertion to match the union type
           items: [],
           taxRate: 0
-        })} 
+        } as Invoice}  // Type assertion to Invoice
         isOpen={isInvoiceModalOpen}
         onClose={() => {
           setIsInvoiceModalOpen(false);
@@ -1048,6 +1143,33 @@ export default function Dashboard() {
       />
       <ConsignmentCreationModal />
       <CreateRequestModal />
+
+      {/* Add the notification component */}
+      <AnimatePresence>
+        <StatusNotification message={statusUpdateNotification} />
+      </AnimatePresence>
+      
+      {/* Add status timeline in a collapsible panel */}
+      <motion.div
+        initial={false}
+        animate={{ height: showStatusHistory ? 'auto' : 0 }}
+        className="fixed bottom-0 right-0 w-80 bg-white shadow-lg rounded-t-lg overflow-hidden"
+      >
+        <button
+          onClick={() => setShowStatusHistory(!showStatusHistory)}
+          className="w-full px-4 py-2 flex items-center justify-between bg-gray-100"
+        >
+          <span className="font-medium">Status History</span>
+          <motion.span
+            animate={{ rotate: showStatusHistory ? 180 : 0 }}
+          >
+            ↑
+          </motion.span>
+        </button>
+        <div className="p-4">
+          <StatusTimeline updates={statusHistory} />
+        </div>
+      </motion.div>
     </div>
   );
 }

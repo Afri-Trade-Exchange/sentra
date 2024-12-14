@@ -179,18 +179,20 @@ export default function TraderLogin() {
                   id="email-input"
                   aria-label="Email Address"
                   aria-required="true"
-                  aria-invalid={formState.errors.email ? "true" : "false"}
+                  aria-invalid={(formState.errors.email ? "true" : "false")}
                   aria-describedby="email-error"
                   name="email"
                   value={formState.data.email}
                   onChange={handleInputChange}
-                  placeholder="Enter Your Email"
+                  placeholder="johnOludhe@gmail.com"
                   className={`w-full px-4 py-3 border rounded-[15px] ${
                     formState.errors.email ? 'border-red-500' : 'border-gray-300'
                   }`}
                 />
                 {formState.errors.email && (
-                  <p className="text-red-500 text-sm">{formState.errors.email}</p>
+                  <p id="email-error" className="text-red-500 text-sm">
+                    {formState.errors.email}
+                  </p>
                 )}
                 
                 <div className="relative">

@@ -1595,6 +1595,7 @@ export const CustomsDashboard: React.FC = () => {
     // Add implementation details here
   };
 
+  // loading state
   const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {

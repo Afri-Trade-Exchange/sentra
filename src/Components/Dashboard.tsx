@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaUpload, FaDownload, FaBox, FaSignOutAlt, FaArchive, FaFileInvoice, FaHistory, FaCog, FaApplePay, FaPlusCircle, } from 'react-icons/fa';
+import { FaUpload, FaDownload, FaBox, FaSignOutAlt, FaFileInvoice, FaHistory, FaCog, FaApplePay, FaPlusCircle, FaClipboardCheck } from 'react-icons/fa';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import UploadModal from './UploadModal';
 import InvoiceDetailModal from './InvoiceDetailModal';
@@ -42,12 +42,6 @@ interface InvoiceItem {
 }
 
 // Additional imports
-import { 
-  FaInfoCircle, 
-  FaChartLine, 
-  FaExclamationTriangle, 
-  FaClipboardCheck 
-} from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 // import { format, parseISO } from 'date-fns';
 
@@ -200,6 +194,64 @@ const getStatusColor = (status: ActivityStatus) => {
   }
 };
 
+// Add new interfaces for analytics
+// interface AnalyticsData {
+//   dailyStats: {
+//     date: string;
+//     value: number;
+//     trend: 'up' | 'down' | 'stable';
+//   }[];
+//   performance: {
+//     metric: string;
+//     value: number;
+//     target: number;
+//     progress: number;
+//   }[];
+// }
+
+// Add new interface for enhanced insights
+interface EnhancedInsights extends DashboardInsights {
+  revenueGrowth: number;
+  processingEfficiency: number;
+  customerSatisfaction: number;
+}
+
+const calculateRiskLevel = (insights: EnhancedInsights): RiskAssessment => {
+  const score = insights.processingEfficiency + (insights.revenueGrowth * 0.5);
+  
+  return {
+    level: score > 80 ? 'Low' : score > 50 ? 'Medium' : 'High',
+    description: `Risk assessment based on processing efficiency and revenue growth`,
+    impactScore: score
+  };
+};
+
+// Add this component before the Dashboard component
+const ContextualHelp: React.FC<{ content: string }> = ({ content }) => {
+  const [showTooltip, setShowTooltip] = useState(false);
+  
+  return (
+    <div className="relative ml-2">
+      <button
+        type="button"
+        aria-label="Help information"
+        onMouseEnter={() => setShowTooltip(true)}
+        onMouseLeave={() => setShowTooltip(false)}
+        className="text-gray-400 hover:text-gray-600"
+      >
+        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </button>
+      {showTooltip && (
+        <div className="absolute z-10 w-64 p-2 mt-2 text-sm text-white bg-gray-800 rounded-md shadow-lg">
+          {content}
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -208,7 +260,7 @@ export default function Dashboard() {
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [showAllInvoices, setShowAllInvoices] = useState(false);
-  const [insights, setInsights] = useState<DashboardInsights | null>(null);
+  const [enhancedInsights, setEnhancedInsights] = useState<EnhancedInsights | null>(null);
   const [riskAssessment, setRiskAssessment] = useState<RiskAssessment | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isConsignmentModalOpen, setIsConsignmentModalOpen] = useState(false);
@@ -217,45 +269,29 @@ export default function Dashboard() {
   const [statusUpdateNotification, setStatusUpdateNotification] = useState<string | null>(null);
   const [showStatusHistory, setShowStatusHistory] = useState(false);
 
-  // Move calculateInsights outside of useEffect to make it accessible
+  // Enhance the calculateInsights function
   const calculateInsights = (activityList: Activity[]) => {
-    const totalRevenue = activityList.reduce((sum, activity) => sum + activity.amount, 0);
-    const pendingRequests = activityList.filter(a => a.status === 'Pending').length;
-    const completedRequests = activityList.filter(a => a.status === 'Completed').length;
-    
-    const insightsData: DashboardInsights = {
-      totalRevenue,
-      pendingRequests,
-      completedRequests,
+    const baseInsights = {
+      totalRevenue: activityList.reduce((sum, activity) => sum + activity.amount, 0),
+      pendingRequests: activityList.filter(a => a.status === 'Pending').length,
+      completedRequests: activityList.filter(a => a.status === 'Completed').length,
       averageProcessingTime: calculateAverageProcessingTime(activityList)
     };
-    
-    // Risk assessment logic
-    const pendingPercentage = (insightsData.pendingRequests / activityList.length) * 100;
-    
-    let riskLevel: RiskAssessment = {
-      level: 'Low',
-      description: 'Operations are running smoothly',
-      impactScore: 1
+
+    // Add enhanced metrics
+    const enhancedMetrics = {
+      ...baseInsights,
+      revenueGrowth: calculateRevenueGrowth(activityList),
+      processingEfficiency: calculateProcessingEfficiency(activityList),
+      customerSatisfaction: calculateCustomerSatisfaction(),
     };
 
-    if (pendingPercentage > 30) {
-      riskLevel = {
-        level: 'Medium',
-        description: 'High number of pending requests detected',
-        impactScore: 5
-      };
-    }
+    setEnhancedInsights(enhancedMetrics);
 
-    if (pendingPercentage > 50) {
-      riskLevel = {
-        level: 'High',
-        description: 'Critical backlog of requests',
-        impactScore: 8
-      };
-    }
-
-    return { insightsData, riskLevel };
+    return {
+      insightsData: enhancedMetrics,
+      riskLevel: calculateRiskLevel(enhancedMetrics),
+    };
   };
 
   useEffect(() => {
@@ -292,7 +328,7 @@ export default function Dashboard() {
 
     // Calculate dashboard insights
     const { insightsData, riskLevel } = calculateInsights(initialActivities);
-    setInsights(insightsData);
+    setEnhancedInsights(insightsData);
     setRiskAssessment(riskLevel);
 
     // Generate invoices for ALL activities
@@ -302,7 +338,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     const { insightsData, riskLevel } = calculateInsights(activities);
-    setInsights(insightsData);
+    setEnhancedInsights(insightsData);
     setRiskAssessment(riskLevel);
   }, [activities]);
 
@@ -316,12 +352,12 @@ export default function Dashboard() {
     navigate('/');
   };
 
+  // Update navItems to be more concise
   const navItems = [
-    { label: 'Current Requests', icon: FaPlusCircle },
-    { label: 'Closed Requests', icon: FaArchive },
+    { label: 'Requests', icon: FaPlusCircle },
     { label: 'Invoices', icon: FaFileInvoice },
     { label: 'Payments', icon: FaApplePay },
-    { label: 'Order History', icon: FaHistory },
+    { label: 'History', icon: FaHistory },
     { label: 'Settings', icon: FaCog },
     { label: 'Log Out', icon: FaSignOutAlt, action: handleSignOut },
   ];
@@ -363,75 +399,6 @@ export default function Dashboard() {
     setSelectedInvoice(invoice);
     setIsInvoiceModalOpen(true);
   };
-
-  // Render additional insights section
-  const renderInsightsSection = () => (
-    <div className="grid grid-cols-3 gap-4">
-      {/* Total Revenue Insight */}
-      <motion.div 
-        whileHover={{ scale: 1.05 }}
-        className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-5 flex items-center space-x-4"
-      >
-        <FaChartLine className="text-4xl text-green-500" />
-        <div>
-          <h3 className="text-lg font-semibold text-gray-700">Total Revenue</h3>
-          <p className="text-2xl font-bold text-green-600">
-            ${insights?.totalRevenue.toLocaleString() || 0}
-          </p>
-        </div>
-      </motion.div>
-
-      {/* Request Status Insight */}
-      <motion.div 
-        whileHover={{ scale: 1.05 }}
-        className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-5 flex items-center space-x-4"
-      >
-        <FaClipboardCheck className="text-4xl text-blue-500" />
-        <div>
-          <h3 className="text-lg font-semibold text-gray-700">Requests</h3>
-          <p className="text-2xl font-bold text-blue-600">
-            {insights?.completedRequests} / {activities.length}
-          </p>
-        </div>
-      </motion.div>
-
-      {/* Risk Assessment */}
-      <motion.div 
-        whileHover={{ scale: 1.05 }}
-        className={`bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-5 flex items-center space-x-4 ${
-          riskAssessment?.level === 'High' ? 'border-2 border-red-500' : 
-          riskAssessment?.level === 'Medium' ? 'border-2 border-yellow-500' : ''
-        }`}
-      >
-        <FaExclamationTriangle 
-          className={`text-4xl ${
-            riskAssessment?.level === 'High' ? 'text-red-500' : 
-            riskAssessment?.level === 'Medium' ? 'text-yellow-500' : 'text-green-500'
-          }`} 
-        />
-        <div>
-          <h3 className="text-lg font-semibold text-gray-700">Risk Level</h3>
-          <p className={`text-xl font-bold ${
-            riskAssessment?.level === 'High' ? 'text-red-600' : 
-            riskAssessment?.level === 'Medium' ? 'text-yellow-600' : 'text-green-600'
-          }`}>
-            {riskAssessment?.level}
-          </p>
-          <p className="text-xs text-gray-500">{riskAssessment?.description}</p>
-        </div>
-      </motion.div>
-    </div>
-  );
-
-  // Contextual Help Tooltip Component
-  const ContextualHelp = ({ content }: { content: string }) => (
-    <div className="group relative inline-block">
-      <FaInfoCircle className="text-blue-500 cursor-help" />
-      <div className="absolute z-10 p-2 -mt-2 text-sm text-white bg-gray-800 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 -left-full w-64">
-        {content}
-      </div>
-    </div>
-  );
 
   // Add this to your existing navItems or quick action cards
   const createConsignmentHandler = () => {
@@ -925,23 +892,45 @@ export default function Dashboard() {
     );
   };
 
+  // Add new utility functions
+  const calculateRevenueGrowth = (activities: Activity[]): number => {
+    // Implementation for revenue growth calculation
+    const currentRevenue = activities.reduce((sum, act) => sum + act.amount, 0);
+    const previousRevenue = currentRevenue * 0.9; // Placeholder calculation
+    return Number(((currentRevenue - previousRevenue) / previousRevenue * 100).toFixed(1));
+  };
+
+  const calculateProcessingEfficiency = (activities: Activity[]): number => {
+    const completedActivities = activities.filter(act => act.status === ActivityStatus.Completed);
+    return Number(((completedActivities.length / activities.length) * 100).toFixed(1));
+  };
+
+  const calculateCustomerSatisfaction = (): number => {
+    // Placeholder implementation
+    return 85;
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <div className="container mx-auto px-4 pt-20 space-y-6">
-        {/* Insights Section */}
-        {renderInsightsSection()}
+      <div className="container mx-auto px-4 pt-8 space-y-6">
+        {/* Add Welcome Header */}
+        <div className="flex justify-between items-center bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-5">
+          <h1 className="text-2xl font-bold">Welcome, {user?.name || 'Guest'}</h1>
+          <div className="text-gray-600">{user?.email}</div>
+        </div>
 
-        {/* Main Dashboard Content */}
+        {/* Remove insights section and continue with rest of the layout */}
         <div className="grid grid-cols-12 gap-4">
           {/* Sidebar */}
-          <aside className="col-span-2">
+          <aside className="col-span-2 space-y-2 p-4 bg-white/80 backdrop-blur-md rounded-2xl shadow-lg">
             {navItems.map((item) => (
-              <button 
+              <button
+                type="button"
                 key={item.label} 
                 onClick={item.action}
-                className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-colors group"
+                className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-colors group"
               >
-                <item.icon className="text-base text-gray-600 group-hover:text-blue-600 transition-colors" />
+                <item.icon className="text-lg text-gray-600 group-hover:text-blue-600 transition-colors" />
                 <span className="text-sm font-medium">{item.label}</span>
               </button>
             ))}
@@ -982,6 +971,35 @@ export default function Dashboard() {
                 </button>
               ))}
             </section>
+
+            {/* Add this after the Quick Action Cards section */}
+            <section className="grid grid-cols-3 gap-4">
+              {enhancedInsights && (
+                <>
+                  <div className="bg-white/80 backdrop-blur-md rounded-xl p-4">
+                    <h3 className="text-lg font-medium">Revenue Growth</h3>
+                    <p className="text-2xl">{enhancedInsights.revenueGrowth}%</p>
+                  </div>
+                  <div className="bg-white/80 backdrop-blur-md rounded-xl p-4">
+                    <h3 className="text-lg font-medium">Processing Efficiency</h3>
+                    <p className="text-2xl">{enhancedInsights.processingEfficiency}%</p>
+                  </div>
+                  <div className="bg-white/80 backdrop-blur-md rounded-xl p-4">
+                    <h3 className="text-lg font-medium">Customer Satisfaction</h3>
+                    <p className="text-2xl">{enhancedInsights.customerSatisfaction}%</p>
+                  </div>
+                </>
+              )}
+            </section>
+
+            {/* Add Risk Assessment Display */}
+            {riskAssessment && (
+              <div className="bg-white/80 backdrop-blur-md rounded-xl p-4">
+                <h3 className="text-lg font-medium">Risk Assessment</h3>
+                <p className="text-2xl">{riskAssessment.level} Risk</p>
+                <p className="text-sm text-gray-600">{riskAssessment.description}</p>
+              </div>
+            )}
 
             {/* Analytics Section - Modern Card Design */}
             <div className="grid grid-cols-2 gap-4">

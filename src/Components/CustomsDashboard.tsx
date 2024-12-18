@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useReducer, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useReducer, useCallback, useEffect, useRef } from 'react';
 import { Timestamp } from 'firebase/firestore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -30,6 +30,10 @@ import NewConsignmentModal from './NewConsignmentModal';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import { db } from '../firebase/firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import Papa from 'papaparse';
+import { format } from 'date-fns';
 
 // Register ChartJS components
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement);
@@ -340,6 +344,7 @@ const StatusDropdown: React.FC<{
             <div className="py-1">
               {statusOptions.map((status) => (
                 <button
+                  type="button"
                   key={status}
                   onClick={() => {
                     onStatusChange(status);
@@ -405,7 +410,8 @@ const ConsignmentCard: React.FC<{
         <span className="text-sm text-gray-500">
           {consignment.uploadDate.toDate().toLocaleDateString()}
         </span>
-        <button 
+        <button
+          type="button"
           onClick={() => onViewDetails(consignment)}
           className="text-blue-500 hover:text-blue-700 flex items-center"
         >
@@ -480,11 +486,12 @@ const QrScannerModal: React.FC<{
   onScanSuccess: (data: QrScannerData) => void;
 }> = ({ isOpen, onClose, onScanSuccess }) => {
   const [error, setError] = useState<string>('');
+  const scannerRef = useRef<Html5QrcodeScanner | null>(null);
   
   useEffect(() => {
     if (!isOpen) return;
 
-    const scanner = new Html5QrcodeScanner(
+    scannerRef.current = new Html5QrcodeScanner(
       "qr-reader", 
       { 
         fps: 10,
@@ -493,7 +500,7 @@ const QrScannerModal: React.FC<{
       false
     );
 
-    scanner.render(
+    scannerRef.current.render(
       async (decodedText) => {
         try {
           const qrData = JSON.parse(decodedText);
@@ -501,7 +508,9 @@ const QrScannerModal: React.FC<{
           if (consignmentDoc.exists()) {
             const consignmentData = consignmentDoc.data() as QrScannerData;
             onScanSuccess(consignmentData);
-            scanner.clear();
+            if (scannerRef.current) {
+              await scannerRef.current.clear();
+            }
             onClose();
           } else {
             setError('Consignment not found');
@@ -516,7 +525,9 @@ const QrScannerModal: React.FC<{
     );
 
     return () => {
-      scanner.clear().catch(console.error);
+      if (scannerRef.current) {
+        scannerRef.current.clear().catch(console.error);
+      }
     };
   }, [isOpen, onClose, onScanSuccess]);
 
@@ -548,6 +559,49 @@ const QrScannerModal: React.FC<{
     </div>
   );
 };
+
+// Add this interface for export settings
+interface ExportSettings {
+  format: 'csv' | 'pdf' | 'excel';
+  includeFields: string[];
+  dateRange?: { start: Date; end: Date };
+  orientation?: 'portrait' | 'landscape';
+  customFileName?: string;
+}
+
+// Update the type declaration
+declare module 'jspdf' {
+  interface jsPDF {
+    autoTable: (options: {
+      head?: string[][];
+      body: (string | number)[][];
+      startY?: number;
+      styles?: {
+        fontSize?: number;
+        cellPadding?: number;
+      };
+      headStyles?: {
+        fillColor?: number[];
+        textColor?: number;
+      };
+      alternateRowStyles?: {
+        fillColor?: number[];
+      };
+    }) => jsPDF;
+    internal: {
+      events: PubSub;
+      scaleFactor: number;
+      pageSize: {
+        width: number;
+        getWidth: () => number;
+        height: number;
+        getHeight: () => number;
+      };
+      pages: number[];
+      getEncryptor(objectId: number): (data: string) => string;
+    };
+  }
+}
 
 export const CustomsDashboard: React.FC = () => {
   const { user, signOut } = useAuth(); 
@@ -645,6 +699,7 @@ export const CustomsDashboard: React.FC = () => {
         />
         {state.searchTerm && (
           <button
+            type="button"
             onClick={() => dispatch({ type: 'SET_SEARCH_TERM', payload: '' })}
             className="absolute inset-y-0 right-0 pr-3 flex items-center"
             aria-label="Clear search"
@@ -699,69 +754,159 @@ export const CustomsDashboard: React.FC = () => {
     const [showNewConsignmentModal, setShowNewConsignmentModal] = useState(false);
     const [showScanner, setShowScanner] = useState(false);
     const [scannedData, setScannedData] = useState<QrScannerData | null>(null);
+    const [exportSettings, setExportSettings] = useState<ExportSettings>({
+      format: 'pdf',
+      includeFields: ['traderName', 'documentType', 'status', 'uploadDate'],
+      orientation: 'portrait'
+    });
 
     const handleNewConsignment = () => {
       setShowNewConsignmentModal(true);
     };
 
-    const handleExportData = () => {
-      // Convert consignments to Excel
-      const worksheet = XLSX.utils.json_to_sheet(state.consignments.map(c => ({
+    const formatConsignmentData = (consignments: Consignment[]) => {
+      return consignments.map(c => ({
         'Trader Name': c.traderName,
         'Email': c.traderEmail,
         'Document Type': c.documentType,
         'Status': c.status,
-        'Upload Date': c.uploadDate.toDate().toLocaleDateString(),
-        'Declaration Number': c.details?.declarationNumber,
-        'Description': c.details?.description,
-        'Estimated Value': c.details?.estimatedValue,
-        'Goods Status': c.details?.goodsStatus
-      })));
-
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Consignments');
-      
-      // Generate Excel file
-      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-      const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      
-      // Download file
-      saveAs(data, `consignments_${new Date().toISOString().split('T')[0]}.xlsx`);
+        'Upload Date': format(c.uploadDate.toDate(), 'dd/MM/yyyy'),
+        'Declaration Number': c.details?.declarationNumber || '',
+        'Description': c.details?.description || '',
+        'Estimated Value': c.details?.estimatedValue?.toLocaleString() || '',
+        'Goods Status': c.details?.goodsStatus || ''
+      }));
     };
 
-    const handleGenerateReport = () => {
-      // Create a summary report
-      const report = {
-        totalConsignments: state.consignments.length,
-        statusBreakdown: {
-          pending: state.consignments.filter(c => c.status === ConsignmentStatus.Pending).length,
-          approved: state.consignments.filter(c => c.status === ConsignmentStatus.Approved).length,
-          rejected: state.consignments.filter(c => c.status === ConsignmentStatus.Rejected).length,
+    const exportToPDF = (data: Consignment[]) => {
+      const doc = new jsPDF({
+        orientation: exportSettings.orientation,
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      // Add header
+      doc.setFontSize(16);
+      doc.text('Consignments Report', 14, 15);
+      
+      // Add metadata
+      doc.setFontSize(10);
+      doc.text(`Generated on: ${format(new Date(), 'dd/MM/yyyy HH:mm')}`, 14, 25);
+      doc.text(`Total Records: ${data.length}`, 14, 30);
+
+      // Prepare table data
+      const formattedData = formatConsignmentData(data);
+      const tableData = formattedData.map(item => 
+        exportSettings.includeFields.map(field => item[field as keyof typeof item])
+      );
+
+      // Add table
+      doc.autoTable({
+        head: [exportSettings.includeFields.map(field => 
+          field.replace(/([A-Z])/g, ' $1').trim() // Convert camelCase to Title Case
+        )],
+        body: tableData,
+        startY: 35,
+        styles: {
+          fontSize: 8,
+          cellPadding: 2
         },
-        averageValue: state.consignments.reduce((acc, c) => acc + (c.details?.estimatedValue || 0), 0) / state.consignments.length,
-        documentTypes: state.consignments.reduce((acc, c) => {
-          acc[c.documentType] = (acc[c.documentType] || []).concat(c);
-          return acc;
-        }, {} as Record<string, Consignment[]>),
-      };
+        headStyles: {
+          fillColor: [41, 128, 185],
+          textColor: 255
+        },
+        alternateRowStyles: {
+          fillColor: [245, 245, 245]
+        }
+      });
 
-      // Convert to PDF format
-      const reportContent = `
-        Consignments Report
-        Generated on: ${new Date().toLocaleDateString()}
-        
-        Summary:
-        - Total Consignments: ${report.totalConsignments}
-        - Status Breakdown:
-          * Pending: ${report.statusBreakdown.pending}
-          * Approved: ${report.statusBreakdown.approved}
-          * Rejected: ${report.statusBreakdown.rejected}
-        - Average Value: $${report.averageValue.toFixed(2)}
-      `;
+      // Add footer
+      const pageCount = doc.internal.pages.length - 1;
+      for(let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.text(
+          `Page ${i} of ${pageCount}`,
+          doc.internal.pageSize.width - 20,
+          doc.internal.pageSize.height - 10
+        );
+      }
 
-      // Create and download PDF
-      const blob = new Blob([reportContent], { type: 'text/plain' });
-      saveAs(blob, `report_${new Date().toISOString().split('T')[0]}.txt`);
+      // Save the PDF
+      const fileName = exportSettings.customFileName || 
+        `consignments_report_${format(new Date(), 'yyyyMMdd_HHmm')}.pdf`;
+      doc.save(fileName);
+    };
+
+    const exportToExcel = (data: Consignment[]) => {
+      const formattedData = formatConsignmentData(data);
+      
+      // Create workbook and worksheet
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(formattedData);
+
+      // Add column widths
+      const colWidths = exportSettings.includeFields.map(() => ({ wch: 15 }));
+      ws['!cols'] = colWidths;
+
+      // Add worksheet to workbook
+      XLSX.utils.book_append_sheet(wb, ws, 'Consignments');
+
+      // Add summary sheet
+      const summaryData = [
+        ['Report Summary'],
+        ['Generated Date', format(new Date(), 'dd/MM/yyyy HH:mm')],
+        ['Total Records', data.length.toString()],
+        ['Status Breakdown'],
+        ...Object.values(ConsignmentStatus).map(status => [
+          status,
+          data.filter(c => c.status === status).length
+        ])
+      ];
+      const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
+      XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
+
+      // Save the file
+      const fileName = exportSettings.customFileName || 
+        `consignments_report_${format(new Date(), 'yyyyMMdd_HHmm')}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+    };
+
+    const exportToCSV = (data: Consignment[]) => {
+      const formattedData = formatConsignmentData(data);
+      const csv = Papa.unparse(formattedData);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const fileName = exportSettings.customFileName || 
+        `consignments_report_${format(new Date(), 'yyyyMMdd_HHmm')}.csv`;
+      saveAs(blob, fileName);
+    };
+
+    const handleExport = () => {
+      // Get filtered data based on date range if specified
+      let dataToExport = state.selectedItems.length > 0
+        ? state.consignments.filter(c => state.selectedItems.includes(c.id))
+        : state.consignments;
+
+      if (exportSettings.dateRange) {
+        dataToExport = dataToExport.filter(c => {
+          const date = c.uploadDate.toDate();
+          return date >= exportSettings.dateRange!.start && 
+                 date <= exportSettings.dateRange!.end;
+        });
+      }
+
+      // Export based on selected format
+      switch (exportSettings.format) {
+        case 'pdf':
+          exportToPDF(dataToExport);
+          break;
+        case 'excel':
+          exportToExcel(dataToExport);
+          break;
+        case 'csv':
+          exportToCSV(dataToExport);
+          break;
+      }
     };
 
     const handleScanSuccess = (data: QrScannerData) => {
@@ -769,32 +914,52 @@ export const CustomsDashboard: React.FC = () => {
       // You can also auto-populate a form or display the data in a modal
     };
 
+    const handleExportSettingsChange = (newSettings: Partial<ExportSettings>) => {
+      setExportSettings(prev => ({ ...prev, ...newSettings }));
+    };
+
+    const handleGenerateReport = () => {
+      // Add report generation logic here
+      console.log('Generating report...');
+    };
+
     return (
       <>
         <div className="flex flex-wrap gap-4 mb-8">
           <button
+            type="button"                                     
             onClick={handleNewConsignment}
             className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <FaPlus className="mr-2" /> New Consignment
           </button>
           <button 
-            onClick={handleExportData}
+            type="button"
             className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            onClick={handleExport}
           >
             <FaFileExport className="mr-2" /> Export Data
           </button>
-          <button 
+          <button
+            type="button"
             onClick={handleGenerateReport}
             className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
           >
             <FaChartBar className="mr-2" /> Generate Report
           </button>
           <button
+            type="button"
             onClick={() => setShowScanner(true)}
-            className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+            className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
           >
             <FaQrcode className="mr-2" /> Scan Document
+          </button>
+          <button
+            type="button" 
+            onClick={() => handleExportSettingsChange({ format: 'pdf' })}
+            className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+          >
+            Export Settings
           </button>
         </div>
 
@@ -896,7 +1061,7 @@ export const CustomsDashboard: React.FC = () => {
       <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold">Recent Activity</h3>
-          <button className="text-sm text-blue-600 hover:text-blue-800">
+          <button type="button" className="text-sm text-blue-600 hover:text-blue-800">
             View All
           </button>
         </div>
@@ -942,6 +1107,7 @@ export const CustomsDashboard: React.FC = () => {
     return (
       <div className="bg-white rounded-lg shadow-sm mb-8">
         <button
+          type="button"
           onClick={() => setIsOpen(!isOpen)}
           className="w-full px-6 py-4 flex items-center justify-between text-left"
         >
@@ -1021,10 +1187,10 @@ export const CustomsDashboard: React.FC = () => {
                 </div>
                 
                 <div className="flex justify-end mt-6 gap-3">
-                  <button className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                  <button type="button" className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
                     Reset
                   </button>
-                  <button className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700">
+                  <button type="button" className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700">
                     Apply Filters
                   </button>
                 </div>
@@ -1043,6 +1209,7 @@ export const CustomsDashboard: React.FC = () => {
     return (
       <div className="fixed bottom-4 right-4 z-50">
         <button
+          type="button"
           onClick={() => setIsOpen(!isOpen)}
           className="relative p-3 bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors"
         >
@@ -1123,6 +1290,7 @@ export const CustomsDashboard: React.FC = () => {
         </select>
         
         <button
+          type="button"
           disabled={selectedItems.length === 0}
           className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
@@ -1207,7 +1375,7 @@ export const CustomsDashboard: React.FC = () => {
 
   // Example usage in a button click (add this where appropriate)
   {state.activities.map(activity => (
-    <button key={activity.id} onClick={() => handleActivityStatusChange(activity.id, ActivityStatus.Completed)}>
+    <button type="button" key={activity.id} onClick={() => handleActivityStatusChange(activity.id, ActivityStatus.Completed)}>
       Mark as Completed
     </button>
   ))}
@@ -1262,6 +1430,7 @@ export const CustomsDashboard: React.FC = () => {
           </div>
           
           <button
+            type="button"
             onClick={handleLogout}
             className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
           >
@@ -1331,6 +1500,7 @@ export const CustomsDashboard: React.FC = () => {
                     length: Math.ceil(state.filteredConsignments.length / state.itemsPerPage) 
                   }).map((_, index) => (
                     <button
+                      type="button"
                       key={index}
                       onClick={() => dispatch({ type: 'SET_PAGE', payload: index + 1 })}
                       className={`

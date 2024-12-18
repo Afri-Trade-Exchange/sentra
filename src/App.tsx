@@ -338,27 +338,167 @@ function LandingPage () {
           </div>
         </div>
 
-        
-        {/* <div className="lasg__illustration">
-          {[
-            { src: "/src/assets/images/acceler.png", alt: "Road Illustration", className: "lasg__illustration__road" },
-            { src: "/static/media/buildings.773cd879c2b2585717b29d44d886a769.svg", alt: "Buildings Illustration", className: "lasg__illustration__theatre" },
-            { src: "/static/media/water.a22d392ad8366afd67d52c8793f6af5d.svg", alt: "Water Illustration", className: "lasg__illustration__water" },
-            { src: "/static/media/eko.bdb0bc37172e7013e436fdb8a1af62dd.svg", alt: "Eko Illustration", className: "lasg__illustration__eko" },
-            { src: "/static/media/train__station.9b37d3d5a4bee970212c6a3db563947e.svg", alt: "Train Station Illustration", className: "lasg__illustration__station" },
-            { src: "/static/media/lasg__blueline__rail.a0174585d6cf2ae259efb6c728b852aa.svg", alt: "Train Illustration", className: "lasg__illustration__train" },
-            { src: "/static/media/eyo.eb5452e21e6687503d18ca8331a49943.svg", alt: "Eyo Illustration", className: "lasg__illustration__eyo" },
-            { src: "/static/media/brt.eacc3cf894ece6a28ee365c04ae1e333.svg", alt: "BRT Illustration", className: "motion__illustration brt" },
-            { src: "/static/media/lasumbus.98b624fb71e00c98fe5a7ba9232b9053.svg", alt: "Lasumbus Illustration", className: "motion__illustration lasumbus" },
-            { src: "/static/media/lagosride.2049e78edde6c9ef97c9fba174bcb3c4.svg", alt: "Lagos Ride Illustration", className: "motion__illustration lagride" },
-            { src: "/static/media/danfo.c98079c79960f7354d192431a74143c9.svg", alt: "Danfo Illustration", className: "motion__illustration__2 danfo" },
-          ].map((image, index) => (
-            <div key={index} className={image.className}>
-              <img src={image.src} alt={image.alt} loading="lazy" />
-            </div>
-          ))}
-        </div> */}
+        {/* 
+        <div className="trade-illustrations relative h-[400px] overflow-hidden my-20">
+          {/* Road with Checkpoints *//*}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-full h-20 bg-gray-700 relative">
+              {/* Road Markings *//*}
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full h-2 flex justify-between">
+                  {[...Array(20)].map((_, i) => (
+                    <div 
+                      key={i} 
+                      className="w-16 h-2 bg-yellow-400"
+                      style={{ margin: '0 40px' }}
+                    />
+                  ))}
+                </div>
+              </div>
 
+              {/* Checkpoint Area *//*}
+              <div className="absolute left-1/3 -top-8 bottom-0 w-40 bg-gray-300 rounded-t-lg">
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                  <div className="w-2 h-16 bg-red-500 relative">
+                    <motion.div
+                      className="w-8 h-2 bg-red-500 absolute top-0 left-1/2 transform -translate-x-1/2"
+                      animate={{ rotate: [0, 90, 90, 0] }}
+                      transition={{
+                        duration: 4,
+                        repeat: Infinity,
+                        times: [0, 0.3, 0.7, 1]
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Customs Officer *//*}
+              <motion.div
+                className="absolute left-1/3 top-1/2 transform -translate-y-1/2"
+                animate={{
+                  y: [-5, 5],
+                  rotate: [-5, 5]
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  repeatType: "reverse"
+                }}
+              >
+                <img 
+                  src="/src/assets/images/customs-officer.svg" 
+                  alt="Customs Officer" 
+                  className="w-16 h-16"
+                />
+              </motion.div>
+
+              {/* Moving Vehicles *//*}
+              {[...Array(3)].map((_, index) => (
+                <motion.div
+                  key={index}
+                  className="absolute top-1/2 transform -translate-y-1/2"
+                  initial={{ x: window.innerWidth + 100 }}
+                  animate={{
+                    x: [
+                      window.innerWidth + 100, // Start position (right side)
+                      window.innerWidth * 0.4, // Position before checkpoint
+                      window.innerWidth * 0.4, // Wait at checkpoint
+                      -100 // End position (left side)
+                    ]
+                  }}
+                  transition={{
+                    duration: 10,
+                    times: [0, 0.4, 0.6, 1],
+                    delay: index * 3,
+                    repeat: Infinity,
+                    ease: "linear"
+                  }}
+                >
+                  <motion.div
+                    style={{
+                      scaleX: -1 // This flips the image horizontally
+                    }}
+                  >
+                    <img 
+                      src="/src/assets/images/delivery-truck.svg" 
+                      alt={`Delivery Truck ${index + 1}`} 
+                      className="w-20 h-20"
+                    />
+                  </motion.div>
+                </motion.div>
+              ))}
+
+              {/* Road Signs *//*}
+              <div className="absolute right-1/4 -top-12">
+                <img 
+                  src="/src/assets/images/road-sign.svg" 
+                  alt="Road Sign" 
+                  className="w-12 h-12"
+                />
+                <div className="text-xs text-white mt-1">Customs Ahead</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Additional Decorative Elements *//*}
+          <motion.div 
+            className="absolute top-10 right-1/4"
+            animate={{
+              y: [-5, 5],
+              rotate: [-2, 2]
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              repeatType: "reverse"
+            }}
+          >
+            <img 
+              src="/src/assets/images/documents.svg" 
+              alt="Documents" 
+              className="w-12 h-12"
+            />
+          </motion.div>
+
+          {/* Add some buildings in the background *//*}
+          <div className="absolute left-0 bottom-20 w-full flex justify-around">
+            {[...Array(4)].map((_, index) => (
+              <div 
+                key={index}
+                className="w-32 h-48 bg-gray-800 rounded-t-lg"
+                style={{
+                  transform: `translateY(${index * 10}px)`,
+                  opacity: 0.8 - (index * 0.1)
+                }}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* CSS Styles
+        .trade-illustrations {
+          background: linear-gradient(
+            180deg,
+            #87CEEB 0%,    /* Sky *//*
+            #87CEEB 60%,   /* Sky *//*
+            #8B4513 60%,   /* Ground *//*
+            #8B4513 100%   /* Ground *//*
+          );
+        }
+
+        .trade-illustrations::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 40px;
+          background: rgba(0, 0, 0, 0.2);
+          filter: blur(10px);
+        }
+        *//*}
+        */}
 
         <div className="mt-16">
           <h3 className="text-center text-xl text-gray-600 mb-6">Trusted by Leading Logistics Companies</h3>

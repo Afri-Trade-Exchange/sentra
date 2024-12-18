@@ -18,6 +18,7 @@ import {
   FaBell,
   FaClock,
   FaQrcode,
+  FaQuestion,
 } from 'react-icons/fa';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement } from 'chart.js';
 import { Pie, Line } from 'react-chartjs-2';
@@ -602,6 +603,185 @@ declare module 'jspdf' {
     };
   }
 }
+
+interface TourStep {
+  element: string;
+  title: string;
+  content: string;
+  position?: 'top' | 'right' | 'bottom' | 'left';
+}
+
+const GuidedTour: React.FC = () => {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [isVisible, setIsVisible] = useState(true);
+  
+  const steps: TourStep[] = [
+    {
+      element: '#search',
+      title: 'Search',
+      content: 'Type to instantly filter consignments by trader name, ID, or status.',
+      position: 'bottom'
+    },
+    {
+      element: '#filters',
+      title: 'Filters',
+      content: 'Refine results using multiple criteria for precise control.',
+      position: 'right'
+    },
+    {
+      element: '#quick-actions',
+      title: 'Quick Actions',
+      content: 'Access common tasks like creating new consignments or generating reports.',
+      position: 'left'
+    },
+    {
+      element: '#analytics',
+      title: 'Analytics',
+      content: 'Monitor key metrics and trends at a glance.',
+      position: 'top'
+    }
+  ];
+
+  const handleSkip = () => {
+    setIsVisible(false);
+    // Save to user preferences that tour is completed
+    localStorage.setItem('tourCompleted', 'true');
+  };
+
+  if (!isVisible || currentStep >= steps.length) return null;
+
+  return (
+    <div className="fixed inset-0 z-50">
+      {/* Semi-transparent overlay */}
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+      
+      {/* Tour card */}
+      <div 
+        className="
+          absolute p-6 
+          bg-white 
+          rounded-none 
+          shadow-2xl 
+          max-w-md 
+          transform -translate-x-1/2 -translate-y-1/2
+          left-1/2 top-1/2
+        "
+      >
+        {/* Progress indicator */}
+        <div className="flex gap-1.5 mb-6">
+          {steps.map((_, index) => (
+            <div 
+              key={index}
+              className={`
+                h-1 flex-1 rounded-none
+                transition-colors duration-200
+                ${index <= currentStep ? 'bg-blue-600' : 'bg-gray-200'}
+              `}
+            />
+          ))}
+        </div>
+
+        {/* Content */}
+        <h4 className="font-helvetica text-xl mb-3">
+          {steps[currentStep].title}
+        </h4>
+        <p className="text-base leading-relaxed text-gray-600 mb-8">
+          {steps[currentStep].content}
+        </p>
+
+        {/* Navigation */}
+        <div className="flex items-center justify-between">
+          <div className="flex gap-4">
+            <button
+              type="button"
+              onClick={handleSkip}
+              className="
+                px-4 py-2
+                text-sm font-medium text-gray-600
+                hover:text-gray-900
+                transition-colors
+              "
+            >
+              Skip Tour
+            </button>
+            {currentStep > 0 && (
+              <button
+                type="button"
+                onClick={() => setCurrentStep(prev => prev - 1)}
+                className="
+                  px-4 py-2
+                  text-sm font-medium text-gray-600
+                  hover:text-gray-900
+                  transition-colors
+                "
+              >
+                Previous
+              </button>
+            )}
+          </div>
+          
+          <button
+            type="button"
+            onClick={() => setCurrentStep(prev => prev + 1)}
+            className="
+              px-6 py-2
+              bg-blue-600 text-white
+              hover:bg-blue-700
+              rounded-lg
+              shadow-md
+              transition-colors
+              text-sm font-medium
+              focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+            "
+          >
+            {currentStep === steps.length - 1 ? 'Finish' : 'Next'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const LoadingState: React.FC = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="space-y-4 text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+      <p className="text-gray-600">Loading dashboard...</p>
+    </div>
+  </div>
+);
+
+const HelpButton: React.FC = () => {
+  const [showHelp, setShowHelp] = useState(false);
+  
+  return (
+    <div className="fixed bottom-4 left-4 z-50">
+      <button
+        type="button"
+        onClick={() => setShowHelp(!showHelp)}
+        className="p-3 bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors"
+        aria-label="Help"
+      >
+        <FaQuestion className="w-6 h-6 text-gray-600" />
+      </button>
+      
+      {showHelp && (
+        <div className="absolute bottom-full left-0 mb-2 p-4 bg-white rounded-lg shadow-xl w-64">
+          <h4 className="font-semibold mb-2">Quick Help</h4>
+          <ul className="space-y-2 text-sm">
+            <li>• Click cards to view details</li>
+            <li>• Use filters to narrow results</li>
+            <li>• Create a New Consignment for a trader</li>
+            <li>• Export data using quick actions</li>
+            <li>• Scan QR codes for consignment details</li>
+            <li>• Check notifications for any updates</li>
+            <li>• Contact support for any issues</li>
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export const CustomsDashboard: React.FC = () => {
   const { user, signOut } = useAuth(); 
@@ -1415,8 +1595,18 @@ export const CustomsDashboard: React.FC = () => {
     // Add implementation details here
   };
 
+  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    // Simulate loading time or use real data loading
+    setTimeout(() => setIsLoading(false), 1000);
+  }, []);
+
+  if (isLoading) return <LoadingState />;
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
+      <GuidedTour />
       <div className="flex-grow px-6 py-8 max-w-7xl mx-auto w-full">
         {/* Header Section */}
         <div className="mb-8 flex justify-between items-center">
@@ -1546,6 +1736,7 @@ export const CustomsDashboard: React.FC = () => {
       {/* <div className="mb-8">
         <QrCodeScanner />
       </div> */}
+      <HelpButton />
     </div>
   );
 };

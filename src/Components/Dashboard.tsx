@@ -354,11 +354,11 @@ export default function Dashboard() {
 
   // Update navItems to be more concise
   const navItems = [
-    { label: 'Requests', icon: FaPlusCircle },
-    { label: 'Invoices', icon: FaFileInvoice },
-    { label: 'Payments', icon: FaApplePay },
-    { label: 'History', icon: FaHistory },
-    { label: 'Settings', icon: FaCog },
+    { label: 'Requests', icon: FaPlusCircle, path: '/requests' },
+    { label: 'Invoices', icon: FaFileInvoice, path: '/invoices' },
+    { label: 'Payments', icon: FaApplePay, path: '/payments' },
+    { label: 'History', icon: FaHistory, path: '/history' },
+    { label: 'Settings', icon: FaCog, path: '/settings' },
     { label: 'Log Out', icon: FaSignOutAlt, action: handleSignOut },
   ];
 
@@ -922,18 +922,73 @@ export default function Dashboard() {
         {/* Remove insights section and continue with rest of the layout */}
         <div className="grid grid-cols-12 gap-4">
           {/* Sidebar */}
-          <aside className="col-span-2 space-y-2 p-4 bg-white/80 backdrop-blur-md rounded-2xl shadow-lg">
-            {navItems.map((item) => (
-              <button
-                type="button"
-                key={item.label} 
-                onClick={item.action}
-                className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-colors group"
-              >
-                <item.icon className="text-lg text-gray-600 group-hover:text-blue-600 transition-colors" />
-                <span className="text-sm font-medium">{item.label}</span>
-              </button>
-            ))}
+          <aside className="col-span-2 bg-white/80 backdrop-blur-md rounded-2xl shadow-lg overflow-hidden">
+            {/* Profile Section */}
+            <div className="p-4 border-b border-gray-100">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                  <span className="text-xl font-semibold text-blue-600">
+                    {user?.name?.charAt(0) || 'G'}
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-sm font-semibold text-gray-900 truncate">
+                    {user?.name || 'Guest'}
+                  </h2>
+                  <p className="text-xs text-gray-500 truncate">
+                    {user?.email || 'guest@example.com'}
+                  </p>
+                </div>
+                <button 
+                  onClick={handleSignOut}
+                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+                  title="Sign Out"
+                >
+                  <FaSignOutAlt className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Existing Sidebar Content */}
+            <div className="p-4">
+              <div className="mb-6">
+                <h2 className="text-lg font-semibold text-gray-800">Dashboard</h2>
+                <p className="text-sm text-gray-500">Manage your business</p>
+              </div>
+              
+              <nav className="space-y-1">
+                {navItems.map((item) => {
+                  const isActive = location.pathname === item.path;
+                  return (
+                    <button
+                      key={item.label}
+                      onClick={item.action || (() => navigate(item.path))}
+                      className={`
+                        w-full flex items-center px-4 py-3 rounded-lg
+                        transition-all duration-200 ease-in-out
+                        ${isActive 
+                          ? 'bg-blue-50 text-blue-600' 
+                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                        }
+                        group
+                      `}
+                    >
+                      <item.icon className={`
+                        w-5 h-5 mr-3
+                        transition-colors
+                        ${isActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'}
+                      `} />
+                      <span className="font-medium">{item.label}</span>
+                      {item.path && (
+                        <span className="ml-auto transform group-hover:translate-x-1 transition-transform">
+                          →
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </nav>
+            </div>
           </aside>
 
           {/* Main Content */}

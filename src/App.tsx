@@ -10,7 +10,6 @@ import TraderSignup from './Components/TraderSignup'
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom'
 import ContactPage from './Components/ContactPage'
 import Layout from './Components/Layout'
-import Navbar from './Components/Navbar'
 import ErrorBoundary from './Components/ErrorBoundary'
 import Dashboard from './Components/Dashboard' 
 import { useState } from 'react';
@@ -20,6 +19,7 @@ import CustomsDashboard from './Components/CustomsDashboard';
 import { AuthProvider } from './Components/AuthContext';
 import Typewriter from 'typewriter-effect';
 import { Dialog } from '@headlessui/react'
+import { FaClock, FaShieldAlt, FaChartLine } from 'react-icons/fa';
 
 
 // // Define an interface for the activity type
@@ -54,7 +54,6 @@ export default function App() {
         <Router>
           <Suspense fallback={<div>Loading...</div>}>
             <div className="App">
-              <Navbar />
               <Layout>
                 <Routes>
                   <Route path="/" element={<LandingPage />} />
@@ -310,17 +309,35 @@ function LandingPage () {
             <a href="./contact" className="text-sm text-gray-800 hover:text-teal-500">Need Help?</a>
           </div>
         </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12 mb-16">
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="text-teal-500 text-2xl mb-3">
+              <FaClock className="inline-block mr-2" /> Fast Processing
+            </div>
+            <p className="text-gray-600">Clear customs in half the time with our streamlined digital process</p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="text-teal-500 text-2xl mb-3">
+              <FaShieldAlt className="inline-block mr-2" /> Secure & Compliant
+            </div>
+            <p className="text-gray-600">100% compliance with customs regulations and secure document handling</p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="text-teal-500 text-2xl mb-3">
+              <FaChartLine className="inline-block mr-2" /> Real-time Tracking
+            </div>
+            <p className="text-gray-600">Monitor your shipments and customs clearance status in real-time</p>
+          </div>
+        </div>
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="md:w-1/2 mb-8 md:mb-0">
             <h2 className="text-teal-500 text-xl mb-2">Digital Trade, Simplified</h2>
             <h1 className="text-5xl font-bold mb-4 leading-tight">
-              Simplify trade, cut customs processes by <span className="text-teal-500">50%</span> <br />
-               with our <span className="text-teal-500">digital solutions</span><br />
-              Experience faster, more efficient
-              transactions for cross-border trade.
+              Clear Customs <span className="text-teal-500">50% Faster</span><br />
+              with Digital Solutions
             </h1>
             <p className="text-gray-600 mb-6">
-              Making customs processes faster and smoother for businesses across the Globe.
+              One platform for all your cross-border trade needs. Track, manage, and clear shipments seamlessly.
             </p>
             <button 
               onClick={() => navigate('/trader-signup')} 

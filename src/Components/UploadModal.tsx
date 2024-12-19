@@ -257,10 +257,7 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div
-              className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-              style={{ 
-                width: `${(Object.values(documents).filter(doc => doc.file !== null).length / Object.values(documents).length) * 100}%` 
-              }}
+              className={`bg-blue-500 h-2 rounded-full transition-all duration-300 w-[${(Object.values(documents).filter(doc => doc.file !== null).length / Object.values(documents).length) * 100}%]`}
             />
           </div>
         </div>

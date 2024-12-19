@@ -20,6 +20,8 @@ import { AuthProvider } from './Components/AuthContext';
 import Typewriter from 'typewriter-effect';
 import { Dialog } from '@headlessui/react'
 import { FaClock, FaShieldAlt, FaChartLine } from 'react-icons/fa';
+import { FaBell, FaFileAlt, FaLock, FaCheckCircle } from 'react-icons/fa';
+import './Components/LandingPage.css';
 
 
 // // Define an interface for the activity type
@@ -310,19 +312,19 @@ function LandingPage () {
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12 mb-16">
-          <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="bg-white p-6 rounded-[15px] shadow-md">
             <div className="text-teal-500 text-2xl mb-3">
               <FaClock className="inline-block mr-2" /> Fast Processing
             </div>
             <p className="text-gray-600">Clear customs in half the time with our streamlined digital process</p>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="bg-white p-6 rounded-[15px] shadow-md">
             <div className="text-teal-500 text-2xl mb-3">
               <FaShieldAlt className="inline-block mr-2" /> Secure & Compliant
             </div>
             <p className="text-gray-600">100% compliance with customs regulations and secure document handling</p>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="bg-white p-6 rounded-[15px] shadow-md">
             <div className="text-teal-500 text-2xl mb-3">
               <FaChartLine className="inline-block mr-2" /> Real-time Tracking
             </div>
@@ -339,19 +341,66 @@ function LandingPage () {
             <p className="text-gray-600 mb-6">
               One platform for all your cross-border trade needs. Track, manage, and clear shipments seamlessly.
             </p>
-            <button 
-              onClick={() => navigate('/trader-signup')} 
-              className="px-12 py-3 text-white  bg-teal-500 rounded-[15px] hover:bg-teal-600"
-            >
-              Get Started
-            </button>
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={() => navigate('/trader-signup')} 
+                className="px-12 py-3 text-gray-700 bg-white border-2 border-gray-200 rounded-[15px] hover:bg-gray-50 hover:border-gray-300 transition-all"
+              >
+                How others use it
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/trader-signup')} 
+                className="px-12 py-3 text-white bg-teal-500 rounded-[15px] hover:bg-teal-600 transition-all"
+              >
+                Try for free
+              </button>
+            </div>
           </div>
           <div className="md:w-1/2">
-            <img
-              src="/src/assets/images/Dayflow Riding.png"
-              alt="Illustration of person on bicycle"
-              className="w-full h-auto"
-            />
+            <div className="relative group transform scale-110 mx-auto">
+              {/* Glowing background effect */}
+              <div className="absolute -inset-4 bg-gradient-to-r from-teal-500/20 to-blue-500/20 rounded-[40px] blur-2xl opacity-75 group-hover:opacity-100 transition-all duration-500" />
+              
+              {/* Semi-transparent overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent rounded-[30px] backdrop-blur-[2px] group-hover:backdrop-blur-[1px] transition-all duration-300" />
+              
+              {/* Main image */}
+              <img
+                src="/src/assets/images/clearance.png"
+                alt="Illustration of person on bicycle"
+                className="w-full h-auto relative z-10 transition-all duration-500 
+                           rounded-[30px] transform group-hover:scale-[1.02] main-image"
+              />
+              
+              {/* Decorative elements */}
+              <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
+                              w-[140%] h-[140%] bg-gradient-to-r from-teal-500/10 via-blue-500/10 
+                              to-transparent rounded-full blur-3xl opacity-60 group-hover:opacity-75 
+                              transition-all duration-500" />
+              
+              {/* Bottom fade effect */}
+              <div className="absolute -z-10 bottom-0 left-0 w-full h-32 
+                              bg-gradient-to-t from-gray-100 via-gray-100/50 to-transparent" />
+              
+              {/* Optional floating elements */}
+              <div className="absolute top-5 right-5 bg-white/90 backdrop-blur-sm 
+                              p-3 rounded-full shadow-xl transform -rotate-12 
+                              group-hover:-rotate-6 transition-all duration-500">
+                <svg className="w-6 h-6 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              
+              <div className="absolute bottom-8 left-8 bg-white/90 backdrop-blur-sm 
+                              p-3 rounded-full shadow-xl transform rotate-12 
+                              group-hover:rotate-6 transition-all duration-500">
+                <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -561,6 +610,103 @@ function LandingPage () {
             </div>
           </div>
         </section>
+
+        <section className="bg-gradient-to-r from-teal-500 to-teal-600 py-20 my-16 rounded-[30px]">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-col md:flex-row items-center justify-between">
+              <div className="md:w-1/2 mb-10 md:mb-0">
+                <h2 className="text-4xl font-bold text-white mb-6">Download Our Mobile App</h2>
+                <div className="space-y-4 text-white mb-8">
+                  <div className="flex items-start space-x-3">
+                    <FaShieldAlt className="text-2xl mt-1" />
+                    <div>
+                      <h3 className="font-semibold text-xl">Real-Time Tracking</h3>
+                      <p className="opacity-90">Track your shipments anytime, anywhere with live updates</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <FaBell className="text-2xl mt-1" />
+                    <div>
+                      <h3 className="font-semibold text-xl">Instant Notifications</h3>
+                      <p className="opacity-90">Get alerts about your shipment status and customs clearance</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <FaFileAlt className="text-2xl mt-1" />
+                    <div>
+                      <h3 className="font-semibold text-xl">Digital Documentation</h3>
+                      <p className="opacity-90">Upload and manage all your trade documents digitally</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex space-x-4">
+                  <a 
+                    href="https://play.google.com/store/apps/details?id=com.yourapp" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="bg-white px-6 py-3 rounded-lg flex items-center space-x-2 hover:shadow-lg transition-shadow"
+                  >
+                    <FaGooglePlay className="text-2xl text-teal-600" />
+                    <div>
+                      <div className="text-xs text-gray-600">GET IT ON</div>
+                      <div className="text-sm font-bold text-gray-800">Google Play</div>
+                    </div>
+                  </a>
+                  <a 
+                    href="https://apps.apple.com/app/idyourappid" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="bg-white px-6 py-3 rounded-lg flex items-center space-x-2 hover:shadow-lg transition-shadow"
+                  >
+                    <FaApple className="text-2xl text-teal-600" />
+                    <div>
+                      <div className="text-xs text-gray-600">Download on the</div>
+                      <div className="text-sm font-bold text-gray-800">App Store</div>
+                    </div>
+                  </a>
+                </div>
+              </div>
+              <div className="md:w-1/2 relative">
+                <img 
+                  src="/src/assets/images/app-preview.png" 
+                  alt="AfriTrade Mobile App" 
+                  className="w-72 mx-auto relative z-10"
+                />
+                {/* Add floating elements around the app preview */}
+                <div className="absolute top-0 right-0 -mr-4 bg-white p-4 rounded-lg shadow-lg">
+                  <FaCheckCircle className="text-teal-500 text-xl" />
+                  <div className="text-sm mt-1">Instant Updates</div>
+                </div>
+                <div className="absolute bottom-0 left-0 -ml-4 bg-white p-4 rounded-lg shadow-lg">
+                  <FaLock className="text-teal-500 text-xl" />
+                  <div className="text-sm mt-1">Secure Access</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Add a download counter section */}
+        <div className="container mx-auto px-4 mb-16">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div>
+              <div className="text-4xl font-bold text-teal-500 mb-2">50K+</div>
+              <div className="text-gray-600">App Downloads</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold text-teal-500 mb-2">4.8/5</div>
+              <div className="text-gray-600">User Rating</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold text-teal-500 mb-2">20+</div>
+              <div className="text-gray-600">Countries</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold text-teal-500 mb-2">24/7</div>
+              <div className="text-gray-600">Support</div>
+            </div>
+          </div>
+        </div>
       </div>
       <footer className="bg-gradient-to-r from-gray-800 to-gray-900 text-white mt-auto relative z-10">
         <div className="container mx-auto px-6 py-12">

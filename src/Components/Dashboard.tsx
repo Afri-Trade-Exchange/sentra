@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { FaUpload, FaDownload, FaBox, FaSignOutAlt, FaFileInvoice, FaHistory, FaCog, FaApplePay, FaPlusCircle, FaClipboardCheck } from 'react-icons/fa';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import UploadModal from './UploadModal';
@@ -270,7 +270,7 @@ export default function Dashboard() {
   const [showStatusHistory, setShowStatusHistory] = useState(false);
 
   // Enhance the calculateInsights function
-  const calculateInsights = (activityList: Activity[]) => {
+  const calculateInsights = useCallback((activityList: Activity[]) => {
     const baseInsights = {
       totalRevenue: activityList.reduce((sum, activity) => sum + activity.amount, 0),
       pendingRequests: activityList.filter(a => a.status === 'Pending').length,
@@ -292,7 +292,7 @@ export default function Dashboard() {
       insightsData: enhancedMetrics,
       riskLevel: calculateRiskLevel(enhancedMetrics),
     };
-  };
+  }, []);
 
   useEffect(() => {
     // Get user data from localStorage
@@ -334,13 +334,13 @@ export default function Dashboard() {
     // Generate invoices for ALL activities
     const generatedInvoices: Invoice[] = initialActivities.map(activity => generateInvoice(activity, user));
     setInvoices(generatedInvoices);
-  }, [user]);
+  }, [user, calculateInsights]);
 
   useEffect(() => {
     const { insightsData, riskLevel } = calculateInsights(activities);
     setEnhancedInsights(insightsData);
     setRiskAssessment(riskLevel);
-  }, [activities]);
+  }, [activities, calculateInsights]);
 
   // Add a sign out function
   const handleSignOut = () => {

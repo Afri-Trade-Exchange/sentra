@@ -6,6 +6,7 @@ import Footer from './Footer';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../firebase/firebaseConfig'; 
 import { signupUser } from '../firebase/authService';
+import './TraderSignup.css';
 
 type UserRole = 'trader' | 'customs';
 
@@ -28,6 +29,7 @@ export default function TraderSignup() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prevData => ({ ...prevData, [name]: value }));
+    setFormState(prev => ({ ...prev, data: { ...prev.data, [name]: value } }));
   };
 
   const validateForm = () => {
@@ -56,9 +58,8 @@ export default function TraderSignup() {
     setFormState(prev => ({ ...prev, isLoading: true }));
 
     try {
-      // Use formData instead of formState.data
       const userRole: UserRole = await signupUser({
-        ...formData,  // Changed from formState.data
+        ...formState.data,  // Changed from formData
         role: accountType as UserRole
       });
       
@@ -111,7 +112,7 @@ export default function TraderSignup() {
       <div className="flex flex-col min-h-screen">
         <div className="flex-grow flex bg-gray-100">
           {/* Left side - Image and Quote */}
-          <div className="hidden lg:block w-1/2 bg-cover bg-center relative animate-fadeIn" style={{ backgroundImage: "url('./src/assets/images/paul.png')" }}>
+          <div className="hidden lg:block w-1/2 bg-cover bg-center relative animate-fadeIn trader-signup-bg">
             <div className="absolute inset-0 bg-gradient-to-br from-teal-500/90 via-teal-600/85 to-teal-900/90 
                             backdrop-blur-sm flex flex-col justify-center p-12 text-white">
               <h2 className="text-6xl font-bold mb-6 leading-tight">

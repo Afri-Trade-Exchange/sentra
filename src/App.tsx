@@ -22,6 +22,7 @@ import { Dialog } from '@headlessui/react'
 import { FaClock, FaShieldAlt, FaChartLine } from 'react-icons/fa';
 import { FaBell, FaFileAlt, FaLock, FaCheckCircle } from 'react-icons/fa';
 import './Components/LandingPage.css';
+import Settings from './Components/Settings';
 
 
 // // Define an interface for the activity type
@@ -63,6 +64,7 @@ export default function App() {
                   <Route path="/contact" element={<ContactPage />} />
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/customs-dashboard" element={<CustomsDashboard />} />
+                  <Route path="/settings" element={<Settings />} />
                   {/* Add other routes as needed */}
                 </Routes>
               </Layout>

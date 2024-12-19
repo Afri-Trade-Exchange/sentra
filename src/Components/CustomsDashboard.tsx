@@ -1616,7 +1616,7 @@ export const CustomsDashboard: React.FC = () => {
               Welcome, {user?.displayName || user?.email?.split('@')[0] || 'Guest'}
             </h1>
             <p className="text-sm text-gray-600">
-              Manage and track customs declarations and documents
+              Manage and track your customs declarations and documents
             </p>
           </div>
           

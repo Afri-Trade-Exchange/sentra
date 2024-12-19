@@ -3,12 +3,13 @@ import { FaUpload, FaDownload, FaBox, FaSignOutAlt, FaFileInvoice, FaHistory, Fa
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import UploadModal from './UploadModal';
 import InvoiceDetailModal from './InvoiceDetailModal';
-import Footer from './Footer';
+import Footer from './Footer';                       
 // import { Link } from 'react-router-dom';
 
 interface User {
   name: string;
   email: string;
+  displayName?: string;
 }
 
 interface Activity {
@@ -352,7 +353,7 @@ export default function Dashboard() {
     navigate('/');
   };
 
-  // Update navItems to be more concise
+
   const navItems = [
     { label: 'Requests', icon: FaPlusCircle, path: '/requests' },
     { label: 'Invoices', icon: FaFileInvoice, path: '/invoices' },
@@ -914,9 +915,15 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="container mx-auto px-4 pt-8 space-y-6">
         {/* Add Welcome Header */}
-        <div className="flex justify-between items-center bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-5">
-          <h1 className="text-2xl font-bold">Welcome, {user?.name || 'Guest'}</h1>
-          <div className="text-gray-600">{user?.email}</div>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              Welcome {user?.displayName || user?.email?.split('@')[0] || ''}
+            </h1>
+            <p className="text-sm text-gray-600">
+              {user?.email || 'Manage and track your customs declarations and documents'}
+            </p>
+          </div>
         </div>
 
         {/* Remove insights section and continue with rest of the layout */}
@@ -953,7 +960,7 @@ export default function Dashboard() {
             <div className="p-4">
               <div className="mb-6">
                 <h2 className="text-lg font-semibold text-gray-800">Dashboard</h2>
-                <p className="text-sm text-gray-500">Manage your business</p>
+                <p className="text-sm text-gray-500">Manage your account</p>
               </div>
               
               <nav className="space-y-1">

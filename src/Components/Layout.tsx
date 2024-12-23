@@ -60,13 +60,10 @@ export default function Layout({ children }: LayoutProps) {
 
         <div className="hidden md:flex items-center justify-end space-x-4 w-1/4">
           <button type="button" onClick={() => navigate('/trader-signup')} className="px-4 py-2 text-l text-gray-700 hover:text-teal-500">
-            Register
+            Sign in
           </button>
-          <button type="button" onClick={() => navigate('/trader-signup')} className="px-4 py-2 text-l text-gray-700 hover:text-teal-500">
-            Login
-          </button>
-          <button type="button" onClick={() => navigate('/contact')} className="px-8 py-3 text-l text-white bg-teal-500 hover:bg-teal-600 rounded-[15px]">
-            Contact Us
+          <button type="button" onClick={() => navigate('/bookademo')} className="px-8 py-3 text-l text-white bg-teal-500 hover:bg-teal-600 rounded-[15px]">
+            Book a Demo
           </button>
         </div>
 

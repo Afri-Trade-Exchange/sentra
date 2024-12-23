@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { FaFacebookF, FaInstagram, FaTwitter } from 'react-icons/fa';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Footer from './Footer';
 
 const faqs = [
   {
@@ -236,7 +235,7 @@ const ContactPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Modernized FAQ Section */}
+        {/* FAQ Section */}
         <div className="max-w-3xl mx-auto mb-20">
           <h2 className="text-3xl font-semibold mb-8 text-teal-500 text-center">
             Frequently Asked Questions
@@ -278,8 +277,6 @@ const ContactPage: React.FC = () => {
           </Link>
         </div>
       </div>
-      
-      <Footer />
     </div>
   );
 };

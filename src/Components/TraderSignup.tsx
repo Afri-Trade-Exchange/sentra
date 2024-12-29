@@ -1,16 +1,22 @@
-import React, { useState, FormEvent } from 'react';
+import React, { Suspense, lazy, useState, useCallback, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaGoogle } from 'react-icons/fa';
 import Layout from './Layout';
-import Footer from './Footer'; 
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../firebase/firebaseConfig'; 
 import { signupUser } from '../firebase/authService';
 import './TraderSignup.css';
 
+// Lazy load Footer
+const Footer = lazy(() => import('./Footer'));
+
 type UserRole = 'trader' | 'customs';
 
-export default function TraderSignup() {
+interface AuthError {
+  message: string;
+}
+
+const TraderSignup: React.FC = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [accountType, setAccountType] = useState('trader');
@@ -25,6 +31,7 @@ export default function TraderSignup() {
     errors: {},
     isLoading: false
   });
+  const [error, setError] = useState<AuthError | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -88,9 +95,11 @@ export default function TraderSignup() {
     }
   };
 
-  const handleGoogleSignUp = async () => {
+  const handleGoogleSignUp = useCallback(async () => {
     const provider = new GoogleAuthProvider();
     try {
+      setFormState(prev => ({ ...prev, isLoading: true }));
+      setError(null);
       await signInWithPopup(auth, provider);
       // Navigate based on account type
       if (accountType === 'trader') {
@@ -98,14 +107,12 @@ export default function TraderSignup() {
       } else if (accountType === 'customs') {
         navigate('/customs-dashboard');
       }
-    } catch (error) {
-      console.error('Google Sign-Up Error', error);
-      setFormState(prev => ({
-        ...prev,
-        errors: { submit: 'Failed to complete Google sign-up' }
-      }));
+    } catch (err) {
+      setError({ message: 'Failed to sign up with Google' });
+    } finally {
+      setFormState(prev => ({ ...prev, isLoading: false }));
     }
-  };
+  }, [accountType, navigate]);
 
   return (
     <Layout>
@@ -220,25 +227,41 @@ export default function TraderSignup() {
               </form>
 
               <div className="mt-8">
+                {error && (
+                  <div role="alert" className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
+                    {error.message}
+                  </div>
+                )}
+                
                 <button 
                   onClick={handleGoogleSignUp}
-                  className="w-full border border-gray-300 text-gray-700 py-3 rounded-[15px] 
-                             hover:bg-gray-50 hover:border-teal-300 transform hover:scale-[1.01] 
-                             transition-all duration-200 flex items-center justify-center 
-                             font-medium shadow-sm hover:shadow-md"
+                  disabled={formState.isLoading}
+                  aria-busy={formState.isLoading}
+                  className={`
+                    w-full border border-gray-300 text-gray-700 py-3 rounded-[15px] 
+                    hover:bg-gray-50 hover:border-teal-300 transform hover:scale-[1.01] 
+                    transition-all duration-200 flex items-center justify-center 
+                    font-medium shadow-sm hover:shadow-md
+                    ${formState.isLoading ? 'opacity-50 cursor-not-allowed' : ''}
+                  `}
                 >
-                  <FaGoogle className="mr-2 text-teal-500" /> Sign up with Google
+                  <FaGoogle className="mr-2 text-teal-500" />
+                  {formState.isLoading ? 'Signing up...' : 'Sign up with Google'}
                 </button>
               </div>
 
               <p className="mt-8 text-center text-gray-600">
-                Already have an account? <Link to="/login" className="text-teal-500 hover:underline font-medium">Login</Link>
+                Already have an account? <Link to="/login" className="text-teal-500 hover:underline font-medium" aria-label="Login to your existing account">Login</Link>
               </p>
             </div>
           </div>
         </div>
-        <Footer />
+        <Suspense fallback={<div>Loading footer...</div>}>
+          <Footer />
+        </Suspense>
       </div>
     </Layout>
   );
-}
+};
+
+export default React.memo(TraderSignup);

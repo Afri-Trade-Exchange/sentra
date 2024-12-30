@@ -1,16 +1,21 @@
-import React, { useState, FormEvent } from 'react';
+import React, { useState, useCallback, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaGoogle } from 'react-icons/fa';
 import Layout from './Layout';
-import Footer from './Footer'; 
+import HeroSection from './HeroSection';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../firebase/firebaseConfig'; 
 import { signupUser } from '../firebase/authService';
 import './TraderSignup.css';
 
+
 type UserRole = 'trader' | 'customs';
 
-export default function TraderSignup() {
+interface AuthError {
+  message: string;
+}
+
+const TraderSignup: React.FC = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [accountType, setAccountType] = useState('trader');
@@ -25,6 +30,8 @@ export default function TraderSignup() {
     errors: {},
     isLoading: false
   });
+  const [error, setError] = useState<AuthError | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -48,10 +55,13 @@ export default function TraderSignup() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
     
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setFormState(prev => ({ ...prev, errors: validationErrors }));
+      setIsSubmitting(false);
       return;
     }
 
@@ -85,12 +95,15 @@ export default function TraderSignup() {
       }));
     } finally {
       setFormState(prev => ({ ...prev, isLoading: false }));
+      setIsSubmitting(false);
     }
   };
 
-  const handleGoogleSignUp = async () => {
+  const handleGoogleSignUp = useCallback(async () => {
     const provider = new GoogleAuthProvider();
     try {
+      setFormState(prev => ({ ...prev, isLoading: true }));
+      setError(null);
       await signInWithPopup(auth, provider);
       // Navigate based on account type
       if (accountType === 'trader') {
@@ -98,41 +111,20 @@ export default function TraderSignup() {
       } else if (accountType === 'customs') {
         navigate('/customs-dashboard');
       }
-    } catch (error) {
-      console.error('Google Sign-Up Error', error);
-      setFormState(prev => ({
-        ...prev,
-        errors: { submit: 'Failed to complete Google sign-up' }
-      }));
+    } catch (err) {
+      setError({ message: 'Failed to sign up with Google' });
+    } finally {
+      setFormState(prev => ({ ...prev, isLoading: false }));
     }
-  };
+  }, [accountType, navigate]);
 
   return (
     <Layout>
       <div className="flex flex-col min-h-screen">
         <div className="flex-grow flex bg-gray-100">
-          {/* Left side - Image and Quote */}
-          <div className="hidden lg:block w-1/2 bg-cover bg-center relative animate-fadeIn trader-signup-bg">
-            <div className="absolute inset-0 bg-gradient-to-br from-teal-500/90 via-teal-600/85 to-teal-900/90 
-                            backdrop-blur-sm flex flex-col justify-center p-12 text-white">
-              <h2 className="text-6xl font-bold mb-6 leading-tight">
-                Streamline Your <br />
-                <span className="text-teal-300">Customs Process</span>
-              </h2>
-              <p className="text-2xl mb-12 font-light">Unleash efficiency. Save time. Grow your business.</p>
-              <blockquote className="bg-white bg-opacity-10 p-8 rounded-2xl shadow-lg backdrop-blur-sm">
-                <p className="text-lg mb-4 leading-relaxed italic">
-                  "The streamlined customs process between Kenya and Tanzania has been a game-changer. It has accelerated my trade transactions, saving time and reducing hassles."
-                </p>
-                <footer className="flex items-center">
-                  <img src="./src/assets/images/paul.png" alt="Paul Ondiso" className="w-12 h-12 rounded-full mr-4" />
-                  <div>
-                    <p className="font-bold">Paul Ondiso</p>
-                    <p className="text-sm text-teal-300">Trader</p>
-                  </div>
-                </footer>
-              </blockquote>
-            </div>
+          {/* Left side - HeroSection */}
+          <div className="hidden lg:block w-1/2">
+            <HeroSection />
           </div>
 
           {/* Right side - Sign Up Form */}
@@ -200,6 +192,22 @@ export default function TraderSignup() {
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
                 </div>
+                <div className="mt-1">
+                  {formData.password && (
+                    <div className="text-sm">
+                      <div className={`flex items-center ${
+                        formData.password.length >= 8 ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        <span>• Minimum 8 characters</span>
+                      </div>
+                      <div className={`flex items-center ${
+                        /[A-Z]/.test(formData.password) ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        <span>• One uppercase letter</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
                 <input
                   type="password"
                   name="confirmPassword"
@@ -210,35 +218,74 @@ export default function TraderSignup() {
                   className="w-full px-4 py-3 border border-gray-300 rounded-[15px] focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-200"
                   required
                 />
-                <button type="submit" 
-                        className="w-full bg-teal-500 text-white py-3 rounded-[15px] 
-                                   hover:bg-teal-600 active:bg-teal-700 
-                                   transform hover:scale-[1.01] transition-all duration-200 
-                                   font-medium shadow-sm hover:shadow-md">
-                  Sign Up
+                <button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                  aria-busy={isSubmitting}
+                  className={`
+                    w-full py-3 rounded-[15px] 
+                    transform transition-all duration-200 
+                    font-medium shadow-sm hover:shadow-md
+                    ${isSubmitting 
+                      ? 'bg-gray-400 cursor-not-allowed' 
+                      : 'bg-teal-500 hover:bg-teal-600 active:bg-teal-700 hover:scale-[1.01]'
+                    }
+                    text-white
+                  `}
+                >
+                  {isSubmitting ? 'Signing up...' : 'Sign Up'}
                 </button>
               </form>
 
               <div className="mt-8">
+                {error && (
+                  <div role="alert" className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
+                    {error.message}
+                  </div>
+                )}
+                
                 <button 
                   onClick={handleGoogleSignUp}
-                  className="w-full border border-gray-300 text-gray-700 py-3 rounded-[15px] 
-                             hover:bg-gray-50 hover:border-teal-300 transform hover:scale-[1.01] 
-                             transition-all duration-200 flex items-center justify-center 
-                             font-medium shadow-sm hover:shadow-md"
+                  disabled={formState.isLoading}
+                  aria-busy={formState.isLoading}
+                  className={`
+                    w-full border border-gray-300 text-gray-700 py-3 rounded-[15px] 
+                    hover:bg-gray-50 hover:border-teal-300 transform hover:scale-[1.01] 
+                    transition-all duration-200 flex items-center justify-center 
+                    font-medium shadow-sm hover:shadow-md
+                    ${formState.isLoading ? 'opacity-50 cursor-not-allowed' : ''}
+                  `}
                 >
-                  <FaGoogle className="mr-2 text-teal-500" /> Sign up with Google
+                  <FaGoogle className="mr-2 text-teal-500" />
+                  {formState.isLoading ? 'Signing up...' : 'Sign up with Google'}
                 </button>
               </div>
-
-              <p className="mt-8 text-center text-gray-600">
-                Already have an account? <Link to="/login" className="text-teal-500 hover:underline font-medium">Login</Link>
-              </p>
+              <div className="mt-8 text-center text-gray-600">
+                Already have an account? {' '}
+                <Link 
+                  to="/login" 
+                  className="text-teal-500 hover:underline font-medium"
+                  aria-label="Login to your existing account"
+                >
+                  Login here
+                </Link>
+                <div className="mt-8 text-center text-grey-600">
+                  Forgot your password? {' '}
+                <Link 
+                      to="/forgot-password" 
+                      className="text-teal-500 hover:underline font-medium"
+                      aria-label='Forgot your password?'
+                >
+                  Reset Here
+                </Link>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-        <Footer />
+        </div>  
       </div>
     </Layout>
   );
-}
+};
+
+export default React.memo(TraderSignup);

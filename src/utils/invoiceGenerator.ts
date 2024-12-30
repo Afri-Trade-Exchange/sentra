@@ -1,7 +1,28 @@
 import { format } from 'date-fns';
 import { v4 as uuidv4 } from 'uuid';
 import { Activity } from '../types/activity';
-import { InvoiceItem } from '../types/invoiceItem';
+
+export interface Invoice {
+  id: string;
+  invoiceNumber: string;
+  customerName: string;
+  businessName: string;
+  activity: Activity;
+  invoiceDate: string;
+  dueDate: string;
+  totalAmount: number;
+  status: string;
+  items: InvoiceItem[];
+  taxRate: number;
+  notes: string;
+}
+
+export interface InvoiceItem {
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+}
 
 export function generateInvoice(activity: Activity): Invoice {
   const taxRate = 0.16; // 16% tax rate(For Kenya)
@@ -33,4 +54,4 @@ export function generateInvoice(activity: Activity): Invoice {
     taxRate,
     notes: 'Thank you for your business!'
   };
-} 
+}

@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useState, useCallback, FormEvent } from 'react';
+import React, { useState, useCallback, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaGoogle } from 'react-icons/fa';
 import Layout from './Layout';
@@ -8,8 +8,6 @@ import { auth } from '../firebase/firebaseConfig';
 import { signupUser } from '../firebase/authService';
 import './TraderSignup.css';
 
-// Lazy load Footer
-const Footer = lazy(() => import('./Footer'));
 
 type UserRole = 'trader' | 'customs';
 
@@ -33,6 +31,7 @@ const TraderSignup: React.FC = () => {
     isLoading: false
   });
   const [error, setError] = useState<AuthError | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -56,10 +55,13 @@ const TraderSignup: React.FC = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
     
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setFormState(prev => ({ ...prev, errors: validationErrors }));
+      setIsSubmitting(false);
       return;
     }
 
@@ -93,6 +95,7 @@ const TraderSignup: React.FC = () => {
       }));
     } finally {
       setFormState(prev => ({ ...prev, isLoading: false }));
+      setIsSubmitting(false);
     }
   };
 
@@ -189,6 +192,22 @@ const TraderSignup: React.FC = () => {
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
                 </div>
+                <div className="mt-1">
+                  {formData.password && (
+                    <div className="text-sm">
+                      <div className={`flex items-center ${
+                        formData.password.length >= 8 ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        <span>• Minimum 8 characters</span>
+                      </div>
+                      <div className={`flex items-center ${
+                        /[A-Z]/.test(formData.password) ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        <span>• One uppercase letter</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
                 <input
                   type="password"
                   name="confirmPassword"
@@ -199,12 +218,22 @@ const TraderSignup: React.FC = () => {
                   className="w-full px-4 py-3 border border-gray-300 rounded-[15px] focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-200"
                   required
                 />
-                <button type="submit" 
-                        className="w-full bg-teal-500 text-white py-3 rounded-[15px] 
-                                   hover:bg-teal-600 active:bg-teal-700 
-                                   transform hover:scale-[1.01] transition-all duration-200 
-                                   font-medium shadow-sm hover:shadow-md">
-                  Sign Up
+                <button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                  aria-busy={isSubmitting}
+                  className={`
+                    w-full py-3 rounded-[15px] 
+                    transform transition-all duration-200 
+                    font-medium shadow-sm hover:shadow-md
+                    ${isSubmitting 
+                      ? 'bg-gray-400 cursor-not-allowed' 
+                      : 'bg-teal-500 hover:bg-teal-600 active:bg-teal-700 hover:scale-[1.01]'
+                    }
+                    text-white
+                  `}
+                >
+                  {isSubmitting ? 'Signing up...' : 'Sign Up'}
                 </button>
               </form>
 
@@ -253,12 +282,7 @@ const TraderSignup: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Footer */}  
-        <Suspense fallback={<div>Loading footer...</div>}>
-          <Footer />
-        </Suspense>
+        </div>  
       </div>
     </Layout>
   );

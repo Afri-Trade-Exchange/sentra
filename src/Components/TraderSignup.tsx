@@ -2,6 +2,7 @@ import React, { Suspense, lazy, useState, useCallback, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaGoogle } from 'react-icons/fa';
 import Layout from './Layout';
+import HeroSection from './HeroSection';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../firebase/firebaseConfig'; 
 import { signupUser } from '../firebase/authService';
@@ -118,28 +119,9 @@ const TraderSignup: React.FC = () => {
     <Layout>
       <div className="flex flex-col min-h-screen">
         <div className="flex-grow flex bg-gray-100">
-          {/* Left side - Image and Quote */}
-          <div className="hidden lg:block w-1/2 bg-cover bg-center relative animate-fadeIn trader-signup-bg">
-            <div className="absolute inset-0 bg-gradient-to-br from-teal-500/90 via-teal-600/85 to-teal-900/90 
-                            backdrop-blur-sm flex flex-col justify-center p-12 text-white">
-              <h2 className="text-6xl font-bold mb-6 leading-tight">
-                Streamline Your <br />
-                <span className="text-teal-300">Customs Process</span>
-              </h2>
-              <p className="text-2xl mb-12 font-light">Unleash efficiency. Save time. Grow your business.</p>
-              <blockquote className="bg-white bg-opacity-10 p-8 rounded-2xl shadow-lg backdrop-blur-sm">
-                <p className="text-lg mb-4 leading-relaxed italic">
-                  "The streamlined customs process between Kenya and Tanzania has been a game-changer. It has accelerated my trade transactions, saving time and reducing hassles."
-                </p>
-                <footer className="flex items-center">
-                  <img src="./src/assets/images/paul.png" alt="Paul Ondiso" className="w-12 h-12 rounded-full mr-4" />
-                  <div>
-                    <p className="font-bold">Paul Ondiso</p>
-                    <p className="text-sm text-teal-300">Trader</p>
-                  </div>
-                </footer>
-              </blockquote>
-            </div>
+          {/* Left side - HeroSection */}
+          <div className="hidden lg:block w-1/2">
+            <HeroSection />
           </div>
 
           {/* Right side - Sign Up Form */}
@@ -249,13 +231,31 @@ const TraderSignup: React.FC = () => {
                   {formState.isLoading ? 'Signing up...' : 'Sign up with Google'}
                 </button>
               </div>
-
-              <p className="mt-8 text-center text-gray-600">
-                Already have an account? <Link to="/login" className="text-teal-500 hover:underline font-medium" aria-label="Login to your existing account">Login</Link>
-              </p>
+              <div className="mt-8 text-center text-gray-600">
+                Already have an account? {' '}
+                <Link 
+                  to="/login" 
+                  className="text-teal-500 hover:underline font-medium"
+                  aria-label="Login to your existing account"
+                >
+                  Login here
+                </Link>
+                <div className="mt-8 text-center text-grey-600">
+                  Forgot your password? {' '}
+                <Link 
+                      to="/forgot-password" 
+                      className="text-teal-500 hover:underline font-medium"
+                      aria-label='Forgot your password?'
+                >
+                  Reset Here
+                </Link>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+
+        {/* Footer */}  
         <Suspense fallback={<div>Loading footer...</div>}>
           <Footer />
         </Suspense>

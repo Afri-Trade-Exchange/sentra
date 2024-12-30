@@ -39,6 +39,7 @@
     "react-scanner": "^1.2.0",
     "react-slick": "^0.30.2",
     "react-tippy": "^1.4.0",
+    "react-toastify": "^11.0.2",
     "recharts": "^2.13.0",
     "slick-carousel": "^1.8.1",
     "typewriter-effect": "^2.21.0",

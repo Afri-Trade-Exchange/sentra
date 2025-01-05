@@ -11,13 +11,13 @@ const Footer: React.FC = () => (
           <p className="text-sm mb-4">Empowering African trade through innovative solutions.</p>
           <div className="flex justify-center md:justify-start space-x-4">
             <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300">
-              <FaFacebook size={20} />
+              <FaFacebook size={30} />
             </a>
             <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300">
-              <FaLinkedin size={20} />
+              <FaLinkedin size={30} />
             </a>
             <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300">
-              <FaInstagram size={20} />
+              <FaInstagram size={30} />
             </a>
           </div>
         </div>
@@ -52,10 +52,10 @@ const Footer: React.FC = () => (
           <h3 className="text-white text-lg font-semibold mb-4">Download Our App</h3>
           <div className="flex justify-center md:justify-start space-x-4">
             <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300">
-              <FaGooglePlay size={20} />
+              <FaGooglePlay size={30} />
             </a>
             <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300">
-              <FaApple size={20} />
+              <FaApple size={30} />
             </a>
           </div>
         </div>

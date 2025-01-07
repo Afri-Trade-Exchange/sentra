@@ -8,8 +8,13 @@ import { auth } from '../firebase/firebaseConfig';
 import { signupUser } from '../firebase/authService';
 import './TraderSignup.css';
 
-
-type UserRole = 'trader' | 'customs';
+interface FormState {
+  email: string;
+  password: string;
+  confirmPassword?: string;
+  accountType: 'trader' | 'customs';
+  isLoading: boolean;
+}
 
 interface AuthError {
   message: string;
@@ -18,16 +23,10 @@ interface AuthError {
 const TraderSignup: React.FC = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [accountType, setAccountType] = useState('trader');
-  const [formData, setFormData] = useState({
-    name: '',
+  const [formState, setFormState] = useState<FormState>({
     email: '',
     password: '',
-    confirmPassword: '',
-  });
-  const [formState, setFormState] = useState({
-    data: formData,
-    errors: {},
+    accountType: 'trader',
     isLoading: false
   });
   const [error, setError] = useState<AuthError | null>(null);
@@ -35,18 +34,17 @@ const TraderSignup: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prevData => ({ ...prevData, [name]: value }));
-    setFormState(prev => ({ ...prev, data: { ...prev.data, [name]: value } }));
+    setFormState(prev => ({ ...prev, [name]: value }));
   };
 
   const validateForm = () => {
     const errors: { [key: string]: string } = {};
 
-    if (formData.password !== formData.confirmPassword) {
+    if (formState.password !== formState.confirmPassword) {
       errors.confirmPassword = 'Passwords do not match';
     }
 
-    if (formData.password.length < 6) {
+    if (formState.password.length < 6) {
       errors.password = 'Password must be at least 6 characters';
     }
 
@@ -69,8 +67,8 @@ const TraderSignup: React.FC = () => {
 
     try {
       const userRole: UserRole = await signupUser({
-        ...formState.data,  // Changed from formData
-        role: accountType as UserRole
+        ...formState,  // Changed from formData
+        role: formState.accountType as UserRole
       });
       
       // Navigate based on user role
@@ -106,9 +104,9 @@ const TraderSignup: React.FC = () => {
       setError(null);
       await signInWithPopup(auth, provider);
       // Navigate based on account type
-      if (accountType === 'trader') {
+      if (formState.accountType === 'trader') {
         navigate('/dashboard');
-      } else if (accountType === 'customs') {
+      } else if (formState.accountType === 'customs') {
         navigate('/customs-dashboard');
       }
     } catch (err) {
@@ -116,7 +114,7 @@ const TraderSignup: React.FC = () => {
     } finally {
       setFormState(prev => ({ ...prev, isLoading: false }));
     }
-  }, [accountType, navigate]);
+  }, [formState.accountType, navigate]);
 
   return (
     <Layout>
@@ -139,6 +137,40 @@ const TraderSignup: React.FC = () => {
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-8">
+                <div className="mb-8">
+                  <label className="block text-lg font-medium text-gray-700 mb-3">
+                    Account Type
+                  </label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setFormState(prev => ({ ...prev, accountType: 'trader' }))}
+                      className={`p-4 border-2 rounded-xl flex flex-col items-center justify-center transition-all duration-200
+                        ${formState.accountType === 'trader' 
+                          ? 'border-teal-500 bg-teal-50 text-teal-700' 
+                          : 'border-gray-200 hover:border-teal-200'}`}
+                    >
+                      <svg className="w-8 h-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      Trader
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormState(prev => ({ ...prev, accountType: 'customs' }))}
+                      className={`p-4 border-2 rounded-xl flex flex-col items-center justify-center transition-all duration-200
+                        ${formState.accountType === 'customs' 
+                          ? 'border-teal-500 bg-teal-50 text-teal-700' 
+                          : 'border-gray-200 hover:border-teal-200'}`}
+                    >
+                      <svg className="w-8 h-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      Customs
+                    </button>
+                  </div>
+                </div>
+
                 <div>
                   <label className="block text-lg font-medium text-gray-700 mb-3">
                     Email
@@ -149,8 +181,8 @@ const TraderSignup: React.FC = () => {
                     className="w-full text-lg px-6 py-4 border border-gray-300 rounded-xl
                              focus:ring-2 focus:ring-teal-500 focus:border-transparent
                              transition-all duration-200"
-                    value={formData.email}
-                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                    value={formState.email}
+                    onChange={e => setFormState({ ...formState, email: e.target.value })}
                   />
                 </div>
 
@@ -165,8 +197,8 @@ const TraderSignup: React.FC = () => {
                       className="w-full text-lg px-6 py-4 border border-gray-300 rounded-xl
                                focus:ring-2 focus:ring-teal-500 focus:border-transparent
                                transition-all duration-200"
-                      value={formData.password}
-                      onChange={e => setFormData({ ...formData, password: e.target.value })}
+                      value={formState.password}
+                      onChange={e => setFormState({ ...formState, password: e.target.value })}
                     />
                     <button
                       type="button"

@@ -8,7 +8,7 @@ const Footer: React.FC = () => (
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center md:text-left">
         <div className="flex flex-col items-center md:items-start">
           <h3 className="text-white text-lg font-semibold mb-4">Afritrade-Xchange</h3>
-          <p className="text-sm mb-4">Empowering African trade through innovative solutions.</p>
+          <p className="text-lg mb-4">Empowering African trade through innovative solutions.</p>
           <div className="flex justify-center md:justify-start space-x-4">
             <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300">
               <FaFacebook size={30} />
@@ -23,8 +23,8 @@ const Footer: React.FC = () => (
         </div>
         
         <div className="flex flex-col items-center md:items-start">
-          <h3 className="text-white text-lg font-semibold mb-4">Quick Links</h3>
-          <ul className="text-center md:text-left">
+          <h3 className="text-white text-lg font-bold mb-4">Quick Links</h3>
+          <ul className="text-center text-lg md:text-left">
             <li className="mb-2">
               <Link to="/terms" className="text-gray-400 hover:text-white transition-colors duration-300">
                 Terms and Conditions

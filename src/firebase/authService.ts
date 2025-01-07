@@ -43,7 +43,7 @@ export const signupUser = async (userData: {
   email: string;
   password: string;
   name: string;
-  role: UserRole
+  role: UserRole;
 }) => {
   try {
     // Create user in Firebase Authentication

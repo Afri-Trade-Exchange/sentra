@@ -8,10 +8,12 @@ import { auth } from '../firebase/firebaseConfig';
 import { signupUser } from '../firebase/authService';
 import './TraderSignup.css';
 
+type UserRole = 'trader' | 'customs';
+
 interface FormState {
   email: string;
   password: string;
-  confirmPassword?: string;
+  confirmPassword: string;
   accountType: 'trader' | 'customs';
   isLoading: boolean;
 }
@@ -26,74 +28,68 @@ const TraderSignup: React.FC = () => {
   const [formState, setFormState] = useState<FormState>({
     email: '',
     password: '',
+    confirmPassword: '',
     accountType: 'trader',
     isLoading: false
   });
   const [error, setError] = useState<AuthError | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    setError(null); // Clear error on input change
     setFormState(prev => ({ ...prev, [name]: value }));
   };
 
-  const validateForm = () => {
+  const validateForm = (): { isValid: boolean; errors: { [key: string]: string } } => {
     const errors: { [key: string]: string } = {};
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (formState.password !== formState.confirmPassword) {
+    if (!formState.email) {
+      errors.email = 'Email is required';
+    } else if (!emailRegex.test(formState.email)) {
+      errors.email = 'Invalid email format';
+    }
+
+    if (!formState.password) {
+      errors.password = 'Password is required';
+    } else if (formState.password.length < 8) {
+      errors.password = 'Password must be at least 8 characters';
+    }
+
+    if (!formState.confirmPassword) {
+      errors.confirmPassword = 'Please confirm your password';
+    } else if (formState.password !== formState.confirmPassword) {
       errors.confirmPassword = 'Passwords do not match';
     }
 
-    if (formState.password.length < 6) {
-      errors.password = 'Password must be at least 6 characters';
-    }
-
-    return errors;
+    return {
+      isValid: Object.keys(errors).length === 0,
+      errors
+    };
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setError(null);
-    
-    const validationErrors = validateForm();
-    if (Object.keys(validationErrors).length > 0) {
-      setFormState(prev => ({ ...prev, errors: validationErrors }));
-      setIsSubmitting(false);
+    const { isValid, errors } = validateForm();
+
+    if (!isValid) {
+      setError({ message: Object.values(errors)[0] });
       return;
     }
 
-    setFormState(prev => ({ ...prev, isLoading: true }));
-
     try {
-      const userRole: UserRole = await signupUser({
-        ...formState,  // Changed from formData
+      setFormState(prev => ({ ...prev, isLoading: true }));
+      await signupUser({
+        email: formState.email,
+        password: formState.password,
+        name: '',  // Add a default empty name
         role: formState.accountType as UserRole
       });
-      
-      // Navigate based on user role
-      switch(userRole) {
-        case 'trader':
-          navigate('/dashboard');
-          break;
-        case 'customs':
-          navigate('/customs-dashboard');
-          break;
-        default:
-          throw new Error('Invalid user role');
-      }
-    } catch (error) {
-      setFormState(prev => ({
-        ...prev,
-        errors: { 
-          submit: error instanceof Error 
-            ? error.message 
-            : 'An unexpected error occurred'  
-        }
-      }));
+      navigate(formState.accountType === 'customs' ? '/customs-dashboard' : '/dashboard');
+    } catch (err) {
+      setError({ message: 'Failed to create account' });
     } finally {
       setFormState(prev => ({ ...prev, isLoading: false }));
-      setIsSubmitting(false);
     }
   };
 
@@ -137,6 +133,11 @@ const TraderSignup: React.FC = () => {
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-8">
+                {error && (
+                  <div className="p-4 mb-4 text-red-700 bg-red-100 rounded-xl">
+                    {error.message}
+                  </div>
+                )}
                 <div className="mb-8">
                   <label className="block text-lg font-medium text-gray-700 mb-3">
                     Account Type
@@ -177,12 +178,13 @@ const TraderSignup: React.FC = () => {
                   </label>
                   <input
                     type="email"
+                    name="email"
                     required
                     className="w-full text-lg px-6 py-4 border border-gray-300 rounded-xl
                              focus:ring-2 focus:ring-teal-500 focus:border-transparent
                              transition-all duration-200"
                     value={formState.email}
-                    onChange={e => setFormState({ ...formState, email: e.target.value })}
+                    onChange={handleInputChange}
                   />
                 </div>
 
@@ -213,12 +215,12 @@ const TraderSignup: React.FC = () => {
 
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={formState.isLoading}
                   className="w-full text-lg bg-teal-600 text-white py-4 px-6 rounded-xl
                            hover:bg-teal-700 transform transition-all duration-200
                            hover:scale-[1.02] font-medium"
                 >
-                  {isSubmitting ? 'Creating account...' : 'Create Account'}
+                  {formState.isLoading ? 'Creating account...' : 'Create Account'}
                 </button>
 
                 <div className="relative my-10">

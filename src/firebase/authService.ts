@@ -5,12 +5,10 @@ import { doc, setDoc, getDoc } from 'firebase/firestore';
 // Define user roles
 export type UserRole = 'trader' | 'customs';
 
-// Update the loginUser function type definition
+// Update the LoginUserParams type to only include email and password
 export type LoginUserParams = {
   email: string;
   password: string;
-  name: string;
-  role: UserRole;
 };
 
 export async function loginUser(params: LoginUserParams) {

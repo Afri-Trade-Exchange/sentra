@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaGoogle, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { auth } from '../firebase/firebaseConfig';
+import { loginUser } from '../firebase/authService';
 
 interface LoginFormData {
   email: string;
@@ -19,17 +22,46 @@ const LoginForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Initialize remember me state from local storage
+  useEffect(() => {
+    const rememberMe = localStorage.getItem('rememberMe') === 'true';
+    if (rememberMe) {
+      const email = localStorage.getItem('email') || '';
+      setFormData(prev => ({ ...prev, email, rememberMe }));
+    }
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    
+
     try {
-      // Add auth logic here
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await loginUser({ email: formData.email, password: formData.password });
+      if (formData.rememberMe) {
+        localStorage.setItem('rememberMe', 'true');
+        localStorage.setItem('email', formData.email);
+      } else {
+        localStorage.removeItem('rememberMe');
+        localStorage.removeItem('email');
+      }
       navigate('/dashboard');
     } catch (err) {
-      setError('Invalid credentials');
+      setError('Invalid email or password. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      navigate('/dashboard');
+    } catch (err) {
+      setError('Failed to sign in with Google. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -43,7 +75,7 @@ const LoginForm: React.FC = () => {
             Sign in to your account
           </h2>
         </div>
-        
+
         {error && (
           <div className="bg-red-50 border-l-4 border-red-400 p-4">
             <p className="text-sm text-red-700">{error}</p>
@@ -122,7 +154,8 @@ const LoginForm: React.FC = () => {
           <div>
             <button
               type="button"
-              onClick={() => {/* Add Google sign-in logic */}}
+              onClick={handleGoogleSignIn}
+              disabled={loading}
               className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
             >
               <FaGoogle className="mr-2" /> Sign in with Google

@@ -4,7 +4,7 @@ import { FaEye, FaEyeSlash, FaGoogle } from 'react-icons/fa';
 import Layout from './Layout';
 import HeroSection from './HeroSection';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { auth } from '../firebase/firebaseConfig'; 
+import { auth } from '../firebase/firebaseConfig';
 import { signupUser } from '../firebase/authService';
 import './TraderSignup.css';
 
@@ -14,7 +14,6 @@ interface FormState {
   email: string;
   password: string;
   confirmPassword: string;
-  accountType: 'trader' | 'customs';
   isLoading: boolean;
 }
 
@@ -29,7 +28,6 @@ const TraderSignup: React.FC = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    accountType: 'trader',
     isLoading: false
   });
   const [error, setError] = useState<AuthError | null>(null);
@@ -83,11 +81,11 @@ const TraderSignup: React.FC = () => {
         email: formState.email,
         password: formState.password,
         name: '',  // Add a default empty name
-        role: formState.accountType as UserRole
+        role: 'trader' as UserRole
       });
-      navigate(formState.accountType === 'customs' ? '/customs-dashboard' : '/dashboard');
+      navigate('/dashboard');
     } catch (err) {
-      setError({ message: 'Failed to create account' });
+      setError({ message: 'Failed to create account. Please try again.' });
     } finally {
       setFormState(prev => ({ ...prev, isLoading: false }));
     }
@@ -99,18 +97,13 @@ const TraderSignup: React.FC = () => {
       setFormState(prev => ({ ...prev, isLoading: true }));
       setError(null);
       await signInWithPopup(auth, provider);
-      // Navigate based on account type
-      if (formState.accountType === 'trader') {
-        navigate('/dashboard');
-      } else if (formState.accountType === 'customs') {
-        navigate('/customs-dashboard');
-      }
+      navigate('/dashboard');
     } catch (err) {
-      setError({ message: 'Failed to sign up with Google' });
+      setError({ message: 'Failed to sign up with Google. Please try again.' });
     } finally {
       setFormState(prev => ({ ...prev, isLoading: false }));
     }
-  }, [formState.accountType, navigate]);
+  }, [navigate]);
 
   return (
     <Layout>
@@ -138,39 +131,6 @@ const TraderSignup: React.FC = () => {
                     {error.message}
                   </div>
                 )}
-                <div className="mb-8">
-                  <label className="block text-lg font-medium text-gray-700 mb-3">
-                    Account Type
-                  </label>
-                  <div className="grid grid-cols-2 gap-4">
-                    <button
-                      type="button"
-                      onClick={() => setFormState(prev => ({ ...prev, accountType: 'trader' }))}
-                      className={`p-4 border-2 rounded-xl flex flex-col items-center justify-center transition-all duration-200
-                        ${formState.accountType === 'trader' 
-                          ? 'border-teal-500 bg-teal-50 text-teal-700' 
-                          : 'border-gray-200 hover:border-teal-200'}`}
-                    >
-                      <svg className="w-8 h-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                      </svg>
-                      Trader
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setFormState(prev => ({ ...prev, accountType: 'customs' }))}
-                      className={`p-4 border-2 rounded-xl flex flex-col items-center justify-center transition-all duration-200
-                        ${formState.accountType === 'customs' 
-                          ? 'border-teal-500 bg-teal-50 text-teal-700' 
-                          : 'border-gray-200 hover:border-teal-200'}`}
-                    >
-                      <svg className="w-8 h-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                      </svg>
-                      Customs
-                    </button>
-                  </div>
-                </div>
 
                 <div>
                   <label className="block text-lg font-medium text-gray-700 mb-3">
@@ -237,6 +197,7 @@ const TraderSignup: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleGoogleSignUp}
+                  disabled={formState.isLoading}
                   className="w-full flex items-center justify-center px-6 py-4 
                            border border-gray-300 rounded-xl text-lg font-medium 
                            text-gray-700 bg-white hover:bg-gray-50 transform 
@@ -249,7 +210,7 @@ const TraderSignup: React.FC = () => {
 
               <p className="mt-10 text-center text-lg text-gray-600">
                 Already have an account?{' '}
-                <Link to="/login" className="text-teal-600 hover:underline font-medium">
+                <Link to="/TraderLogin" className="text-teal-600 hover:underline font-medium">
                   Login
                 </Link>
               </p>

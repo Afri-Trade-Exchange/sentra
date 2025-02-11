@@ -62,7 +62,7 @@ export default function Layout({ children }: LayoutProps) {
           <button type="button" onClick={() => navigate('/trader-signup')} className="px-4 py-2 text-l text-gray-700 hover:text-teal-500">
             Sign in
           </button>
-          <button type="button" onClick={() => navigate('/bookademo')} className="px-8 py-3 text-l text-white bg-teal-500 hover:bg-teal-600 rounded-[15px]">
+          <button type="button" onClick={() => navigate('/contact')} className="px-8 py-3 text-l text-white bg-teal-500 hover:bg-teal-600 rounded-[15px]">
             Book a Demo
           </button>
         </div>

@@ -25,11 +25,12 @@ export default function Layout({ children }: LayoutProps) {
       <nav className="fixed top-0 left-0 right-0 flex items-center justify-between px-4 sm:px-8 md:px-12 lg:px-40 py-4 bg-white bg-opacity-80 backdrop-blur-sm z-20">
         <div className="flex items-center w-1/4">
           <div className="logo cursor-pointer" onClick={() => navigate('/')}>
-            <GiAfrica className="text-2xl text-teal-500 mr-2" />
+            {/* <GiAfrica className="text-2xl text-teal-500 mr-2" /> */}
           </div>
-          <span className="text-xl font-bold text-gray-700 cursor-pointer" onClick={() => navigate('/')}>
-            AfriTrade-Xchange
+          <span className="text-xl font-bold text-gray-900 cursor-pointer" onClick={() => navigate('/')}>
+            Sentra
           </span>
+          <img src="src/assets/images/Sentra_Logo2.png" alt="Logo" className="h-8 w-8 ml-2"/>
         </div>
 
         {/* Hamburger Menu */}
@@ -50,19 +51,19 @@ export default function Layout({ children }: LayoutProps) {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex justify-center items-center space-x-8 w-1/2">
-          <a href="/trader-signup" className="hover:text-teal-500">I'm a Trader</a>
-          <button type="button" onClick={() => navigate('/trader-signup')} className="hover:text-teal-500">
+          <a href="/trader-signup" className="hover:text-teal-500 font-bold">I'm a Trader</a>
+          <button type="button" onClick={() => navigate('/trader-signup')} className="hover:text-teal-500 font-bold">
             I'm a Customs Officer
           </button>
-          <a href="/contact" className="hover:text-teal-500">Company</a>
-          <a href="/contact" className="hover:text-teal-500">Tracking</a>
+          <a href="/contact" className="hover:text-teal-500 font-bold">Company</a>
+          <a href="/contact" className="hover:text-teal-500 font-bold">Tracking</a>
         </div>
 
         <div className="hidden md:flex items-center justify-end space-x-4 w-1/4">
-          <button type="button" onClick={() => navigate('/trader-signup')} className="px-4 py-2 text-l text-gray-700 hover:text-teal-500">
+          <button type="button" onClick={() => navigate('/trader-signup')} className="px-4 py-2 text-l text-gray-700 hover:text-teal-500 font-bold">
             Sign in
           </button>
-          <button type="button" onClick={() => navigate('/contact')} className="px-8 py-3 text-l text-white bg-teal-500 hover:bg-teal-600 rounded-[15px]">
+          <button type="button" onClick={() => navigate('/contact')} className="px-8 py-3 text-l text-white bg-teal-500 hover:bg-teal-600 rounded-[15px] font-bold">
             Book a Demo
           </button>
         </div>

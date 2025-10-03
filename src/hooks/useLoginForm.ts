@@ -63,8 +63,7 @@ export const useLoginForm = () => {
 
     try {
       const userRole = await loginUser({
-        ...formState.data,
-        role: uiState.accountType
+        ...formState.data
       });
       
       navigate(userRole === 'trader' ? '/dashboard' : '/customs-dashboard');

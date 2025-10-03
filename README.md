@@ -1,9 +1,9 @@
-# 🌍 AfriTradeXchange
+# 🌍 Sentra
 
 > ⚠️ **BETA NOTICE**: This software is currently in beta and should be considered a Minimum Viable Product (MVP). While functional, it may contain bugs and features might change significantly during development. Use in production environments is not recommended at this stage.
 
 ## 📝 Project Overview
-AfriTradeXchange is an innovative web application designed to revolutionize trade customs processes across Africa, reducing wait times and streamlining invoice management for businesses.
+Sentra is an innovative web application designed to revolutionize trade customs processes across Africa, reducing wait times and streamlining invoice management for businesses.
 
 ## 🚀 Key Objectives
 - Reduce trade processing time by 50%

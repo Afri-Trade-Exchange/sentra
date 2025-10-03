@@ -4,7 +4,7 @@ const HeroSection: React.FC = () => (
   <div className="w-full h-full flex items-center justify-center p-8 lg:p-12">
     <div className="max-w-2xl text-gray-900">
       <h1 className="text-4xl lg:text-5xl font-bold mb-6">
-        Welcome to AfriTrade-Xchange
+        Welcome to Sentra
       </h1>
       <p className="text-xl mb-8">
         Your gateway to seamless cross-border trade in Africa

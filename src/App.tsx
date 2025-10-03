@@ -56,11 +56,9 @@ export default function App() {
                   <Route path="/settings" element={<Settings />} />
                   {/* Add other routes as needed */}
                 </Routes>
+                <Footer />
               </Layout>
             </div>
-          </Suspense>
-          <Suspense fallback={<div>Loading...</div>}>
-            <Footer />
           </Suspense>
         </Router>
       </ErrorBoundary>

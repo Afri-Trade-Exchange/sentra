@@ -13,7 +13,7 @@ import { AuthProvider } from './Components/AuthContext';
 import ProtectedRoute from './Components/ProtectedRoute';
 import TraderLogin from './Components/TraderLogin';
 import { Dialog } from '@headlessui/react'
-import { FaClock, FaShieldAlt, FaChartLine } from 'react-icons/fa';
+import { FaClock, FaShieldAlt, FaChartLine, FaBriefcase, FaUserShield, FaFileUpload, FaQrcode, FaCheckCircle, FaArrowRight } from 'react-icons/fa';
 import './Components/LandingPage.css';
 import Settings from './Components/Settings';
 import clearanceImg from './assets/images/clearance.jpg';
@@ -126,7 +126,7 @@ function LandingPage () {
 
   return (
     <div 
-      className="min-h-screen bg-gray-100 text-gray-800 font-['Montserrat'] flex flex-col relative overflow-hidden"
+      className="min-h-screen bg-stone-100 text-gray-800 font-['Montserrat'] flex flex-col relative overflow-hidden"
     >
 
       {/* Subtle background pattern */}
@@ -147,15 +147,140 @@ function LandingPage () {
         </svg>
       </div>
 
-      <div className="container mx-auto px-4 py-8 pt-24 relative z-10">
-        <div className="max-w-4xl mx-auto mb-12">
+      <div className="max-w-6xl mx-auto px-4 py-8 pt-24 relative z-10">
+
+        {/* Hero */}
+        <div className="flex flex-col md:flex-row justify-between items-center gap-10 mb-20">
+          <div className="md:w-1/2">
+            <span className="inline-block text-teal-700 bg-teal-50 text-sm font-medium px-3 py-1 rounded-full mb-4">
+              Welcome to Sentra
+            </span>
+            <h1 className="text-4xl sm:text-5xl font-light mb-4 leading-tight">
+              Clear Customs <span className="font-semibold text-teal-600">40% Faster</span><br />
+              with our platform, and grow your business.
+            </h1>
+            <p className="text-gray-600 mb-6">
+              One platform for traders and customs officers across Africa to track, verify, and clear shipments together — seamlessly.
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <button
+                type="button"
+                onClick={() => navigate('/trader-signup')}
+                className="px-8 sm:px-12 py-3 text-gray-700 bg-stone-50 border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-colors font-medium"
+              >
+                How others use it
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/trader-signup')}
+                className="px-8 sm:px-12 py-3 text-white bg-teal-600 rounded-xl hover:bg-teal-700 transition-colors font-medium"
+              >
+                Try for free
+              </button>
+            </div>
+          </div>
+          <div className="md:w-1/2 w-full">
+            <img
+              src={clearanceImg}
+              alt="Man inspecting customs clearance documents"
+              className="w-full h-auto rounded-2xl main-image mx-auto max-w-md md:max-w-none"
+            />
+          </div>
+        </div>
+
+        {/* Choose your path */}
+        <div className="mb-20">
+          <h2 className="text-center text-2xl font-medium mb-2">Wherever you're joining us from, you're in the right place</h2>
+          <p className="text-center text-gray-600 mb-8">Pick the side you're on and we'll get you set up.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+            <div className="bg-stone-50 p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex flex-col items-center text-center">
+              <div className="w-12 h-12 rounded-full bg-teal-50 flex items-center justify-center mb-4">
+                <FaBriefcase className="text-teal-600 text-lg" />
+              </div>
+              <h3 className="text-lg font-medium mb-2">I'm a Trader</h3>
+              <p className="text-gray-600 mb-5">Upload your documents once, get a QR code, and clear customs without the paperwork chase.</p>
+              <button
+                type="button"
+                onClick={() => navigate('/trader-signup')}
+                className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-medium"
+              >
+                Get started as a trader <FaArrowRight className="text-sm" />
+              </button>
+            </div>
+            <div className="bg-stone-50 p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex flex-col items-center text-center">
+              <div className="w-12 h-12 rounded-full bg-teal-50 flex items-center justify-center mb-4">
+                <FaUserShield className="text-teal-600 text-lg" />
+              </div>
+              <h3 className="text-lg font-medium mb-2">I'm a Customs Officer</h3>
+              <p className="text-gray-600 mb-5">Scan a trader's QR code at the border to instantly verify their documents and clear the consignment.</p>
+              <button
+                type="button"
+                onClick={() => navigate('/customs-login')}
+                className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-medium"
+              >
+                Sign in as an officer <FaArrowRight className="text-sm" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* How it works */}
+        <div className="mb-20">
+          <h2 className="text-center text-2xl font-medium mb-10">How it works</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl mx-auto">
+            {[
+              { icon: FaFileUpload, title: 'Upload your documents', body: "Submit your import or export paperwork once, right from your dashboard." },
+              { icon: FaQrcode, title: 'Get your QR code', body: 'We generate a secure QR code tied to your verified consignment.' },
+              { icon: FaCheckCircle, title: 'Cleared at the border', body: 'The officer scans your code and pulls up everything instantly.' },
+            ].map((step, index) => (
+              <div key={step.title} className="text-center">
+                <div className="w-14 h-14 rounded-full bg-teal-50 flex items-center justify-center mx-auto mb-4">
+                  <step.icon className="text-teal-600 text-xl" />
+                </div>
+                <p className="text-xs font-medium text-teal-600 mb-1">STEP {index + 1}</p>
+                <h3 className="text-lg font-medium mb-2">{step.title}</h3>
+                <p className="text-gray-600 text-sm">{step.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Feature highlights */}
+        <div className="mb-20">
+          <h2 className="text-center text-2xl font-medium mb-10">Why traders choose Sentra</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 max-w-3xl mx-auto">
+            <div className="bg-stone-50 p-6 rounded-xl shadow-sm text-center flex flex-col items-center">
+              <div className="text-teal-600 text-xl font-medium mb-3">
+                <FaClock className="inline-block mr-2" /> Fast Processing
+              </div>
+              <p className="text-gray-600">Clear customs in half the time with our streamlined digital process</p>
+            </div>
+            <div className="bg-stone-50 p-6 rounded-xl shadow-sm text-center flex flex-col items-center">
+              <div className="text-teal-600 text-xl font-medium mb-3">
+                <FaShieldAlt className="inline-block mr-2" /> Secure & Compliant
+              </div>
+              <p className="text-gray-600">100% compliance with customs regulations and secure document handling</p>
+            </div>
+            <div className="bg-stone-50 p-6 rounded-xl shadow-sm text-center flex flex-col items-center">
+              <div className="text-teal-600 text-xl font-medium mb-3">
+                <FaChartLine className="inline-block mr-2" /> Real-time Tracking
+              </div>
+              <p className="text-gray-600">Monitor your shipments and customs clearance status in real-time</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Track an existing shipment */}
+        <div className="max-w-2xl mx-auto mb-20 bg-stone-50 rounded-2xl shadow-sm p-8 text-center">
+          <h2 className="text-lg font-medium mb-1">Already shipping with us?</h2>
+          <p className="text-gray-600 mb-4 text-sm">Track your order below.</p>
           <div className="flex flex-col gap-4">
-            <div className="flex items-center bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-200">
+            <div className="flex items-center bg-gray-50 rounded-2xl overflow-hidden border border-gray-200">
               <div className="flex-grow flex items-center px-6">
                 <FiSearch className="text-gray-400 text-xl mr-3" aria-hidden="true" />
                 <input
                   type="text"
-                  className="w-full py-4 text-base focus:outline-none"
+                  className="w-full py-4 text-base bg-transparent focus:outline-none"
                   aria-label="Search orders"
                   placeholder="Search order, e.g. ORD-001"
                   value={orderNumber}
@@ -179,11 +304,11 @@ function LandingPage () {
                 Searching...
               </div>
             )}
-            
+
             <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)} className="relative z-50">
               <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" aria-hidden="true" />
               <div className="fixed inset-0 flex items-center justify-center p-4">
-                <Dialog.Panel className="bg-white rounded-lg p-6 shadow-xl max-w-md w-full">
+                <Dialog.Panel className="bg-stone-50 rounded-lg p-6 shadow-xl max-w-md w-full">
                   <h3 className="text-xl font-semibold mb-4">Order Information</h3>
                   {orderInfo && (
                     <div className="space-y-2">
@@ -193,7 +318,7 @@ function LandingPage () {
                       <p><span className="font-medium">Last Update:</span> {orderInfo.lastUpdate}</p>
                     </div>
                   )}
-                  <button 
+                  <button
                     onClick={() => setIsModalOpen(false)}
                     className="mt-4 px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600"
                   >
@@ -210,66 +335,12 @@ function LandingPage () {
             )}
           </div>
           <div className="text-center mt-3">
-            <a href="./contact" className="text-sm text-gray-800 hover:text-teal-500">Need Help?</a>
+            <a href="./contact" className="text-sm text-gray-500 hover:text-teal-600">Need Help?</a>
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row justify-between items-center gap-10">
-          <div className="md:w-1/2">
-            <h2 className="text-teal-600 text-lg font-medium mb-2">Digital Trade, Simplified</h2>
-            <h1 className="text-4xl sm:text-5xl font-light mb-4 leading-tight">
-              Clear Customs <span className="font-semibold text-teal-600">40% Faster</span><br />
-              with our platform, and grow your business.
-            </h1>
-            <p className="text-gray-600 mb-6">
-              One platform for all your cross-border trade needs. Track, manage, and clear shipments seamlessly.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <button
-                type="button"
-                onClick={() => navigate('/trader-signup')}
-                className="px-8 sm:px-12 py-3 text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-colors font-medium"
-              >
-                How others use it
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate('/trader-signup')}
-                className="px-8 sm:px-12 py-3 text-white bg-teal-600 rounded-xl hover:bg-teal-700 transition-colors font-medium"
-              >
-                Try for free
-              </button>
-            </div>
-          </div>
-          <div className="md:w-1/2 w-full">
-            <img
-              src={clearanceImg}
-              alt="Man inspecting customs clearance documents"
-              className="w-full h-auto rounded-2xl main-image mx-auto max-w-md md:max-w-none"
-            />
-          </div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 mt-12 mb-16">
-          <div className="bg-white p-6 rounded-xl shadow-sm">
-            <div className="text-teal-600 text-xl font-medium mb-3">
-              <FaClock className="inline-block mr-2" /> Fast Processing
-            </div>
-            <p className="text-gray-600">Clear customs in half the time with our streamlined digital process</p>
-          </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm">
-            <div className="text-teal-600 text-xl font-medium mb-3">
-              <FaShieldAlt className="inline-block mr-2" /> Secure & Compliant
-            </div>
-            <p className="text-gray-600">100% compliance with customs regulations and secure document handling</p>
-          </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm">
-            <div className="text-teal-600 text-xl font-medium mb-3">
-              <FaChartLine className="inline-block mr-2" /> Real-time Tracking
-            </div>
-            <p className="text-gray-600">Monitor your shipments and customs clearance status in real-time</p>
-          </div>
-        </div>
-        <div className="mt-16">
+        {/* Trust logos */}
+        <div className="mb-20">
           <h3 className="text-center text-lg text-gray-500 font-medium mb-6">Trusted by global companies</h3>
           <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
             {trustedLogos.map((logo) => (
@@ -281,6 +352,19 @@ function LandingPage () {
               />
             ))}
           </div>
+        </div>
+
+        {/* Closing CTA */}
+        <div className="text-center bg-teal-600 rounded-2xl px-6 py-14 mb-16">
+          <h2 className="text-2xl sm:text-3xl font-light text-white mb-3">Ready to clear customs faster?</h2>
+          <p className="text-teal-50 mb-6">Join traders across Africa already moving goods faster with Sentra.</p>
+          <button
+            type="button"
+            onClick={() => navigate('/trader-signup')}
+            className="px-10 py-3 bg-white text-teal-700 rounded-xl hover:bg-teal-50 transition-colors font-medium"
+          >
+            Try for free
+          </button>
         </div>
       </div>
     </div>

@@ -22,52 +22,54 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <nav className="fixed top-0 left-0 right-0 flex items-center justify-between px-4 sm:px-8 md:px-12 lg:px-40 py-4 bg-white bg-opacity-80 backdrop-blur-sm z-20">
-        <div className="flex flex-col items-start cursor-pointer" onClick={() => navigate('/')}>
-          <img src={sentraLogo} alt="Sentra" className="h-7 sm:h-8 w-auto" />
-          <span className="hidden sm:block text-[10px] text-gray-500 font-medium tracking-wide mt-0.5 whitespace-nowrap">
-            Smart Solutions, Global Impact
-          </span>
-        </div>
+      <header className="fixed top-4 inset-x-4 sm:inset-x-6 lg:inset-x-10 z-20">
+        <nav className="mx-auto max-w-6xl flex items-center justify-between gap-4 rounded-full border border-gray-200/70 bg-white/75 backdrop-blur-md px-5 sm:px-6 py-2.5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)]">
+          <img
+            src={sentraLogo}
+            alt="Sentra"
+            className="h-6 sm:h-7 w-auto cursor-pointer"
+            onClick={() => navigate('/')}
+          />
 
-        {/* Hamburger Menu */}
-        <button 
-          type="button"
-          className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-all" 
-          onClick={() => setIsOpen(!isOpen)}
-          aria-label="Toggle menu"
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            {isOpen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            )}
-          </svg>
-        </button>
+          {/* Hamburger Menu */}
+          <button
+            type="button"
+            className="md:hidden p-2 -mr-2 hover:bg-gray-100 rounded-full transition-colors"
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label="Toggle menu"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {isOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
 
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex justify-center items-center space-x-8 w-1/2">
-          <a href="/trader-signup" className="hover:text-teal-600 font-medium">I'm a Trader</a>
-          <button type="button" onClick={() => navigate('/customs-login')} className="hover:text-teal-600 font-medium">
-            I'm a Customs Officer
-          </button>
-          <a href="/contact" className="hover:text-teal-600 font-medium">Company</a>
-          <a href="/contact" className="hover:text-teal-600 font-medium">Tracking</a>
-        </div>
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-7 text-sm">
+            <a href="/trader-signup" className="text-gray-600 hover:text-teal-600 font-medium transition-colors">I'm a Trader</a>
+            <button type="button" onClick={() => navigate('/customs-login')} className="text-gray-600 hover:text-teal-600 font-medium transition-colors">
+              I'm a Customs Officer
+            </button>
+            <a href="/contact" className="text-gray-600 hover:text-teal-600 font-medium transition-colors">Company</a>
+            <a href="/contact" className="text-gray-600 hover:text-teal-600 font-medium transition-colors">Tracking</a>
+          </div>
 
-        <div className="hidden md:flex items-center justify-end space-x-4 w-1/4">
-          <button type="button" onClick={() => navigate('/login')} className="px-4 py-2 text-base text-gray-700 hover:text-teal-600 font-medium">
-            Sign in
-          </button>
-          <button type="button" onClick={() => navigate('/contact')} className="px-8 py-3 text-base text-white bg-teal-600 hover:bg-teal-700 rounded-xl font-medium">
-            Book a Demo
-          </button>
-        </div>
+          <div className="hidden md:flex items-center gap-2">
+            <button type="button" onClick={() => navigate('/login')} className="px-4 py-2 text-sm text-gray-600 hover:text-teal-600 font-medium transition-colors">
+              Sign in
+            </button>
+            <button type="button" onClick={() => navigate('/contact')} className="px-5 py-2 text-sm text-white bg-teal-600 hover:bg-teal-700 rounded-full font-medium transition-colors">
+              Book a Demo
+            </button>
+          </div>
+        </nav>
 
         {/* Mobile Menu Backdrop */}
         {isOpen && (
-          <div 
+          <div
             className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
             onClick={() => setIsOpen(false)}
           />
@@ -75,8 +77,8 @@ export default function Layout({ children }: LayoutProps) {
 
         {/* Mobile Navigation */}
         <div className={`
-          fixed top-0 right-0 h-screen 
-          w-full sm:w-[350px] md:w-[400px] lg:hidden 
+          fixed top-0 right-0 h-screen
+          w-full sm:w-[350px] md:w-[400px] lg:hidden
           bg-white z-40
           transform transition-all duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : 'translate-x-full'}
@@ -157,8 +159,8 @@ export default function Layout({ children }: LayoutProps) {
             </div>
           </div>
         </div>
-      </nav>
-      <main className="flex-grow pt-16">
+      </header>
+      <main className="flex-grow pt-24">
         {children}
       </main>
     </div>

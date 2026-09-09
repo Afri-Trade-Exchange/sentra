@@ -1,0 +1,15 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Consignments are shared between traders (who create/update them) and
+    // customs officers (who look them up via QR scan) — both must be signed in.
+    match /consignments/{consignmentId} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

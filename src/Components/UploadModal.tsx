@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { FaFileAlt, FaTimes, FaUpload, FaDownload, FaQrcode, FaCheckCircle } from 'react-icons/fa';
 import { QRCodeSVG } from 'qrcode.react';
 import jsPDF from 'jspdf';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '../firebase/firebaseConfig';
 
 interface UploadModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onVerify?: () => void;  
+  onVerify?: () => void;
+  consignmentId: string | null;
 }
 
 interface DocumentUpload {
@@ -16,7 +19,7 @@ interface DocumentUpload {
   required: boolean; 
 }
 
-export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
+export default function UploadModal({ isOpen, onClose, consignmentId }: UploadModalProps) {
   const [documents, setDocuments] = useState<{ [key: string]: DocumentUpload }>({
     importDeclaration: { file: null, type: 'Import Declaration', progress: 0, required: true },
     customsEntry: { file: null, type: 'Customs Entry Form', progress: 0, required: true },
@@ -27,15 +30,9 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
     other: { file: null, type: 'Other Documentation (Optional)', progress: 0, required: false },
   });
 
-  const [uploadSessionId, setUploadSessionId] = useState<string>('');
   const [isVerified, setIsVerified] = useState(false);
-
-  useEffect(() => {
-    // Generate a unique session ID when the modal opens
-    if (isOpen) {
-      setUploadSessionId(`UPLOAD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
-    }
-  }, [isOpen]);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verifyError, setVerifyError] = useState<string | null>(null);
 
   const handleFileChange = (key: string, file: File) => {
     setDocuments(prev => ({
@@ -61,16 +58,35 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
   };
 
   const handleVerify = async () => {
-    // Simulate verification process
-    setIsVerified(true);
-    
-    // In a real application, you would:
-    // 1. Upload all files to your server
-    // 2. Generate a unique identifier
-    // 3. Store the files with their metadata
-    // 4. Return a success response
-    
-    console.log('Documents verified:', documents);
+    if (!consignmentId) {
+      setVerifyError('No consignment is linked to this upload. Please create a consignment first.');
+      return;
+    }
+
+    setIsVerifying(true);
+    setVerifyError(null);
+
+    try {
+      const uploadedDocs = Object.values(documents)
+        .filter((docUpload) => docUpload.file !== null)
+        .map((docUpload) => ({
+          type: docUpload.type,
+          fileName: docUpload.file!.name,
+          sizeKb: Math.round(docUpload.file!.size / 1024),
+        }));
+
+      await updateDoc(doc(db, 'consignments', consignmentId), {
+        documents: uploadedDocs,
+        goodsStatus: 'Documents Submitted',
+      });
+
+      setIsVerified(true);
+    } catch (error) {
+      console.error('Document verification failed:', error);
+      setVerifyError('Failed to submit documents. Please try again.');
+    } finally {
+      setIsVerifying(false);
+    }
   };
 
   const handleDownloadQR = () => {
@@ -112,10 +128,10 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
           pdf.setTextColor(0, 0, 0);
           pdf.text('Customs Document Access QR Code', 20, 20);
           
-          // Add session ID
+          // Add consignment ID
           pdf.setFontSize(12);
           pdf.setTextColor(100, 100, 100);
-          pdf.text(`Session ID: ${uploadSessionId}`, 20, 30);
+          pdf.text(`Consignment ID: ${consignmentId}`, 20, 30);
           
           // Add QR code
           const qrSize = 80; // size in mm
@@ -172,7 +188,7 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
           );
           
           // Save the PDF
-          pdf.save(`customs-documents-${uploadSessionId}.pdf`);
+          pdf.save(`customs-documents-${consignmentId}.pdf`);
         }
         
         // Cleanup
@@ -183,14 +199,9 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
     }
   };
 
-  // Generate the QR code data
-  const qrCodeData = {
-    sessionId: uploadSessionId,
-    documentCount: Object.values(documents).filter(doc => doc.file !== null).length,
-    timestamp: new Date().toISOString(),
-    // In production, you'd want to include a secure URL to access these documents
-    accessUrl: `https://your-api.com/customs/documents/${uploadSessionId}`
-  };
+  // The QR code just points at the consignment; the officer's scanner looks up
+  // the current record in Firestore rather than trusting data embedded in the code.
+  const qrCodeData = { consignmentId };
 
   const handleClose = () => {
     // Add console.log to debug
@@ -355,7 +366,7 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
                   </div>
                   <div className="text-center">
                     <p className="text-sm text-gray-600 mb-2">
-                      Session ID: <span className="font-mono font-medium">{uploadSessionId}</span>
+                      Consignment ID: <span className="font-mono font-medium">{consignmentId}</span>
                     </p>
                     <button
                       onClick={handleDownloadQR}
@@ -424,6 +435,18 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
           </div>
         )}
 
+        {!consignmentId && (
+          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800">
+            No consignment is linked to this upload yet. Create a consignment first, then upload its documents.
+          </div>
+        )}
+
+        {verifyError && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+            {verifyError}
+          </div>
+        )}
+
         {/* Action Buttons */}
         <div className="flex justify-end items-center gap-4 pt-4 border-t border-gray-100">
           <button
@@ -434,17 +457,17 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
           </button>
           <button
             onClick={handleVerify}
-            disabled={!areRequiredDocumentsUploaded()}
+            disabled={!areRequiredDocumentsUploaded() || !consignmentId || isVerifying}
             className={`
               px-6 py-2 rounded-lg flex items-center gap-2 font-medium
               transition-all duration-200
-              ${areRequiredDocumentsUploaded()
+              ${areRequiredDocumentsUploaded() && consignmentId && !isVerifying
                 ? 'bg-blue-500 text-white hover:bg-blue-600 shadow-sm hover:shadow'
                 : 'bg-gray-100 text-gray-400 cursor-not-allowed'}
             `}
           >
             <FaUpload />
-            Verify & Upload
+            {isVerifying ? 'Submitting...' : 'Verify & Upload'}
           </button>
         </div>
       </div>

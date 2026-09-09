@@ -85,6 +85,7 @@ const TraderSignup: React.FC = () => {
       });
       navigate('/dashboard');
     } catch (err) {
+      console.error('Signup error:', err);
       setError({ message: 'Failed to create account. Please try again.' });
     } finally {
       setFormState(prev => ({ ...prev, isLoading: false }));
@@ -99,6 +100,7 @@ const TraderSignup: React.FC = () => {
       await signInWithPopup(auth, provider);
       navigate('/dashboard');
     } catch (err) {
+      console.error('Google sign-up error:', err);
       setError({ message: 'Failed to sign up with Google. Please try again.' });
     } finally {
       setFormState(prev => ({ ...prev, isLoading: false }));

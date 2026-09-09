@@ -3,7 +3,10 @@ import { FaUpload, FaDownload, FaBox, FaSignOutAlt, FaFileInvoice, FaHistory, Fa
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import UploadModal from './UploadModal';
 import InvoiceDetailModal from './InvoiceDetailModal';
-import Footer from './Footer';                       
+import Footer from './Footer';
+import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { db } from '../firebase/firebaseConfig';
+import { useAuth } from './AuthContext';
 // import { Link } from 'react-router-dom';
 
 interface User {
@@ -255,6 +258,7 @@ const ContextualHelp: React.FC<{ content: string }> = ({ content }) => {
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { user: authUser, signOut } = useAuth();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
@@ -265,6 +269,7 @@ export default function Dashboard() {
   const [riskAssessment, setRiskAssessment] = useState<RiskAssessment | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isConsignmentModalOpen, setIsConsignmentModalOpen] = useState(false);
+  const [activeConsignmentId, setActiveConsignmentId] = useState<string | null>(null);
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [statusHistory, setStatusHistory] = useState<StatusUpdate[]>([]);
   const [statusUpdateNotification, setStatusUpdateNotification] = useState<string | null>(null);
@@ -344,11 +349,11 @@ export default function Dashboard() {
   }, [activities, calculateInsights]);
 
   // Add a sign out function
-  const handleSignOut = () => {
-
+  const handleSignOut = async () => {
+    await signOut();
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    
+
     // Navigate back to home page
     navigate('/');
   };
@@ -409,12 +414,14 @@ export default function Dashboard() {
   // Consignment Creation Modal Component
   const ConsignmentCreationModal = () => {
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState<string | null>(null);
 
-    const { 
-      control, 
-      handleSubmit, 
-      formState: { errors }, 
-      reset 
+    const {
+      control,
+      handleSubmit,
+      formState: { errors },
+      reset
     } = useForm<ConsignmentFormData>({
       resolver: zodResolver(ConsignmentSchema),
       defaultValues: {
@@ -425,18 +432,40 @@ export default function Dashboard() {
       }
     });
 
-    const onSubmit = (data: ConsignmentFormData) => {
-      console.log('Consignment Data:', data);
-      
-      // Set submitted state and show animation
-      setIsSubmitted(true);
+    const onSubmit = async (data: ConsignmentFormData) => {
+      setIsSubmitting(true);
+      setSubmitError(null);
 
-      // Close modal and reset after animation
-      setTimeout(() => {
-        setIsConsignmentModalOpen(false);
-        setIsSubmitted(false);
-        reset();
-      }, 2000);
+      try {
+        const docRef = await addDoc(collection(db, 'consignments'), {
+          traderName: data.traderName,
+          traderEmail: authUser?.email ?? '',
+          documentType: data.documentType,
+          description: data.goodsDescription,
+          estimatedValue: data.estimatedValue,
+          declarationNumber: data.declarationNumber ?? '',
+          goodsStatus: 'Pending',
+          goodsOrdered: [] as string[],
+          documents: [] as { type: string; fileName: string; sizeKb: number }[],
+          createdAt: Timestamp.now(),
+        });
+
+        setActiveConsignmentId(docRef.id);
+        setIsSubmitted(true);
+
+        // Close modal, reset, and move straight into document upload for the new consignment
+        setTimeout(() => {
+          setIsConsignmentModalOpen(false);
+          setIsSubmitted(false);
+          reset();
+          setIsUploadModalOpen(true);
+        }, 1500);
+      } catch (error) {
+        console.error('Failed to create consignment:', error);
+        setSubmitError('Failed to create consignment. Please try again.');
+      } finally {
+        setIsSubmitting(false);
+      }
     };
 
     if (isSubmitted) {
@@ -488,6 +517,11 @@ export default function Dashboard() {
               </h2>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                {submitError && (
+                  <div className="rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+                    {submitError}
+                  </div>
+                )}
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Trader Name
@@ -587,12 +621,13 @@ export default function Dashboard() {
                   >
                     Cancel
                   </button>
-                  <button 
+                  <button
                     type="submit"
-                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center"
+                    disabled={isSubmitting}
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <FaClipboardCheck className="h-5 w-5 mr-2" />
-                    Create Consignment
+                    {isSubmitting ? 'Creating...' : 'Create Consignment'}
                   </button>
                 </div>
               </form>
@@ -1191,9 +1226,10 @@ export default function Dashboard() {
       </div>
 
       {/* Modals */}
-      <UploadModal 
+      <UploadModal
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}
+        consignmentId={activeConsignmentId}
       />
       <InvoiceDetailModal 
         invoice={selectedInvoice ?? {

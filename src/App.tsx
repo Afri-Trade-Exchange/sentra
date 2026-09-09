@@ -9,10 +9,12 @@ import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-route
 import ContactPage from './Components/ContactPage'
 import Layout from './Components/Layout'
 import ErrorBoundary from './Components/ErrorBoundary'
-import Dashboard from './Components/Dashboard' 
+import Dashboard from './Components/Dashboard'
 import { useState } from 'react';
 import CustomsDashboard from './Components/CustomsDashboard';
 import { AuthProvider } from './Components/AuthContext';
+import ProtectedRoute from './Components/ProtectedRoute';
+import TraderLogin from './Components/TraderLogin';
 import Typewriter from 'typewriter-effect';
 import { Dialog } from '@headlessui/react'
 import { FaClock, FaShieldAlt, FaChartLine } from 'react-icons/fa';
@@ -50,9 +52,25 @@ export default function App() {
                 <Routes>
                   <Route path="/" element={<LandingPage />} />
                   <Route path="/trader-signup" element={<TraderSignup />} />
+                  <Route path="/login" element={<TraderLogin />} />
+                  <Route path="/customs-login" element={<TraderLogin />} />
                   <Route path="/contact" element={<ContactPage />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/customs-dashboard" element={<CustomsDashboard />} />
+                  <Route
+                    path="/dashboard"
+                    element={
+                      <ProtectedRoute>
+                        <Dashboard />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/customs-dashboard"
+                    element={
+                      <ProtectedRoute>
+                        <CustomsDashboard />
+                      </ProtectedRoute>
+                    }
+                  />
                   <Route path="/settings" element={<Settings />} />
                   {/* Add other routes as needed */}
                 </Routes>

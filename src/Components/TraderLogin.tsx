@@ -37,7 +37,7 @@ const LoginForm: React.FC = () => {
     setError(null);
 
     try {
-      await loginUser({ email: formData.email, password: formData.password });
+      const role = await loginUser({ email: formData.email, password: formData.password });
       if (formData.rememberMe) {
         localStorage.setItem('rememberMe', 'true');
         localStorage.setItem('email', formData.email);
@@ -45,8 +45,9 @@ const LoginForm: React.FC = () => {
         localStorage.removeItem('rememberMe');
         localStorage.removeItem('email');
       }
-      navigate('/dashboard');
+      navigate(role === 'customs' ? '/customs-dashboard' : '/dashboard');
     } catch (err) {
+      console.error('Login error:', err);
       setError('Invalid email or password. Please try again.');
     } finally {
       setLoading(false);
@@ -61,6 +62,7 @@ const LoginForm: React.FC = () => {
       await signInWithPopup(auth, provider);
       navigate('/dashboard');
     } catch (err) {
+      console.error('Google sign-in error:', err);
       setError('Failed to sign in with Google. Please try again.');
     } finally {
       setLoading(false);

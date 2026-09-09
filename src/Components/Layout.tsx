@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { GiAfrica } from 'react-icons/gi';
 import { FaTwitter, FaLinkedinIn, FaInstagram, FaFacebookF } from 'react-icons/fa';
 import { HiPhone, HiMail } from 'react-icons/hi';
+import sentraLogo from '../assets/images/Sentralogo.png';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -23,14 +24,11 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <div className="flex flex-col min-h-screen">
       <nav className="fixed top-0 left-0 right-0 flex items-center justify-between px-4 sm:px-8 md:px-12 lg:px-40 py-4 bg-white bg-opacity-80 backdrop-blur-sm z-20">
-        <div className="flex items-center w-1/4">
-          <div className="logo cursor-pointer" onClick={() => navigate('/')}>
-            {/* <GiAfrica className="text-2xl text-teal-500 mr-2" /> */}
-          </div>
-          <span className="text-xl font-bold text-gray-900 cursor-pointer" onClick={() => navigate('/')}>
-            Sentra
+        <div className="flex flex-col items-start w-1/4 cursor-pointer" onClick={() => navigate('/')}>
+          <img src={sentraLogo} alt="Sentra" className="h-8 w-auto" />
+          <span className="text-[10px] text-gray-500 font-medium tracking-wide mt-0.5">
+            Smart Solutions, Global Impact
           </span>
-          <img src="src/assets/images/Sentra_Logo2.png" alt="Logo" className="h-8 w-8 ml-2"/>
         </div>
 
         {/* Hamburger Menu */}
@@ -52,7 +50,7 @@ export default function Layout({ children }: LayoutProps) {
         {/* Desktop Navigation */}
         <div className="hidden md:flex justify-center items-center space-x-8 w-1/2">
           <a href="/trader-signup" className="hover:text-teal-500 font-bold">I'm a Trader</a>
-          <button type="button" onClick={() => navigate('/trader-signup')} className="hover:text-teal-500 font-bold">
+          <button type="button" onClick={() => navigate('/customs-login')} className="hover:text-teal-500 font-bold">
             I'm a Customs Officer
           </button>
           <a href="/contact" className="hover:text-teal-500 font-bold">Company</a>
@@ -108,7 +106,7 @@ export default function Layout({ children }: LayoutProps) {
               <a href="/trader-signup" className="block py-3 px-4 hover:bg-teal-50 rounded-lg transition-all">
                 <span className="text-gray-700 hover:text-teal-600">I'm a Trader</span>
               </a>
-              <a href="/trader-signup" className="block py-3 px-4 hover:bg-teal-50 rounded-lg transition-all">
+              <a href="/customs-login" className="block py-3 px-4 hover:bg-teal-50 rounded-lg transition-all">
                 <span className="text-gray-700 hover:text-teal-600">I'm a Customs Officer</span>
               </a>
               <a href="/contact" className="block py-3 px-4 hover:bg-teal-50 rounded-lg transition-all">

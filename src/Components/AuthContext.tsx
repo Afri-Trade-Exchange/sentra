@@ -24,8 +24,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signOut = async () => {
-    // Implement your sign out logic here
-    // For example: await auth.signOut();
+    await auth.signOut();
   };
 
   return (

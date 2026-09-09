@@ -478,6 +478,7 @@ interface QrScannerData {
   goodsOrdered: string[];
   estimatedValue: number;
   description: string;
+  documents?: { type: string; fileName: string; sizeKb: number }[];
 }
 
 // Updated QR Scanner Modal component
@@ -505,9 +506,16 @@ const QrScannerModal: React.FC<{
       async (decodedText) => {
         try {
           const qrData = JSON.parse(decodedText);
+          if (!qrData.consignmentId || typeof qrData.consignmentId !== 'string') {
+            setError('Invalid QR code');
+            return;
+          }
           const consignmentDoc = await getDoc(doc(db, 'consignments', qrData.consignmentId));
           if (consignmentDoc.exists()) {
-            const consignmentData = consignmentDoc.data() as QrScannerData;
+            const consignmentData = {
+              ...consignmentDoc.data(),
+              consignmentId: consignmentDoc.id,
+            } as QrScannerData;
             onScanSuccess(consignmentData);
             if (scannerRef.current) {
               await scannerRef.current.clear();
@@ -1159,18 +1167,46 @@ export const CustomsDashboard: React.FC = () => {
         {/* Display scanned data */}
         {scannedData && (
           <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <h3 className="text-lg font-semibold mb-4">Scanned Document Details</h3>
+            <h3 className="text-lg font-semibold mb-4">Scanned Consignment Details</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm font-medium text-gray-500">Trader Name</p>
                 <p className="mt-1">{scannedData.traderName}</p>
               </div>
               <div>
+                <p className="text-sm font-medium text-gray-500">Trader Email</p>
+                <p className="mt-1">{scannedData.traderEmail}</p>
+              </div>
+              <div>
                 <p className="text-sm font-medium text-gray-500">Document Type</p>
                 <p className="mt-1">{scannedData.documentType}</p>
               </div>
-              {/* Add more fields as needed */}
+              <div>
+                <p className="text-sm font-medium text-gray-500">Status</p>
+                <p className="mt-1">{scannedData.goodsStatus}</p>
+              </div>
+              <div className="col-span-2">
+                <p className="text-sm font-medium text-gray-500">Goods Description</p>
+                <p className="mt-1">{scannedData.description}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Estimated Value</p>
+                <p className="mt-1">{scannedData.estimatedValue}</p>
+              </div>
             </div>
+
+            {scannedData.documents && scannedData.documents.length > 0 && (
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <p className="text-sm font-medium text-gray-500 mb-2">Submitted Documents</p>
+                <ul className="space-y-1">
+                  {scannedData.documents.map((docItem, index) => (
+                    <li key={index} className="text-sm text-gray-700">
+                      • {docItem.type} — {docItem.fileName} ({docItem.sizeKb}KB)
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         )}
       </>

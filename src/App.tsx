@@ -16,7 +16,7 @@ import { Dialog } from '@headlessui/react'
 import { FaClock, FaShieldAlt, FaChartLine, FaBriefcase, FaUserShield, FaFileUpload, FaQrcode, FaCheckCircle, FaArrowRight } from 'react-icons/fa';
 import './Components/LandingPage.css';
 import Settings from './Components/Settings';
-import heroImg from './assets/images/customs-port.jpg';
+import heroImg from './assets/images/customs-port-2.jpg';
 import accelerLogo from './assets/images/acceler.png';
 import kuehneNagelLogo from './assets/images/kuehne-nagel.png';
 import alslLogo from './assets/images/ALSL-Logo.png';
@@ -126,7 +126,7 @@ function LandingPage () {
 
   return (
     <div 
-      className="min-h-screen bg-stone-100 text-gray-800 font-['Montserrat'] flex flex-col relative overflow-hidden"
+      className="min-h-screen bg-stone-100 text-gray-800 font-['Montserrat'] flex flex-col relative"
     >
 
       {/* Subtle background pattern */}

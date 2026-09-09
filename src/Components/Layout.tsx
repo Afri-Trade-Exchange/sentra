@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { FaTwitter, FaLinkedinIn, FaInstagram, FaFacebookF } from 'react-icons/fa';
 import { HiPhone, HiMail } from 'react-icons/hi';
 import sentraLogo from '../assets/images/Sentralogo.png';
@@ -10,7 +10,9 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   React.useEffect(() => {
     if (isOpen) {
@@ -20,21 +22,36 @@ export default function Layout({ children }: LayoutProps) {
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 500);
+    onScroll();
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [location.pathname]);
+
+  // Only the landing page has a full-bleed hero photo behind the header;
+  // everywhere else (and once scrolled past it) the header needs a solid backing to stay legible.
+  const overHero = location.pathname === '/' && !scrolled;
+
   return (
     <div className="flex flex-col min-h-screen">
       <header className="fixed top-4 inset-x-4 sm:inset-x-6 lg:inset-x-10 z-20">
-        <nav className="mx-auto max-w-6xl flex items-center justify-between gap-4 rounded-full border border-white/40 bg-white/55 backdrop-blur-lg px-5 sm:px-6 py-2.5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.08)]">
+        <nav className={`mx-auto max-w-6xl flex items-center justify-between gap-4 rounded-full px-5 sm:px-6 py-2.5 transition-colors duration-300 ${
+          overHero
+            ? 'bg-transparent backdrop-blur-[2px]'
+            : 'border border-white/40 bg-white/55 backdrop-blur-lg shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.08)]'
+        }`}>
           <img
             src={sentraLogo}
             alt="Sentra"
-            className="h-6 sm:h-7 w-auto cursor-pointer"
+            className={`h-6 sm:h-7 w-auto cursor-pointer transition-all ${overHero ? 'brightness-0 invert' : ''}`}
             onClick={() => navigate('/')}
           />
 
           {/* Hamburger Menu */}
           <button
             type="button"
-            className="md:hidden p-2 -mr-2 hover:bg-gray-100 rounded-full transition-colors"
+            className={`md:hidden p-2 -mr-2 rounded-full transition-colors ${overHero ? 'text-white hover:bg-white/10' : 'text-gray-900 hover:bg-gray-100'}`}
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle menu"
           >
@@ -48,17 +65,17 @@ export default function Layout({ children }: LayoutProps) {
           </button>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-7 text-sm">
-            <a href="/trader-signup" className="text-gray-600 hover:text-teal-600 font-medium transition-colors">I'm a Trader</a>
-            <button type="button" onClick={() => navigate('/customs-login')} className="text-gray-600 hover:text-teal-600 font-medium transition-colors">
+          <div className={`hidden md:flex items-center gap-7 text-sm transition-colors duration-300 ${overHero ? 'text-white' : 'text-gray-600'}`}>
+            <a href="/trader-signup" className={`font-medium transition-colors ${overHero ? 'hover:text-teal-200' : 'hover:text-teal-600'}`}>I'm a Trader</a>
+            <button type="button" onClick={() => navigate('/customs-login')} className={`font-medium transition-colors ${overHero ? 'hover:text-teal-200' : 'hover:text-teal-600'}`}>
               I'm a Customs Officer
             </button>
-            <a href="/contact" className="text-gray-600 hover:text-teal-600 font-medium transition-colors">Company</a>
-            <a href="/contact" className="text-gray-600 hover:text-teal-600 font-medium transition-colors">Tracking</a>
+            <a href="/contact" className={`font-medium transition-colors ${overHero ? 'hover:text-teal-200' : 'hover:text-teal-600'}`}>Company</a>
+            <a href="/contact" className={`font-medium transition-colors ${overHero ? 'hover:text-teal-200' : 'hover:text-teal-600'}`}>Tracking</a>
           </div>
 
           <div className="hidden md:flex items-center gap-2">
-            <button type="button" onClick={() => navigate('/login')} className="px-4 py-2 text-sm text-gray-600 hover:text-teal-600 font-medium transition-colors">
+            <button type="button" onClick={() => navigate('/login')} className={`px-4 py-2 text-sm font-medium transition-colors ${overHero ? 'text-white hover:text-teal-200' : 'text-gray-600 hover:text-teal-600'}`}>
               Sign in
             </button>
             <button type="button" onClick={() => navigate('/contact')} className="px-5 py-2 text-sm text-white bg-teal-600 hover:bg-teal-700 rounded-full font-medium transition-colors">

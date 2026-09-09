@@ -151,7 +151,7 @@ function LandingPage () {
       <div className="relative -mt-24 min-h-[600px] sm:min-h-[660px] flex items-center overflow-hidden">
         <img
           src={heroImg}
-          alt="Stacked shipping containers at a busy port"
+          alt="Aerial view of stacked shipping containers at a busy port"
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black/50" />

@@ -107,7 +107,6 @@ AfriTradeXchange/
 - 📊 Real-time Trade Tracking
 - 💱 Multi-currency Support
 - 📈 Detailed Analytics Dashboard
-- 
 
 ## 🤝 Contributing Guidelines
 

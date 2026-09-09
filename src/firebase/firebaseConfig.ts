@@ -4,12 +4,12 @@ import { getFirestore } from 'firebase/firestore';
 
 //  Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBP5Sidb2-STGpvL3jnh5QFKyCoRKfn858",
-  authDomain: "afritrade-4ed4c.firebaseapp.com",
-  projectId: "afritrade-4ed4c",
-  storageBucket: "afritrade-4ed4c.firebasestorage.app",
-  messagingSenderId: "604766264109",
-  appId: "1:604766264109:web:20a25856f8071d2800d1a4"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyBP5Sidb2-STGpvL3jnh5QFKyCoRKfn858",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "afritrade-4ed4c.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "afritrade-4ed4c",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "afritrade-4ed4c.firebasestorage.app",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "604766264109",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:604766264109:web:20a25856f8071d2800d1a4"
 };
 
 const app = initializeApp(firebaseConfig);

@@ -1560,35 +1560,6 @@ export const CustomsDashboard: React.FC = () => {
     </button>
   ))}
 
-  // Add a new state for handling QR code data
-  // const [qrData, setQrData] = useState<string | null>(null);
-
-  // QR Code Scanner Component
-  // const QrCodeScanner: React.FC = () => {
-  //   const handleScan = (data: string | null) => {
-  //     if (data) {
-  //       setQrData(data); // Set the scanned QR code data
-  //       console.log('Scanned QR Code:', data); // Handle the scanned data
-  //     }
-  //   };
-
-  //   const handleError = (err: unknown) => {
-  //     console.error(err); // Handle any errors
-  //   };
-
-  //   return (
-  //     <div className="bg-white p-4 rounded-lg shadow-md">
-  //       <h3 className="text-lg font-semibold mb-2">Scan QR Code</h3>
-  //       <QrScanner
-  //         onError={handleError}
-  //         onScan={handleScan}
-  //         style={{ width: '100%' }}
-  //       />
-  //       {qrData && <p className="mt-2">Scanned Data: {qrData}</p>}
-  //     </div>
-  //   );
-  // };
-
   const handleSubmitNewConsignment = (formData: NewConsignmentFormData) => {
     // Handle the new consignment submission
     console.log('New consignment:', formData);
@@ -1734,9 +1705,6 @@ export const CustomsDashboard: React.FC = () => {
         onClose={() => setIsModalOpen(false)}
       />
 
-      {/* <div className="mb-8">
-        <QrCodeScanner />
-      </div> */}
       <HelpButton />
     </div>
   );

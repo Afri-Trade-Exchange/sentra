@@ -1,9 +1,6 @@
 import { Suspense, lazy } from 'react'
 import { FiSearch } from 'react-icons/fi'
 import './index.css'
-import Slider from 'react-slick'
-import "slick-carousel/slick/slick.css"
-import "slick-carousel/slick/slick-theme.css"
 import TraderSignup from './Components/TraderSignup'
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom'
 import ContactPage from './Components/ContactPage'
@@ -15,12 +12,27 @@ import CustomsDashboard from './Components/CustomsDashboard';
 import { AuthProvider } from './Components/AuthContext';
 import ProtectedRoute from './Components/ProtectedRoute';
 import TraderLogin from './Components/TraderLogin';
-import Typewriter from 'typewriter-effect';
 import { Dialog } from '@headlessui/react'
 import { FaClock, FaShieldAlt, FaChartLine } from 'react-icons/fa';
 import './Components/LandingPage.css';
 import Settings from './Components/Settings';
+import clearanceImg from './assets/images/clearance.jpg';
+import accelerLogo from './assets/images/acceler.png';
+import kuehneNagelLogo from './assets/images/kuehne-nagel.png';
+import alslLogo from './assets/images/ALSL-Logo.png';
+import loriLogo from './assets/images/Lori.png';
+import omlAfricaLogo from './assets/images/omlafrica.png';
+import siginonLogo from './assets/images/Siginon-Group.png';
 const Footer = lazy(() => import('./Components/Footer'));
+
+const trustedLogos = [
+  { src: accelerLogo, alt: 'Acceler' },
+  { src: kuehneNagelLogo, alt: 'Kuehne + Nagel' },
+  { src: alslLogo, alt: 'ALSL' },
+  { src: loriLogo, alt: 'Lori' },
+  { src: omlAfricaLogo, alt: 'Omla Africa' },
+  { src: siginonLogo, alt: 'Siginon Group' },
+];
 
 // Add this interface for order information
 interface OrderInfo {
@@ -91,33 +103,6 @@ function LandingPage () {
   const [isSearching, setIsSearching] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const settings = {
-    dots: false,
-    arrows: false,
-    infinite: true,
-    speed: 5000,
-    slidesToShow: 5,
-    slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 0,
-    cssEase: "linear",
-    pauseOnHover: false,
-    responsive: [
-      {
-        breakpoint: 1024,
-        settings: {
-          slidesToShow: 3,
-        }
-      },
-      {
-        breakpoint: 600,
-        settings: {
-          slidesToShow: 2,
-        }
-      }
-    ]
-  };
-
   const fetchOrderInfo = async (orderNumber: string) => {
     setIsSearching(true);
     // Simulate API call - I will replace with actual API call
@@ -141,7 +126,7 @@ function LandingPage () {
 
   return (
     <div 
-      className={`min-h-screen bg-gray-100 text-gray-800 font-['Montserrat'] flex flex-col relative overflow-hidden landing-page-container`}
+      className="min-h-screen bg-gray-100 text-gray-800 font-['Montserrat'] flex flex-col relative overflow-hidden"
     >
 
       {/* Subtle background pattern */}
@@ -165,36 +150,25 @@ function LandingPage () {
       <div className="container mx-auto px-4 py-8 pt-24 relative z-10">
         <div className="max-w-4xl mx-auto mb-12">
           <div className="flex flex-col gap-4">
-            <div className="flex items-center bg-white rounded-[15px] shadow-md overflow-hidden border border-gray-200">
-              <div className="flex-grow flex items-center px-6 relative">
+            <div className="flex items-center bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-200">
+              <div className="flex-grow flex items-center px-6">
                 <FiSearch className="text-gray-400 text-xl mr-3" aria-hidden="true" />
                 <input
                   type="text"
                   className="w-full py-4 text-base focus:outline-none"
                   aria-label="Search orders"
+                  placeholder="Search order, e.g. ORD-001"
                   value={orderNumber}
                   onChange={(e) => setOrderNumber(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                 />
-                {!orderNumber && (
-                  <div className="absolute left-16 top-1/2 -translate-y-1/2 text-gray-400">
-                    <Typewriter
-                      options={{
-                        strings: ['Search Order e.g., ORD-001', 'Track Your Shipment', 'Check Order Status'],
-                        autoStart: true,
-                        loop: true,
-                        delay: 75,
-                      }}
-                    />
-                  </div>
-                )}
               </div>
-              <button 
+              <button
                 type="button"
-                className="bg-teal-500 text-white px-8 py-4 flex items-center gap-2 hover:bg-teal-600 transition-colors rounded-r-[15px]"
+                className="bg-teal-600 text-white px-8 py-4 flex items-center gap-2 hover:bg-teal-700 transition-colors font-medium"
                 onClick={handleSearch}
               >
-                <span>Track Your Shipment</span>
+                <span>Track Shipment</span>
                 <FiSearch />
               </button>
             </div>
@@ -240,95 +214,73 @@ function LandingPage () {
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row justify-between items-center">
-          <div className="md:w-1/2 mb-8 md:mb-0">
-            <h2 className="text-teal-500 text-xl mb-2">Digital Trade, Simplified</h2>
-            <h1 className="text-5xl font-bold mb-4 leading-tight">
-              Clear Customs <span className="text-teal-500">40% Faster</span><br />
-              with on our platform, grow your business.
+        <div className="flex flex-col md:flex-row justify-between items-center gap-10">
+          <div className="md:w-1/2">
+            <h2 className="text-teal-600 text-lg font-medium mb-2">Digital Trade, Simplified</h2>
+            <h1 className="text-4xl sm:text-5xl font-light mb-4 leading-tight">
+              Clear Customs <span className="font-semibold text-teal-600">40% Faster</span><br />
+              with our platform, and grow your business.
             </h1>
             <p className="text-gray-600 mb-6">
               One platform for all your cross-border trade needs. Track, manage, and clear shipments seamlessly.
             </p>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-4">
               <button
                 type="button"
-                onClick={() => navigate('/trader-signup')} 
-                className="px-12 py-3 text-gray-700 bg-white border-2 border-gray-200 rounded-[15px] hover:bg-gray-50 hover:border-gray-300 transition-all"
+                onClick={() => navigate('/trader-signup')}
+                className="px-8 sm:px-12 py-3 text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-colors font-medium"
               >
                 How others use it
               </button>
               <button
                 type="button"
-                onClick={() => navigate('/trader-signup')} 
-                className="px-12 py-3 text-white bg-teal-500 rounded-[15px] hover:bg-teal-600 transition-all"
+                onClick={() => navigate('/trader-signup')}
+                className="px-8 sm:px-12 py-3 text-white bg-teal-600 rounded-xl hover:bg-teal-700 transition-colors font-medium"
               >
                 Try for free
               </button>
             </div>
           </div>
-          <div className="md:w-1/2">
-            <div className="relative group transform scale-110 mx-auto">
-              {/* Glowing background effect */}
-              <div className="absolute -inset-4 bg-gradient-to-r from-teal-500/20 to-blue-500/20 rounded-[40px] blur-2xl opacity-75 group-hover:opacity-100 transition-all duration-500" />
-              
-              {/* Semi-transparent overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent rounded-[30px] backdrop-blur-[2px] group-hover:backdrop-blur-[1px] transition-all duration-300" />
-              
-              {/* Main image */}
-              <img
-                src="/src/assets/images/clearance.png"
-                alt="Man inspecting customs clearance documents"
-                className="w-full h-auto relative z-10 transition-all duration-500 
-                           rounded-[30px] transform group-hover:scale-[1.02] main-image"
-              />
-              
-      
-            </div>
+          <div className="md:w-1/2 w-full">
+            <img
+              src={clearanceImg}
+              alt="Man inspecting customs clearance documents"
+              className="w-full h-auto rounded-2xl main-image mx-auto max-w-md md:max-w-none"
+            />
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12 mb-16">
-          <div className="bg-white p-6 rounded-[15px] shadow-md">
-            <div className="text-teal-500 text-2xl mb-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 mt-12 mb-16">
+          <div className="bg-white p-6 rounded-xl shadow-sm">
+            <div className="text-teal-600 text-xl font-medium mb-3">
               <FaClock className="inline-block mr-2" /> Fast Processing
             </div>
             <p className="text-gray-600">Clear customs in half the time with our streamlined digital process</p>
           </div>
-          <div className="bg-white p-6 rounded-[15px] shadow-md">
-            <div className="text-teal-500 text-2xl mb-3">
+          <div className="bg-white p-6 rounded-xl shadow-sm">
+            <div className="text-teal-600 text-xl font-medium mb-3">
               <FaShieldAlt className="inline-block mr-2" /> Secure & Compliant
             </div>
             <p className="text-gray-600">100% compliance with customs regulations and secure document handling</p>
           </div>
-          <div className="bg-white p-6 rounded-[15px] shadow-md">
-            <div className="text-teal-500 text-2xl mb-3">
+          <div className="bg-white p-6 rounded-xl shadow-sm">
+            <div className="text-teal-600 text-xl font-medium mb-3">
               <FaChartLine className="inline-block mr-2" /> Real-time Tracking
             </div>
             <p className="text-gray-600">Monitor your shipments and customs clearance status in real-time</p>
           </div>
         </div>
         <div className="mt-16">
-          <h3 className="text-center text-xl text-gray-600 mb-6">Trusted by global Companies</h3>
-          <Slider {...settings}>
-            <div className="px-2">
-              <img src="/src/assets/images/acceler.png" alt="Acceler" className="h-12 mx-auto" />
-            </div>
-            <div className="px-2">
-              <img src="/src/assets/images/kuehne-nagel.png" alt="kuehne-nagel" className="h-12 mx-auto" />
-            </div>
-            <div className="px-2">
-              <img src="/src/assets/images/ALSL-Logo.png" alt="ALSL" className="h-12 mx-auto" />
-            </div>
-            <div className="px-2">
-              <img src="/src/assets/images/Lori.png" alt="Lori" className="h-12 mx-auto" />
-            </div>
-            <div className="px-2">
-              <img src="/src/assets/images/omlafrica.png" alt="Omla Africa" className="h-12 mx-auto" />
-            </div>
-            <div className="px-2">
-              <img src="/src/assets/images/Siginon-Group.png" alt="Siginon-Group" className="h-12 mx-auto" />
-            </div>
-          </Slider>
+          <h3 className="text-center text-lg text-gray-500 font-medium mb-6">Trusted by global companies</h3>
+          <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
+            {trustedLogos.map((logo) => (
+              <img
+                key={logo.alt}
+                src={logo.src}
+                alt={logo.alt}
+                className="h-8 sm:h-10 opacity-60 grayscale"
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>

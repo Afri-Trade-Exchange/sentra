@@ -58,7 +58,7 @@ export default function InvoiceDetailModal({
       // Detailed invoice HTML
       invoiceWrapper.innerHTML = `
         <div style="
-          background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+          background: #f5f7fa;
           border-radius: 12px;
           padding: 30px;
           box-shadow: 0 15px 30px rgba(0,0,0,0.1);
@@ -384,28 +384,28 @@ export default function InvoiceDetailModal({
             <div className="text-right">
               <p>Subtotal: ${invoice.totalAmount.toFixed(2)}</p>
               <p>Tax ({invoice.taxRate * 100}%): ${(invoice.totalAmount * invoice.taxRate).toFixed(2)}</p>
-              <p className="font-bold text-xl">Total: ${invoice.totalAmount.toFixed(2)}</p>
+              <p className="font-semibold text-xl">Total: ${invoice.totalAmount.toFixed(2)}</p>
             </div>
           </div>
-          
+
           {/* Action Buttons */}
           <div className="flex items-center justify-end p-6 border-t border-solid rounded-b border-blueGray-200">
             <button
-              className="px-6 py-2 mb-1 mr-2 text-sm font-bold text-blue-600 uppercase transition-all duration-150 ease-linear outline-none background-transparent focus:outline-none flex items-center"
+              className="px-6 py-2 mb-1 mr-2 text-sm font-semibold text-teal-600 uppercase transition-colors duration-150 ease-linear outline-none background-transparent focus:outline-none flex items-center"
               type="button"
               onClick={downloadInvoice}
             >
               <FaDownload className="mr-2" /> Download PDF
             </button>
             <button
-              className="px-6 py-2 mb-1 mr-2 text-sm font-bold text-green-600 uppercase transition-all duration-150 ease-linear outline-none background-transparent focus:outline-none flex items-center"
+              className="px-6 py-2 mb-1 mr-2 text-sm font-semibold text-green-600 uppercase transition-colors duration-150 ease-linear outline-none background-transparent focus:outline-none flex items-center"
               type="button"
               onClick={() => window.print()}
             >
               <FaPrint className="mr-2" /> Print
             </button>
             <button
-              className="px-6 py-2 mb-1 text-sm font-bold text-red-500 uppercase transition-all duration-150 ease-linear outline-none background-transparent focus:outline-none"
+              className="px-6 py-2 mb-1 text-sm font-semibold text-red-500 uppercase transition-colors duration-150 ease-linear outline-none background-transparent focus:outline-none"
               type="button"
               onClick={onClose}
             >

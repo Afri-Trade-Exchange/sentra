@@ -119,10 +119,10 @@ const InvoiceViewButton: React.FC<{
     <button 
       onClick={onClick}
       className="
-        text-sm 
-        font-medium 
-        text-blue-600 
-        hover:text-blue-800 
+        text-sm
+        font-medium
+        text-teal-600
+        hover:text-teal-700
         transition-colors 
         flex 
         items-center 
@@ -512,7 +512,7 @@ export default function Dashboard() {
               </button>
 
               <h2 className="text-2xl font-bold mb-6 text-gray-800 flex items-center">
-                <HeroIcons.DocumentIcon className="h-8 w-8 mr-3 text-blue-500" />
+                <HeroIcons.DocumentIcon className="h-8 w-8 mr-3 text-teal-600" />
                 Create New Consignment
               </h2>
 
@@ -624,7 +624,7 @@ export default function Dashboard() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <FaClipboardCheck className="h-5 w-5 mr-2" />
                     {isSubmitting ? 'Creating...' : 'Create Consignment'}
@@ -795,7 +795,7 @@ export default function Dashboard() {
                   </button>
                   <button 
                     type="submit"
-                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center"
+                    className="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 flex items-center"
                   >
                     <FaClipboardCheck className="h-5 w-5 mr-2" />
                     Create Request
@@ -947,7 +947,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 pt-8 space-y-6">
         {/* Add Welcome Header */}
         <div className="mb-8 flex justify-between items-center">
@@ -962,14 +962,14 @@ export default function Dashboard() {
         </div>
 
         {/* Remove insights section and continue with rest of the layout */}
-        <div className="grid grid-cols-12 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
           {/* Sidebar */}
-          <aside className="col-span-2 bg-white/80 backdrop-blur-md rounded-2xl shadow-lg overflow-hidden">
+          <aside className="lg:col-span-2 bg-white/80 backdrop-blur-md rounded-2xl shadow-sm overflow-hidden">
             {/* Profile Section */}
             <div className="p-4 border-b border-gray-100">
               <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                  <span className="text-xl font-semibold text-blue-600">
+                <div className="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center">
+                  <span className="text-xl font-medium text-teal-600">
                     {user?.name?.charAt(0) || 'G'}
                   </span>
                 </div>
@@ -1008,8 +1008,8 @@ export default function Dashboard() {
                       className={`
                         w-full flex items-center px-4 py-3 rounded-lg
                         transition-all duration-200 ease-in-out
-                        ${isActive 
-                          ? 'bg-blue-50 text-blue-600' 
+                        ${isActive
+                          ? 'bg-teal-50 text-teal-600'
                           : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                         }
                         group
@@ -1018,7 +1018,7 @@ export default function Dashboard() {
                       <item.icon className={`
                         w-5 h-5 mr-3
                         transition-colors
-                        ${isActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'}
+                        ${isActive ? 'text-teal-600' : 'text-gray-400 group-hover:text-gray-600'}
                       `} />
                       <span className="font-medium">{item.label}</span>
                       {item.path && (
@@ -1034,34 +1034,31 @@ export default function Dashboard() {
           </aside>
 
           {/* Main Content */}
-          <main className="col-span-10 space-y-6">
+          <main className="lg:col-span-10 space-y-6">
             {/* Quick Action Cards */}
-            <section className="grid grid-cols-4 gap-4">
+            <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
-                { 
-                  icon: FaUpload, 
-                  label: 'Upload', 
-                  color: 'bg-blue-500', 
-                  action: () => setIsUploadModalOpen(true) 
+                {
+                  icon: FaUpload,
+                  label: 'Upload',
+                  action: () => setIsUploadModalOpen(true)
                 },
-                { 
-                  icon: FaBox, 
-                  label: 'Create Consignment', 
-                  color: 'bg-purple-500', 
-                  action: createConsignmentHandler 
+                {
+                  icon: FaBox,
+                  label: 'Create Consignment',
+                  action: createConsignmentHandler
                 },
-                { 
-                  icon: FaDownload, 
-                  label: 'Download Report', 
-                  color: 'bg-yellow-500', 
-                  action: downloadActivitiesReport 
+                {
+                  icon: FaDownload,
+                  label: 'Download Report',
+                  action: downloadActivitiesReport
                 }
 
               ].map((card) => (
-                <button 
+                <button
                   key={card.label}
                   onClick={card.action}
-                  className={`${card.color} text-white p-4 rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all flex flex-col items-center justify-center space-y-2`}
+                  className="bg-teal-600 text-white p-4 rounded-xl shadow-sm hover:bg-teal-700 hover:shadow-md transition-colors flex flex-col items-center justify-center space-y-2"
                 >
                   <card.icon className="text-2xl" />
                   <span className="text-sm font-medium">{card.label}</span>
@@ -1070,7 +1067,7 @@ export default function Dashboard() {
             </section>
 
             {/* Add this after the Quick Action Cards section */}
-            <section className="grid grid-cols-3 gap-4">
+            <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {enhancedInsights && (
                 <>
                   <div className="bg-white/80 backdrop-blur-md rounded-xl p-4">
@@ -1099,38 +1096,32 @@ export default function Dashboard() {
             )}
 
             {/* Analytics Section - Modern Card Design */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* Orders Chart */}
-              <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-5">
+              <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-sm p-5">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-semibold">Order Trends</h2>
+                  <h2 className="text-xl font-medium">Order Trends</h2>
                   <span className="text-sm text-red-500">5 Pending</span>
                 </div>
                 <ResponsiveContainer width="100%" height={250}>
                   <AreaChart data={orderData}>
-                    <defs>
-                      <linearGradient id="colorOrders" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
                     <XAxis dataKey="month" axisLine={false} tickLine={false} />
                     <YAxis axisLine={false} tickLine={false} />
                     <Tooltip />
-                    <Area 
-                      type="monotone" 
-                      dataKey="orders" 
-                      stroke="#3b82f6" 
-                      fillOpacity={1} 
-                      fill="url(#colorOrders)" 
+                    <Area
+                      type="monotone"
+                      dataKey="orders"
+                      stroke="#0d9488"
+                      fillOpacity={0.15}
+                      fill="#0d9488"
                     />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
 
               {/* Category Distribution */}
-              <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-5">
-                <h2 className="text-xl font-semibold mb-4">Category Distribution</h2>
+              <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-sm p-5">
+                <h2 className="text-xl font-medium mb-4">Category Distribution</h2>
                 <ResponsiveContainer width="100%" height={250}>
                   <PieChart>
                     <Pie
@@ -1156,9 +1147,9 @@ export default function Dashboard() {
             </div>
 
             {/* Enhanced Recent Activities with More Context */}
-            <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-5">
+            <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-sm p-5">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold flex items-center">
+                <h2 className="text-xl font-medium flex items-center">
                   Recent Activities
                   <ContextualHelp 
                     content="This section shows your most recent business activities, including orders, shipments, and payments." 
@@ -1166,7 +1157,7 @@ export default function Dashboard() {
                 </h2>
                 <button 
                   onClick={() => setShowAllInvoices(!showAllInvoices)}
-                  className="text-base text-blue-500 hover:text-blue-700 transition-colors"
+                  className="text-base text-teal-600 hover:text-teal-700 transition-colors"
                 >
                   {showAllInvoices ? 'Show Recent' : 'View All'}
                 </button>

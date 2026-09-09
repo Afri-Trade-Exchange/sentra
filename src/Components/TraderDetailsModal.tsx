@@ -50,7 +50,7 @@ const TraderDetailsModal: React.FC<TraderDetailsModalProps> = ({
         <p className="text-gray-700">{status}</p>
         <button 
           onClick={onClose} 
-          className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200"
+          className="mt-4 px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition duration-200"
         >
           Close
         </button>

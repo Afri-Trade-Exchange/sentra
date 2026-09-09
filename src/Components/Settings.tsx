@@ -157,7 +157,7 @@ const Settings: React.FC = () => {
                     onChange={handleInputChange}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-teal-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-600"></div>
                 </label>
               </div>
             ))}
@@ -175,7 +175,7 @@ const Settings: React.FC = () => {
                 onClick={() => handleThemeChange(theme)}
                 className={`p-4 rounded-lg border-2 ${
                   settings.theme === theme
-                    ? 'border-blue-500 bg-blue-50'
+                    ? 'border-teal-500 bg-teal-50'
                     : 'border-gray-200 hover:border-gray-300'
                 }`}
               >
@@ -190,7 +190,7 @@ const Settings: React.FC = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? 'Saving...' : 'Save Changes'}
           </button>

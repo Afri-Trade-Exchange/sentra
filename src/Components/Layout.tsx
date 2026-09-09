@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GiAfrica } from 'react-icons/gi';
 import { FaTwitter, FaLinkedinIn, FaInstagram, FaFacebookF } from 'react-icons/fa';
 import { HiPhone, HiMail } from 'react-icons/hi';
 import sentraLogo from '../assets/images/Sentralogo.png';
@@ -24,9 +23,9 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <div className="flex flex-col min-h-screen">
       <nav className="fixed top-0 left-0 right-0 flex items-center justify-between px-4 sm:px-8 md:px-12 lg:px-40 py-4 bg-white bg-opacity-80 backdrop-blur-sm z-20">
-        <div className="flex flex-col items-start w-1/4 cursor-pointer" onClick={() => navigate('/')}>
-          <img src={sentraLogo} alt="Sentra" className="h-8 w-auto" />
-          <span className="text-[10px] text-gray-500 font-medium tracking-wide mt-0.5">
+        <div className="flex flex-col items-start cursor-pointer" onClick={() => navigate('/')}>
+          <img src={sentraLogo} alt="Sentra" className="h-7 sm:h-8 w-auto" />
+          <span className="hidden sm:block text-[10px] text-gray-500 font-medium tracking-wide mt-0.5 whitespace-nowrap">
             Smart Solutions, Global Impact
           </span>
         </div>
@@ -49,19 +48,19 @@ export default function Layout({ children }: LayoutProps) {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex justify-center items-center space-x-8 w-1/2">
-          <a href="/trader-signup" className="hover:text-teal-500 font-bold">I'm a Trader</a>
-          <button type="button" onClick={() => navigate('/customs-login')} className="hover:text-teal-500 font-bold">
+          <a href="/trader-signup" className="hover:text-teal-600 font-medium">I'm a Trader</a>
+          <button type="button" onClick={() => navigate('/customs-login')} className="hover:text-teal-600 font-medium">
             I'm a Customs Officer
           </button>
-          <a href="/contact" className="hover:text-teal-500 font-bold">Company</a>
-          <a href="/contact" className="hover:text-teal-500 font-bold">Tracking</a>
+          <a href="/contact" className="hover:text-teal-600 font-medium">Company</a>
+          <a href="/contact" className="hover:text-teal-600 font-medium">Tracking</a>
         </div>
 
         <div className="hidden md:flex items-center justify-end space-x-4 w-1/4">
-          <button type="button" onClick={() => navigate('/trader-signup')} className="px-4 py-2 text-l text-gray-700 hover:text-teal-500 font-bold">
+          <button type="button" onClick={() => navigate('/login')} className="px-4 py-2 text-base text-gray-700 hover:text-teal-600 font-medium">
             Sign in
           </button>
-          <button type="button" onClick={() => navigate('/contact')} className="px-8 py-3 text-l text-white bg-teal-500 hover:bg-teal-600 rounded-[15px] font-bold">
+          <button type="button" onClick={() => navigate('/contact')} className="px-8 py-3 text-base text-white bg-teal-600 hover:bg-teal-700 rounded-xl font-medium">
             Book a Demo
           </button>
         </div>
@@ -84,11 +83,8 @@ export default function Layout({ children }: LayoutProps) {
         `}>
           {/* Mobile Header */}
           <div className="flex justify-between items-center p-4 border-b">
-            <div className="flex items-center">
-              <GiAfrica className="text-2xl text-teal-500 mr-2" />
-              <span className="text-xl font-bold text-gray-700">AfriTrade</span>
-            </div>
-            <button 
+            <img src={sentraLogo} alt="Sentra" className="h-7 w-auto" />
+            <button
               type="button"
               onClick={() => setIsOpen(false)}
               aria-label="Close menu"
@@ -118,12 +114,12 @@ export default function Layout({ children }: LayoutProps) {
             </div>
 
             <div className="space-y-3 pt-6 border-t">
-              <button type="button" onClick={() => navigate('/trader-signup')} 
-                className="w-full py-3 px-4 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-all">
+              <button type="button" onClick={() => navigate('/trader-signup')}
+                className="w-full py-3 px-4 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors font-medium">
                 Register
               </button>
-              <button type="button" onClick={() => navigate('/trader-signup')} 
-                className="w-full py-3 px-4 border border-teal-500 text-teal-500 rounded-lg hover:bg-teal-50 transition-all">
+              <button type="button" onClick={() => navigate('/login')}
+                className="w-full py-3 px-4 border border-teal-600 text-teal-600 rounded-lg hover:bg-teal-50 transition-colors font-medium">
                 Login
               </button>
             </div>
@@ -132,16 +128,16 @@ export default function Layout({ children }: LayoutProps) {
             <div className="pt-6 border-t">
               <p className="text-sm text-gray-500 mb-4">Follow us on social media</p>
               <div className="flex space-x-4">
-                <a href="#" aria-label="Twitter" className="p-3 text-gray-600 hover:text-teal-500 hover:bg-teal-50 rounded-full transition-all">
+                <a href="#" aria-label="Twitter" className="p-3 text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-full transition-colors">
                   <FaTwitter className="w-5 h-5" />
                 </a>
-                <a href="#" aria-label="LinkedIn" className="p-3 text-gray-600 hover:text-teal-500 hover:bg-teal-50 rounded-full transition-all">
+                <a href="#" aria-label="LinkedIn" className="p-3 text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-full transition-colors">
                   <FaLinkedinIn className="w-5 h-5" />
                 </a>
-                <a href="#" aria-label="Instagram" className="p-3 text-gray-600 hover:text-teal-500 hover:bg-teal-50 rounded-full transition-all">
+                <a href="#" aria-label="Instagram" className="p-3 text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-full transition-colors">
                   <FaInstagram className="w-5 h-5" />
                 </a>
-                <a href="#" aria-label="Facebook" className="p-3 text-gray-600 hover:text-teal-500 hover:bg-teal-50 rounded-full transition-all">
+                <a href="#" aria-label="Facebook" className="p-3 text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-full transition-colors">
                   <FaFacebookF className="w-5 h-5" />
                 </a>
               </div>
@@ -150,13 +146,13 @@ export default function Layout({ children }: LayoutProps) {
             {/* Contact Info */}
             <div className="pt-6 border-t space-y-4">
               <p className="text-sm text-gray-500">Need help?</p>
-              <a href="tel:+1234567890" className="flex items-center text-teal-500 hover:text-teal-600">
+              <a href="tel:+1234567890" className="flex items-center text-teal-600 hover:text-teal-700">
                 <HiPhone className="w-5 h-5 mr-2" />
                 +123 456 7890
               </a>
-              <a href="mailto:support@afritrade.com" className="flex items-center text-teal-500 hover:text-teal-600">
+              <a href="mailto:support@sentra.com" className="flex items-center text-teal-600 hover:text-teal-700">
                 <HiMail className="w-5 h-5 mr-2" />
-                support@afritrade.com
+                support@sentra.com
               </a>
             </div>
           </div>

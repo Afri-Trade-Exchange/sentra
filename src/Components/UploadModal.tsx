@@ -237,14 +237,14 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
       onClick={handleOutsideClick}  // Overlay click handler
     >
-      <div 
-        className="bg-white rounded-xl w-full max-w-4xl p-8 max-h-[90vh] overflow-y-auto shadow-2xl"
+      <div
+        className="bg-white rounded-xl w-full max-w-4xl p-4 sm:p-8 max-h-[90vh] overflow-y-auto shadow-lg"
         onClick={(e) => e.stopPropagation()} // Add this to prevent clicks on modal from closing it
       >
         {/* Header Section */}
         <div className="flex justify-between items-center mb-8 pb-4 border-b border-gray-100">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Upload Documents</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-2">Upload Documents</h2>
             <p className="text-sm text-gray-600">
               Please upload all required documents in PDF or image format
             </p>
@@ -268,7 +268,7 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div
-              className={`bg-blue-500 h-2 rounded-full transition-all duration-300 w-[${(Object.values(documents).filter(doc => doc.file !== null).length / Object.values(documents).length) * 100}%]`}
+              className={`bg-teal-600 h-2 rounded-full transition-all duration-300 w-[${(Object.values(documents).filter(doc => doc.file !== null).length / Object.values(documents).length) * 100}%]`}
             />
           </div>
         </div>
@@ -279,21 +279,21 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
             <div
               key={key}
               className={`
-                relative p-6 rounded-xl transition-all duration-200
-                ${doc.file ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'}
+                relative p-6 rounded-xl transition-colors duration-200
+                ${doc.file ? 'bg-teal-50 border-teal-200' : 'bg-gray-50 border-gray-200'}
                 ${doc.required ? 'border-2' : 'border'}
-                hover:shadow-md cursor-pointer
+                hover:shadow-sm cursor-pointer
               `}
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => handleDrop(e, key)}
             >
               <div className="flex items-start space-x-4">
-                <div className={`p-3 rounded-lg ${doc.file ? 'bg-blue-100' : 'bg-gray-200'}`}>
-                  <FaFileAlt className={`w-6 h-6 ${doc.file ? 'text-blue-500' : 'text-gray-400'}`} />
+                <div className={`p-3 rounded-lg ${doc.file ? 'bg-teal-100' : 'bg-gray-200'}`}>
+                  <FaFileAlt className={`w-6 h-6 ${doc.file ? 'text-teal-600' : 'text-gray-400'}`} />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-semibold text-gray-900">{doc.type}</h3>
+                    <h3 className="font-medium text-gray-900">{doc.type}</h3>
                     {doc.required ? (
                       <span className="text-xs text-red-500 font-medium">Required</span>
                     ) : (
@@ -324,8 +324,8 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
                   />
                   <span className={`
                     inline-flex items-center px-3 py-1 rounded-lg text-sm font-medium
-                    ${doc.file 
-                      ? 'text-blue-600 bg-blue-100 hover:bg-blue-200' 
+                    ${doc.file
+                      ? 'text-teal-700 bg-teal-100 hover:bg-teal-200'
                       : 'text-gray-600 bg-gray-200 hover:bg-gray-300'}
                     transition-colors
                   `}>
@@ -339,12 +339,12 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
 
         {/* QR Code Section */}
         {isVerified && (
-          <div className="mb-8 rounded-xl bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50">
-            <div className="p-6 border border-blue-200 rounded-xl">
+          <div className="mb-8 rounded-xl bg-teal-50">
+            <div className="p-6 border border-teal-200 rounded-xl">
               {/* Success Header */}
               <div className="flex items-center gap-2 mb-6">
-                <FaCheckCircle className="text-green-500 w-6 h-6" />
-                <h3 className="text-xl font-semibold text-gray-900">
+                <FaCheckCircle className="text-teal-600 w-6 h-6" />
+                <h3 className="text-xl font-medium text-gray-900">
                   Documents Verified Successfully!
                 </h3>
               </div>
@@ -361,7 +361,7 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
                       level="H"
                       includeMargin={true}
                       bgColor="#FFFFFF"
-                      fgColor="#4F46E5" // Indigo color for QR code
+                      fgColor="#0d9488"
                     />
                   </div>
                   <div className="text-center">
@@ -370,7 +370,7 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
                     </p>
                     <button
                       onClick={handleDownloadQR}
-                      className="flex items-center justify-center w-full px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm hover:shadow gap-2"
+                      className="flex items-center justify-center w-full px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors gap-2 font-medium"
                     >
                       <FaDownload className="w-4 h-4" />
                       Download QR Code
@@ -380,14 +380,14 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
 
                 {/* Instructions Side */}
                 <div className="space-y-6">
-                  <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                    <FaQrcode className="text-indigo-600" />
+                  <h4 className="font-medium text-gray-900 flex items-center gap-2">
+                    <FaQrcode className="text-teal-600" />
                     Next Steps
                   </h4>
-                  
+
                   <div className="space-y-4">
                     <div className="flex gap-3">
-                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm font-medium">
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-sm font-medium">
                         1
                       </div>
                       <p className="text-sm text-gray-600">
@@ -396,7 +396,7 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
                     </div>
 
                     <div className="flex gap-3">
-                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm font-medium">
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-sm font-medium">
                         2
                       </div>
                       <p className="text-sm text-gray-600">
@@ -405,7 +405,7 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
                     </div>
 
                     <div className="flex gap-3">
-                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm font-medium">
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-sm font-medium">
                         3
                       </div>
                       <p className="text-sm text-gray-600">
@@ -414,7 +414,7 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
                     </div>
 
                     <div className="flex gap-3">
-                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm font-medium">
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-sm font-medium">
                         4
                       </div>
                       <p className="text-sm text-gray-600">
@@ -462,7 +462,7 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
               px-6 py-2 rounded-lg flex items-center gap-2 font-medium
               transition-all duration-200
               ${areRequiredDocumentsUploaded() && consignmentId && !isVerifying
-                ? 'bg-blue-500 text-white hover:bg-blue-600 shadow-sm hover:shadow'
+                ? 'bg-teal-600 text-white hover:bg-teal-700'
                 : 'bg-gray-100 text-gray-400 cursor-not-allowed'}
             `}
           >

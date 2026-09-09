@@ -188,9 +188,9 @@ const NewConsignmentModal: React.FC<NewConsignmentModalProps> = ({ isOpen, onClo
             </button>
             <button
               type="submit"
-              className="px-4 py-2.5 text-sm font-medium text-white bg-blue-600 
-                rounded-lg hover:bg-blue-700 transition-colors focus:outline-none 
-                focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="px-4 py-2.5 text-sm font-medium text-white bg-teal-600
+                rounded-lg hover:bg-teal-700 transition-colors focus:outline-none
+                focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
             >
               Create Consignment
             </button>

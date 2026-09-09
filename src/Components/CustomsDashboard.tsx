@@ -384,8 +384,8 @@ const ConsignmentCard: React.FC<{
       layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition-all space-y-4 ${
-        isSelected ? 'ring-2 ring-blue-500' : ''
+      className={`bg-white shadow-sm rounded-lg p-4 hover:shadow-md transition-shadow space-y-4 ${
+        isSelected ? 'ring-2 ring-teal-500' : ''
       }`}
       onClick={() => onSelect(consignment.id)}
     >
@@ -414,7 +414,7 @@ const ConsignmentCard: React.FC<{
         <button
           type="button"
           onClick={() => onViewDetails(consignment)}
-          className="text-blue-500 hover:text-blue-700 flex items-center"
+          className="text-teal-600 hover:text-teal-700 flex items-center"
         >
           <FaEye className="h-5 w-5 mr-1 border-radius-15" />
           View Details
@@ -683,7 +683,7 @@ const GuidedTour: React.FC = () => {
               className={`
                 h-1 flex-1 rounded-none
                 transition-colors duration-200
-                ${index <= currentStep ? 'bg-blue-600' : 'bg-gray-200'}
+                ${index <= currentStep ? 'bg-teal-600' : 'bg-gray-200'}
               `}
             />
           ))}
@@ -733,13 +733,12 @@ const GuidedTour: React.FC = () => {
             onClick={() => setCurrentStep(prev => prev + 1)}
             className="
               px-6 py-2
-              bg-blue-600 text-white
-              hover:bg-blue-700
+              bg-teal-600 text-white
+              hover:bg-teal-700
               rounded-lg
-              shadow-md
               transition-colors
               text-sm font-medium
-              focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+              focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2
             "
           >
             {currentStep === steps.length - 1 ? 'Finish' : 'Next'}
@@ -753,7 +752,7 @@ const GuidedTour: React.FC = () => {
 const LoadingState: React.FC = () => (
   <div className="flex items-center justify-center min-h-screen">
     <div className="space-y-4 text-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+      <div className="animate-spin rounded-full h-12 w-12 border-4 border-teal-500 border-t-transparent"></div>
       <p className="text-gray-600">Loading dashboard...</p>
     </div>
   </div>
@@ -881,7 +880,7 @@ export const CustomsDashboard: React.FC = () => {
             bg-white border border-gray-200 
             rounded-lg shadow-sm text-sm
             focus:outline-none focus:ring-2 
-            focus:ring-blue-500 focus:border-blue-400
+            focus:ring-teal-500 focus:border-teal-400
             transition-all duration-200
           "
         />
@@ -920,7 +919,7 @@ export const CustomsDashboard: React.FC = () => {
             bg-white border border-gray-200
             rounded-lg shadow-sm text-sm
             focus:outline-none focus:ring-2
-            focus:ring-blue-500 focus:border-blue-400
+            focus:ring-teal-500 focus:border-teal-400
             transition-all duration-200
           "
         >
@@ -1115,15 +1114,15 @@ export const CustomsDashboard: React.FC = () => {
       <>
         <div className="flex flex-wrap gap-4 mb-8">
           <button
-            type="button"                                     
+            type="button"
             onClick={handleNewConsignment}
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
           >
             <FaPlus className="mr-2" /> New Consignment
           </button>
-          <button 
+          <button
             type="button"
-            className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
             onClick={handleExport}
           >
             <FaFileExport className="mr-2" /> Export Data
@@ -1131,7 +1130,7 @@ export const CustomsDashboard: React.FC = () => {
           <button
             type="button"
             onClick={handleGenerateReport}
-            className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+            className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
           >
             <FaChartBar className="mr-2" /> Generate Report
           </button>
@@ -1143,7 +1142,7 @@ export const CustomsDashboard: React.FC = () => {
             <FaQrcode className="mr-2" /> Scan Document
           </button>
           <button
-            type="button" 
+            type="button"
             onClick={() => handleExportSettingsChange({ format: 'pdf' })}
             className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
           >
@@ -1167,8 +1166,8 @@ export const CustomsDashboard: React.FC = () => {
         {/* Display scanned data */}
         {scannedData && (
           <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <h3 className="text-lg font-semibold mb-4">Scanned Consignment Details</h3>
-            <div className="grid grid-cols-2 gap-4">
+            <h3 className="text-lg font-medium mb-4">Scanned Consignment Details</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <p className="text-sm font-medium text-gray-500">Trader Name</p>
                 <p className="mt-1">{scannedData.traderName}</p>
@@ -1277,7 +1276,7 @@ export const CustomsDashboard: React.FC = () => {
       <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold">Recent Activity</h3>
-          <button type="button" className="text-sm text-blue-600 hover:text-blue-800">
+          <button type="button" className="text-sm text-teal-600 hover:text-teal-700">
             View All
           </button>
         </div>
@@ -1356,12 +1355,12 @@ export const CustomsDashboard: React.FC = () => {
                     <div className="space-y-2">
                       <input
                         type="date"
-                        className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        className="w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
                         placeholder="Start Date"
                       />
                       <input
                         type="date"
-                        className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        className="w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
                         placeholder="End Date"
                       />
                     </div>
@@ -1374,7 +1373,7 @@ export const CustomsDashboard: React.FC = () => {
                     <select 
                       id="documentType"
                       name="documentType"
-                      className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      className="w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
                     >
                       <option value="">All Types</option>
                       <option value="import">Import</option>
@@ -1391,12 +1390,12 @@ export const CustomsDashboard: React.FC = () => {
                       <input
                         type="number"
                         placeholder="Min"
-                        className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        className="w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
                       />
                       <input
                         type="number"
                         placeholder="Max"
-                        className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        className="w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
                       />
                     </div>
                   </div>
@@ -1406,7 +1405,7 @@ export const CustomsDashboard: React.FC = () => {
                   <button type="button" className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
                     Reset
                   </button>
-                  <button type="button" className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700">
+                  <button type="button" className="px-4 py-2 bg-teal-600 text-white rounded-md text-sm font-medium hover:bg-teal-700">
                     Apply Filters
                   </button>
                 </div>
@@ -1453,7 +1452,7 @@ export const CustomsDashboard: React.FC = () => {
                   <div
                     key={notification.id}
                     className={`p-4 border-b border-gray-100 hover:bg-gray-50 ${
-                      !notification.read ? 'bg-blue-50' : ''
+                      !notification.read ? 'bg-teal-50' : ''
                     }`}
                   >
                     <p className="text-sm text-gray-900">{notification.message}</p>
@@ -1485,7 +1484,7 @@ export const CustomsDashboard: React.FC = () => {
             type="checkbox"
             checked={selectedItems.length > 0}
             onChange={onSelectAll}
-            className="rounded text-blue-600 focus:ring-blue-500"
+            className="rounded text-teal-600 focus:ring-teal-500"
             aria-label="Select all items"
           />
           <span className="text-sm text-gray-600">
@@ -1496,7 +1495,7 @@ export const CustomsDashboard: React.FC = () => {
         <select
           aria-label="Select bulk action"
           onChange={(e) => onAction(e.target.value)}
-          className="rounded-md border-gray-300 text-sm focus:border-blue-500 focus:ring-blue-500"
+          className="rounded-md border-gray-300 text-sm focus:border-teal-500 focus:ring-teal-500"
           disabled={selectedItems.length === 0}
         >
           <option value="">Bulk Actions</option>
@@ -1508,7 +1507,7 @@ export const CustomsDashboard: React.FC = () => {
         <button
           type="button"
           disabled={selectedItems.length === 0}
-          className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+          className="px-4 py-2 bg-teal-600 text-white text-sm rounded-md hover:bg-teal-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
           Apply
         </button>
@@ -1521,7 +1520,7 @@ export const CustomsDashboard: React.FC = () => {
       <div className="bg-white p-6 rounded-lg shadow-sm mb-8">
         <h3 className="text-lg font-semibold mb-4">Processing Timeline</h3>
         <div className="relative">
-          <div className="border-l-2 border-blue-200 ml-4 space-y-6">
+          <div className="border-l-2 border-gray-200 ml-4 space-y-6">
             {timelineEvents.map((event) => (
               <div key={event.id} className="relative">
                 <div className="absolute -left-[9px] mt-2">
@@ -1529,7 +1528,7 @@ export const CustomsDashboard: React.FC = () => {
                     w-4 h-4 rounded-full border-2 border-white
                     ${event.status === ConsignmentStatus.Approved ? 'bg-green-500' :
                       event.status === ConsignmentStatus.Rejected ? 'bg-red-500' :
-                      'bg-blue-500'}
+                      'bg-teal-500'}
                   `} />
                 </div>
                 <div className="ml-6 pb-6">
@@ -1704,7 +1703,7 @@ export const CustomsDashboard: React.FC = () => {
                       className={`
                         px-3 py-2 text-sm font-medium rounded-md
                         ${state.currentPage === index + 1 
-                          ? 'bg-blue-600 text-white' 
+                          ? 'bg-teal-600 text-white'
                           : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
                         }
                         transition-colors duration-200

@@ -49,13 +49,13 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer }) => {
         onClick={() => setIsOpen(!isOpen)}
         type="button"
       >
-        <span className="text-lg font-medium text-gray-900 group-hover:text-teal-500 transition-colors">
+        <span className="text-lg font-medium text-gray-900 group-hover:text-teal-600 transition-colors">
           {question}
         </span>
         <motion.span
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2 }}
-          className="text-teal-500"
+          className="text-teal-600"
         >
           <svg 
             className="w-5 h-5" 
@@ -123,14 +123,14 @@ const ContactPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-100 to-teal-200 text-gray-800 font-['Comfortaa']">
+    <div className="min-h-screen bg-teal-50 text-gray-800">
       <div className="container mx-auto px-4 py-16">
-        <h1 className="text-5xl font-bold text-center mb-12 text-teal-600">Contact Us</h1>
-        
+        <h1 className="text-5xl font-light text-center mb-12 text-teal-600">Contact Us</h1>
+
         {/* Existing contact form and info sections */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
-          <div className="bg-white rounded-xl shadow-2xl p-8 transform hover:scale-105 transition-transform duration-300">
-            <h2 className="text-3xl font-semibold mb-6 text-teal-500">Get in Touch</h2>
+          <div className="bg-white rounded-xl shadow-sm p-8">
+            <h2 className="text-2xl font-medium mb-6 text-teal-600">Get in Touch</h2>
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
                 <label htmlFor="name" className="block text-gray-700 mb-2">Name *</label>
@@ -157,7 +157,7 @@ const ContactPage: React.FC = () => {
                 className={`w-full py-3 px-4 rounded-lg text-lg font-semibold shadow-md 
                   ${isSubmitting 
                     ? 'bg-gray-400 cursor-not-allowed' 
-                    : 'bg-teal-500 hover:bg-teal-600 text-white hover:shadow-lg'
+                    : 'bg-teal-600 hover:bg-teal-700 text-white hover:shadow-lg'
                   } transition-all`}
               >
                 {isSubmitting ? 'Sending...' : 'Send Message'}
@@ -184,39 +184,39 @@ const ContactPage: React.FC = () => {
               )}
             </form>
           </div>
-          <div className="bg-white rounded-xl shadow-2xl p-8 transform hover:scale-105 transition-transform duration-300">
-            <h2 className="text-3xl font-semibold mb-6 text-teal-500">Contact Information</h2>
+          <div className="bg-white rounded-xl shadow-sm p-8">
+            <h2 className="text-2xl font-medium mb-6 text-teal-600">Contact Information</h2>
             <div className="space-y-6">
               <div className="flex items-center">
-                <MdLocationOn className="text-teal-500 text-3xl mr-4" />
+                <MdLocationOn className="text-teal-600 text-3xl mr-4" />
                 <p className="text-lg">123 Trade Street, Nairobi, Kenya</p>
               </div>
               <div className="flex items-center">
-                <MdPhone className="text-teal-500 text-3xl mr-4" />
+                <MdPhone className="text-teal-600 text-3xl mr-4" />
                 <p className="text-lg">+254 123 456 789</p>
               </div>
               <div className="flex items-center">
-                <MdEmail className="text-teal-500 text-3xl mr-4" />
-                <p className="text-lg">info@afritrade.com</p>
+                <MdEmail className="text-teal-600 text-3xl mr-4" />
+                <p className="text-lg">info@sentra.com</p>
               </div>
             </div>
             <div className="mt-12">
-              <h3 className="text-2xl font-semibold mb-4 text-teal-500">Follow Us</h3>
+              <h3 className="text-2xl font-medium mb-4 text-teal-600">Follow Us</h3>
               <div className="flex space-x-6">
-                <a href="#" className="text-gray-600 hover:text-teal-500 transition-colors">
+                <a href="#" className="text-gray-600 hover:text-teal-600 transition-colors">
                   <FaFacebookF className="w-8 h-8" />
                 </a>
-                <a href="#" className="text-gray-600 hover:text-teal-500 transition-colors">
+                <a href="#" className="text-gray-600 hover:text-teal-600 transition-colors">
                   <FaInstagram className="w-8 h-8" />
                 </a>
-                <a href="#" className="text-gray-600 hover:text-teal-500 transition-colors">
+                <a href="#" className="text-gray-600 hover:text-teal-600 transition-colors">
                   <FaTwitter className="w-8 h-8" />
                 </a>
               </div>
             </div>
             {/* Add business hours */}
             <div className="mt-8">
-              <h3 className="text-2xl font-semibold mb-4 text-teal-500">Business Hours</h3>
+              <h3 className="text-2xl font-medium mb-4 text-teal-600">Business Hours</h3>
               <div className="space-y-2">
                 <p className="flex justify-between">
                   <span>Monday - Friday:</span>
@@ -237,7 +237,7 @@ const ContactPage: React.FC = () => {
 
         {/* FAQ Section */}
         <div className="max-w-3xl mx-auto mb-20">
-          <h2 className="text-3xl font-semibold mb-8 text-teal-500 text-center">
+          <h2 className="text-3xl font-medium mb-8 text-teal-600 text-center">
             Frequently Asked Questions
           </h2>
           <motion.div
@@ -258,7 +258,7 @@ const ContactPage: React.FC = () => {
         <div className="text-center mb-12">
           <Link 
             to="/" 
-            className="inline-flex items-center text-teal-500 hover:text-teal-600 transition-colors text-lg font-semibold"
+            className="inline-flex items-center text-teal-600 hover:text-teal-700 transition-colors text-lg font-medium"
           >
             <svg 
               className="w-5 h-5 mr-2" 

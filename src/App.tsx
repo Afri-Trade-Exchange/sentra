@@ -16,7 +16,7 @@ import { Dialog } from '@headlessui/react'
 import { FaClock, FaShieldAlt, FaChartLine, FaBriefcase, FaUserShield, FaFileUpload, FaQrcode, FaCheckCircle, FaArrowRight } from 'react-icons/fa';
 import './Components/LandingPage.css';
 import Settings from './Components/Settings';
-import clearanceImg from './assets/images/clearance.jpg';
+import heroImg from './assets/images/customs-port.jpg';
 import accelerLogo from './assets/images/acceler.png';
 import kuehneNagelLogo from './assets/images/kuehne-nagel.png';
 import alslLogo from './assets/images/ALSL-Logo.png';
@@ -147,26 +147,31 @@ function LandingPage () {
         </svg>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-8 pt-24 relative z-10">
-
-        {/* Hero */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-10 mb-20">
-          <div className="md:w-1/2">
+      {/* Hero — full-bleed, extends up behind the floating header */}
+      <div className="relative -mt-24 min-h-[600px] sm:min-h-[660px] flex items-center overflow-hidden">
+        <img
+          src={heroImg}
+          alt="Stacked shipping containers at a busy port"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/50" />
+        <div className="relative z-10 max-w-6xl mx-auto px-4 pt-24 w-full">
+          <div className="max-w-xl">
             <span className="inline-block text-teal-700 bg-teal-50 text-sm font-medium px-3 py-1 rounded-full mb-4">
               Welcome to Sentra
             </span>
-            <h1 className="text-4xl sm:text-5xl font-light mb-4 leading-tight">
-              Clear Customs <span className="font-semibold text-teal-600">40% Faster</span><br />
-              with our platform, and grow your business.
+            <h1 className="text-4xl sm:text-5xl font-light mb-4 leading-tight text-white">
+              Clear Customs <span className="font-semibold text-teal-300">40% Faster</span><br />
+              and Keep Your Business Moving.
             </h1>
-            <p className="text-gray-600 mb-6">
-              One platform for traders and customs officers across Africa to track, verify, and clear shipments together — seamlessly.
+            <p className="text-gray-200 mb-6">
+              One platform for traders and customs officers across Africa — upload your documents, get a QR code, and clear the border without the paperwork chase.
             </p>
             <div className="flex flex-wrap gap-4">
               <button
                 type="button"
                 onClick={() => navigate('/trader-signup')}
-                className="px-8 sm:px-12 py-3 text-gray-700 bg-stone-50 border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-colors font-medium"
+                className="px-8 sm:px-12 py-3 text-white bg-white/10 border border-white/40 backdrop-blur-sm rounded-xl hover:bg-white/20 transition-colors font-medium"
               >
                 How others use it
               </button>
@@ -179,14 +184,10 @@ function LandingPage () {
               </button>
             </div>
           </div>
-          <div className="md:w-1/2 w-full">
-            <img
-              src={clearanceImg}
-              alt="Man inspecting customs clearance documents"
-              className="w-full h-auto rounded-2xl main-image mx-auto max-w-md md:max-w-none"
-            />
-          </div>
         </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 py-8 relative z-10">
 
         {/* Choose your path */}
         <div className="mb-20">

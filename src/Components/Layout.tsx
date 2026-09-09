@@ -23,7 +23,7 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <div className="flex flex-col min-h-screen">
       <header className="fixed top-4 inset-x-4 sm:inset-x-6 lg:inset-x-10 z-20">
-        <nav className="mx-auto max-w-6xl flex items-center justify-between gap-4 rounded-full border border-gray-200/70 bg-white/75 backdrop-blur-md px-5 sm:px-6 py-2.5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)]">
+        <nav className="mx-auto max-w-6xl flex items-center justify-between gap-4 rounded-full border border-white/40 bg-white/55 backdrop-blur-lg px-5 sm:px-6 py-2.5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.08)]">
           <img
             src={sentraLogo}
             alt="Sentra"

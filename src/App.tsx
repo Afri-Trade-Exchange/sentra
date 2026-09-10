@@ -148,7 +148,7 @@ function LandingPage () {
       </div>
 
       {/* Hero — full-bleed, extends up behind the floating header */}
-      <div className="relative -mt-24 min-h-[600px] sm:min-h-[660px] flex items-center overflow-hidden">
+      <div className="relative -mt-24 min-h-[600px] sm:min-h-[660px] flex items-start overflow-hidden">
         <img
           src={heroImg}
           alt="Aerial view of stacked shipping containers at a busy port"
@@ -156,10 +156,7 @@ function LandingPage () {
         />
         <div className="absolute inset-0 bg-black/50" />
         <div className="relative z-10 max-w-6xl mx-auto px-4 pt-24 w-full">
-          <div className="max-w-xl">
-            <span className="inline-block text-teal-700 bg-teal-50 text-sm font-medium px-3 py-1 rounded-full mb-4">
-              Welcome to Sentra
-            </span>
+          <div className="max-w-2xl mx-auto text-center">
             <h1 className="text-4xl sm:text-5xl font-light mb-4 leading-tight text-white">
               Clear Customs <span className="font-semibold text-teal-300">40% Faster</span><br />
               and Keep Your Business Moving.
@@ -167,7 +164,7 @@ function LandingPage () {
             <p className="text-gray-200 mb-6">
               One platform for traders and customs officers across Africa — upload your documents, get a QR code, and clear the border without the paperwork chase.
             </p>
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap justify-center gap-4">
               <button
                 type="button"
                 onClick={() => navigate('/trader-signup')}

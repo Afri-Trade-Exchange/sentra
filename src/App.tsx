@@ -159,25 +159,25 @@ function LandingPage () {
         <div className="absolute inset-0 bg-black/50" />
         <div className="relative z-10 max-w-6xl mx-auto px-4 pt-24 w-full">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-5xl sm:text-6xl font-light mb-6 leading-tight text-white">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-light mb-6 leading-tight text-white">
               Clear Customs <span className="font-semibold text-teal-300">40% Faster</span><br />
               and Keep Your Business Moving.
             </h1>
-            <p className="text-lg text-gray-200 mb-8">
+            <p className="text-base sm:text-lg text-gray-200 mb-8 px-2 sm:px-0">
               One platform for traders and customs officers across Africa — upload your documents, get a QR code, and clear the border without the paperwork chase.
             </p>
-            <div className="flex flex-wrap justify-center gap-4">
+            <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4 px-4 sm:px-0">
               <button
                 type="button"
                 onClick={() => navigate('/trader-signup')}
-                className="px-8 sm:px-12 py-3 text-white bg-white/10 border border-white/40 backdrop-blur-sm rounded-xl hover:bg-white/20 transition-colors font-medium"
+                className="px-6 sm:px-8 md:px-12 py-3 text-white bg-white/10 border border-white/40 backdrop-blur-sm rounded-xl hover:bg-white/20 transition-colors font-medium"
               >
                 How others use it
               </button>
               <button
                 type="button"
                 onClick={() => navigate('/trader-signup')}
-                className="px-8 sm:px-12 py-3 text-white bg-teal-600 rounded-xl hover:bg-teal-700 transition-colors font-medium"
+                className="px-6 sm:px-8 md:px-12 py-3 text-white bg-teal-600 rounded-xl hover:bg-teal-700 transition-colors font-medium"
               >
                 Try for free
               </button>
@@ -205,7 +205,7 @@ function LandingPage () {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.6 }}
               transition={{ duration: 0.5, ease: 'easeOut', delay: 0.1 }}
-              className="text-3xl font-medium mb-2"
+              className="text-2xl sm:text-3xl font-medium mb-2"
             >
               From upload to cleared, in one flow
             </motion.h2>
@@ -239,13 +239,25 @@ function LandingPage () {
             </video>
           </motion.div>
 
-          <div className="text-center mb-10">
-            <h3 className="text-2xl font-medium mb-2">Wherever you're joining us from, you're in the right place</h3>
-            <p className="text-gray-600 text-lg">Pick the side you're on and we'll get you set up.</p>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.6 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+            className="text-center mb-10"
+          >
+            <h3 className="text-xl sm:text-2xl font-medium mb-2">Wherever you're joining us from, you're in the right place</h3>
+            <p className="text-gray-600 text-base sm:text-lg">Pick the side you're on and we'll get you set up.</p>
+          </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-3xl mx-auto">
-            <div className="bg-stone-50 p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex flex-col items-center text-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 max-w-3xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.5 }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+              className="bg-stone-50 p-6 sm:p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex flex-col items-center text-center"
+            >
               <div className="w-12 h-12 rounded-full bg-teal-50 flex items-center justify-center mb-4">
                 <FaBriefcase className="text-teal-600 text-lg" />
               </div>
@@ -258,8 +270,14 @@ function LandingPage () {
               >
                 Get started as a trader <FaArrowRight className="text-sm" />
               </button>
-            </div>
-            <div className="bg-stone-50 p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex flex-col items-center text-center">
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.5 }}
+              transition={{ duration: 0.5, ease: 'easeOut', delay: 0.1 }}
+              className="bg-stone-50 p-6 sm:p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex flex-col items-center text-center"
+            >
               <div className="w-12 h-12 rounded-full bg-teal-50 flex items-center justify-center mb-4">
                 <FaUserShield className="text-teal-600 text-lg" />
               </div>
@@ -272,67 +290,130 @@ function LandingPage () {
               >
                 Sign in as an officer <FaArrowRight className="text-sm" />
               </button>
-            </div>
+            </motion.div>
           </div>
         </div>
 
         {/* How it works */}
         <div className="mb-24">
-          <h2 className="text-center text-3xl font-medium mb-12">How it works</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 max-w-5xl mx-auto">
-            {[
-              { icon: FaFileUpload, title: 'Upload your documents', body: "Submit your import or export paperwork once, right from your dashboard." },
-              { icon: FaQrcode, title: 'Get your QR code', body: 'We generate a secure QR code tied to your verified consignment.' },
-              { icon: FaCheckCircle, title: 'Cleared at the border', body: 'The officer scans your code and pulls up everything instantly.' },
-            ].map((step, index) => (
-              <div key={step.title} className="text-center">
-                <div className="w-14 h-14 rounded-full bg-teal-50 flex items-center justify-center mx-auto mb-4">
-                  <step.icon className="text-teal-600 text-xl" />
-                </div>
-                <p className="text-xs font-medium text-teal-600 mb-1">STEP {index + 1}</p>
-                <h3 className="text-lg font-medium mb-2">{step.title}</h3>
-                <p className="text-gray-600 text-sm">{step.body}</p>
-              </div>
-            ))}
+          <motion.h2
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.6 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+            className="text-center text-2xl sm:text-3xl font-medium mb-12"
+          >
+            How it works
+          </motion.h2>
+          <div className="relative max-w-5xl mx-auto">
+            <div
+              className="hidden sm:block absolute left-0 right-0 top-8 h-px bg-gradient-to-r from-transparent via-teal-200 to-transparent"
+              aria-hidden="true"
+            />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-10">
+              {[
+                { icon: FaFileUpload, title: 'Upload your documents', body: 'Submit your import or export paperwork once, right from your dashboard.' },
+                { icon: FaQrcode, title: 'Get your QR code', body: 'We generate a secure QR code tied to your verified consignment.' },
+                { icon: FaCheckCircle, title: 'Cleared at the border', body: 'The officer scans your code and pulls up everything instantly.' },
+              ].map((step, index) => (
+                <motion.div
+                  key={step.title}
+                  initial={{ opacity: 0, x: index === 0 ? -24 : index === 2 ? 24 : 0, y: index === 1 ? 24 : 0 }}
+                  whileInView={{ opacity: 1, x: 0, y: 0 }}
+                  viewport={{ once: true, amount: 0.5 }}
+                  transition={{ duration: 0.5, ease: 'easeOut', delay: index * 0.15 }}
+                  className="relative text-center"
+                >
+                  <div className="relative mx-auto mb-5 w-16 h-16 rounded-2xl bg-white ring-1 ring-teal-100 shadow-sm flex items-center justify-center">
+                    <step.icon className="text-teal-600 text-2xl" />
+                    <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-teal-600 text-white text-xs font-semibold flex items-center justify-center shadow-sm">
+                      {index + 1}
+                    </span>
+                  </div>
+                  <h3 className="text-lg font-medium mb-2">{step.title}</h3>
+                  <p className="text-gray-600 text-sm">{step.body}</p>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Feature highlights */}
-        <div className="mb-24">
-          <h2 className="text-center text-3xl font-medium mb-12">Why traders choose Sentra</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-10 max-w-5xl mx-auto">
-            <div className="bg-stone-50 p-6 rounded-xl shadow-sm text-center flex flex-col items-center">
-              <div className="text-teal-600 text-xl font-medium mb-3">
-                <FaClock className="inline-block mr-2" /> Fast Processing
+        <div className="mb-24 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -24 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.5 }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+              className="lg:col-span-5 text-center lg:text-left"
+            >
+              <span className="inline-block text-teal-600 text-xs font-semibold uppercase tracking-wide mb-3">
+                Why Sentra
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-medium mb-4">Why traders choose Sentra</h2>
+              <p className="text-gray-600 mb-8">
+                Built with traders and customs officers on both sides of the border, so every document, status update, and QR scan stays in sync — no more chasing paperwork by phone or email.
+              </p>
+              <div className="flex justify-center lg:justify-start gap-10">
+                <div>
+                  <p className="text-3xl sm:text-4xl font-semibold text-teal-600">40%</p>
+                  <p className="text-sm text-gray-500">Faster clearance</p>
+                </div>
+                <div>
+                  <p className="text-3xl sm:text-4xl font-semibold text-teal-600">24/7</p>
+                  <p className="text-sm text-gray-500">Document access</p>
+                </div>
               </div>
-              <p className="text-gray-600">Clear customs in half the time with our streamlined digital process</p>
-            </div>
-            <div className="bg-stone-50 p-6 rounded-xl shadow-sm text-center flex flex-col items-center">
-              <div className="text-teal-600 text-xl font-medium mb-3">
-                <FaShieldAlt className="inline-block mr-2" /> Secure & Compliant
-              </div>
-              <p className="text-gray-600">100% compliance with customs regulations and secure document handling</p>
-            </div>
-            <div className="bg-stone-50 p-6 rounded-xl shadow-sm text-center flex flex-col items-center">
-              <div className="text-teal-600 text-xl font-medium mb-3">
-                <FaChartLine className="inline-block mr-2" /> Real-time Tracking
-              </div>
-              <p className="text-gray-600">Monitor your shipments and customs clearance status in real-time</p>
+            </motion.div>
+
+            <div className="lg:col-span-7 space-y-3">
+              {[
+                { icon: FaClock, title: 'Fast Processing', body: 'Clear customs in half the time with our streamlined digital process.' },
+                { icon: FaShieldAlt, title: 'Secure & Compliant', body: '100% compliance with customs regulations and secure document handling.' },
+                { icon: FaChartLine, title: 'Real-time Tracking', body: 'Monitor your shipments and customs clearance status in real-time.' },
+              ].map((feature, index) => (
+                <motion.div
+                  key={feature.title}
+                  initial={{ opacity: 0, x: 24 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, amount: 0.5 }}
+                  transition={{ duration: 0.5, ease: 'easeOut', delay: index * 0.1 }}
+                  className="group flex items-start gap-4 p-5 rounded-2xl border border-transparent hover:border-teal-100 hover:bg-teal-50/40 transition-colors"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-teal-50 group-hover:bg-teal-600 flex items-center justify-center shrink-0 transition-colors">
+                    <feature.icon className="text-teal-600 group-hover:text-white text-lg transition-colors" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium mb-1">{feature.title}</h3>
+                    <p className="text-gray-600 text-sm">{feature.body}</p>
+                  </div>
+                </motion.div>
+              ))}
             </div>
           </div>
         </div>
 
         {/* Track an existing shipment */}
-        <div className="max-w-3xl mx-auto mb-24 bg-stone-50 rounded-2xl shadow-sm p-10 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.5 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="max-w-3xl mx-auto mb-24 bg-stone-50 rounded-2xl shadow-sm p-6 sm:p-10 text-center"
+        >
+          <div className="w-12 h-12 rounded-full bg-teal-50 flex items-center justify-center mx-auto mb-4">
+            <FaQrcode className="text-teal-600 text-lg" />
+          </div>
           <h2 className="text-xl font-medium mb-1">Already shipping with us?</h2>
           <p className="text-gray-600 mb-6 text-sm">Track your order below.</p>
           <div className="flex flex-col gap-4">
-            <div className="flex items-center bg-gray-50 rounded-2xl overflow-hidden border border-gray-200">
-              <div className="flex-grow flex items-center px-6">
-                <FiSearch className="text-gray-400 text-xl mr-3" aria-hidden="true" />
+            <div className="flex flex-col sm:flex-row items-stretch bg-gray-50 rounded-2xl overflow-hidden border border-gray-200">
+              <div className="flex-grow flex items-center px-4 sm:px-6 min-w-0">
+                <FiSearch className="text-gray-400 text-xl mr-3 shrink-0" aria-hidden="true" />
                 <input
                   type="text"
-                  className="w-full py-4 text-base bg-transparent focus:outline-none"
+                  className="w-full min-w-0 py-4 text-base bg-transparent focus:outline-none"
                   aria-label="Search orders"
                   placeholder="Search order, e.g. ORD-001"
                   value={orderNumber}
@@ -342,7 +423,7 @@ function LandingPage () {
               </div>
               <button
                 type="button"
-                className="bg-teal-600 text-white px-8 py-4 flex items-center gap-2 hover:bg-teal-700 transition-colors font-medium"
+                className="bg-teal-600 text-white px-8 py-4 flex items-center justify-center gap-2 hover:bg-teal-700 transition-colors font-medium"
                 onClick={handleSearch}
               >
                 <span>Track Shipment</span>
@@ -389,35 +470,67 @@ function LandingPage () {
           <div className="text-center mt-3">
             <a href="./contact" className="text-sm text-gray-500 hover:text-teal-600">Need Help?</a>
           </div>
-        </div>
+        </motion.div>
 
         {/* Trust logos */}
         <div className="mb-24">
-          <h3 className="text-center text-lg text-gray-500 font-medium mb-8">Trusted by global companies</h3>
-          <div className="flex flex-wrap items-center justify-center gap-x-14 gap-y-8">
-            {trustedLogos.map((logo) => (
-              <img
+          <motion.h3
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.6 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+            className="text-center text-base sm:text-lg text-gray-500 font-medium mb-8"
+          >
+            Trusted by global companies
+          </motion.h3>
+          <div className="flex flex-wrap items-center justify-center gap-x-8 sm:gap-x-14 gap-y-6 sm:gap-y-8 px-4">
+            {trustedLogos.map((logo, index) => (
+              <motion.img
                 key={logo.alt}
                 src={logo.src}
                 alt={logo.alt}
-                className="h-9 sm:h-11 opacity-60 grayscale"
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 0.6, y: 0 }}
+                viewport={{ once: true, amount: 0.8 }}
+                transition={{ duration: 0.4, ease: 'easeOut', delay: index * 0.06 }}
+                whileHover={{ opacity: 1 }}
+                className="h-8 sm:h-11 grayscale hover:grayscale-0 transition-[filter] duration-300"
               />
             ))}
           </div>
         </div>
 
         {/* Closing CTA */}
-        <div className="text-center bg-teal-600 rounded-2xl px-6 py-16 mb-16">
-          <h2 className="text-3xl sm:text-4xl font-light text-white mb-3">Ready to clear customs faster?</h2>
-          <p className="text-teal-50 text-lg mb-8">Join traders across Africa already moving goods faster with Sentra.</p>
-          <button
-            type="button"
-            onClick={() => navigate('/trader-signup')}
-            className="px-10 py-3 bg-white text-teal-700 rounded-xl hover:bg-teal-50 transition-colors font-medium"
-          >
-            Try for free
-          </button>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.5 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="relative text-center bg-teal-600 rounded-2xl px-6 py-12 sm:py-16 mb-16 overflow-hidden"
+        >
+          <div className="pointer-events-none absolute -top-20 -left-16 w-64 h-64 rounded-full bg-teal-400/30 blur-3xl" aria-hidden="true" />
+          <div className="pointer-events-none absolute -bottom-24 -right-10 w-72 h-72 rounded-full bg-teal-800/30 blur-3xl" aria-hidden="true" />
+          <div className="relative">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-light text-white mb-3">Ready to clear customs faster?</h2>
+            <p className="text-teal-50 text-base sm:text-lg mb-8">Join traders across Africa already moving goods faster with Sentra.</p>
+            <div className="flex flex-col sm:flex-row justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => navigate('/trader-signup')}
+                className="w-full sm:w-auto px-10 py-3 bg-white text-teal-700 rounded-xl hover:bg-teal-50 transition-colors font-medium"
+              >
+                Try for free
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/contact')}
+                className="w-full sm:w-auto px-10 py-3 text-white border border-white/40 rounded-xl hover:bg-white/10 transition-colors font-medium"
+              >
+                Talk to us
+              </button>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </div>
   )

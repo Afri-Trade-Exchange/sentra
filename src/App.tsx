@@ -17,6 +17,7 @@ import { FaClock, FaShieldAlt, FaChartLine, FaBriefcase, FaUserShield, FaFileUpl
 import './Components/LandingPage.css';
 import Settings from './Components/Settings';
 import heroImg from './assets/images/customs-port-2.jpg';
+import sentraMotion from './assets/images/sentra-motion.mp4';
 import accelerLogo from './assets/images/acceler.png';
 import kuehneNagelLogo from './assets/images/kuehne-nagel.png';
 import alslLogo from './assets/images/ALSL-Logo.png';
@@ -184,13 +185,27 @@ function LandingPage () {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
 
         {/* Choose your path */}
-        <div className="mb-20">
-          <h2 className="text-center text-2xl font-medium mb-2">Wherever you're joining us from, you're in the right place</h2>
-          <p className="text-center text-gray-600 mb-8">Pick the side you're on and we'll get you set up.</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+        <div className="mb-24">
+          <h2 className="text-center text-3xl font-medium mb-2">Wherever you're joining us from, you're in the right place</h2>
+          <p className="text-center text-gray-600 text-lg mb-10">Pick the side you're on and we'll get you set up.</p>
+
+          <div className="max-w-5xl mx-auto mb-12 rounded-2xl overflow-hidden shadow-lg bg-black">
+            <video
+              src={sentraMotion}
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="w-full h-auto block"
+            >
+              Sorry, your browser doesn't support embedded videos.
+            </video>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-3xl mx-auto">
             <div className="bg-stone-50 p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex flex-col items-center text-center">
               <div className="w-12 h-12 rounded-full bg-teal-50 flex items-center justify-center mb-4">
                 <FaBriefcase className="text-teal-600 text-lg" />
@@ -223,9 +238,9 @@ function LandingPage () {
         </div>
 
         {/* How it works */}
-        <div className="mb-20">
-          <h2 className="text-center text-2xl font-medium mb-10">How it works</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl mx-auto">
+        <div className="mb-24">
+          <h2 className="text-center text-3xl font-medium mb-12">How it works</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 max-w-5xl mx-auto">
             {[
               { icon: FaFileUpload, title: 'Upload your documents', body: "Submit your import or export paperwork once, right from your dashboard." },
               { icon: FaQrcode, title: 'Get your QR code', body: 'We generate a secure QR code tied to your verified consignment.' },
@@ -244,9 +259,9 @@ function LandingPage () {
         </div>
 
         {/* Feature highlights */}
-        <div className="mb-20">
-          <h2 className="text-center text-2xl font-medium mb-10">Why traders choose Sentra</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 max-w-3xl mx-auto">
+        <div className="mb-24">
+          <h2 className="text-center text-3xl font-medium mb-12">Why traders choose Sentra</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-10 max-w-5xl mx-auto">
             <div className="bg-stone-50 p-6 rounded-xl shadow-sm text-center flex flex-col items-center">
               <div className="text-teal-600 text-xl font-medium mb-3">
                 <FaClock className="inline-block mr-2" /> Fast Processing
@@ -269,9 +284,9 @@ function LandingPage () {
         </div>
 
         {/* Track an existing shipment */}
-        <div className="max-w-2xl mx-auto mb-20 bg-stone-50 rounded-2xl shadow-sm p-8 text-center">
-          <h2 className="text-lg font-medium mb-1">Already shipping with us?</h2>
-          <p className="text-gray-600 mb-4 text-sm">Track your order below.</p>
+        <div className="max-w-3xl mx-auto mb-24 bg-stone-50 rounded-2xl shadow-sm p-10 text-center">
+          <h2 className="text-xl font-medium mb-1">Already shipping with us?</h2>
+          <p className="text-gray-600 mb-6 text-sm">Track your order below.</p>
           <div className="flex flex-col gap-4">
             <div className="flex items-center bg-gray-50 rounded-2xl overflow-hidden border border-gray-200">
               <div className="flex-grow flex items-center px-6">
@@ -338,24 +353,24 @@ function LandingPage () {
         </div>
 
         {/* Trust logos */}
-        <div className="mb-20">
-          <h3 className="text-center text-lg text-gray-500 font-medium mb-6">Trusted by global companies</h3>
-          <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
+        <div className="mb-24">
+          <h3 className="text-center text-lg text-gray-500 font-medium mb-8">Trusted by global companies</h3>
+          <div className="flex flex-wrap items-center justify-center gap-x-14 gap-y-8">
             {trustedLogos.map((logo) => (
               <img
                 key={logo.alt}
                 src={logo.src}
                 alt={logo.alt}
-                className="h-8 sm:h-10 opacity-60 grayscale"
+                className="h-9 sm:h-11 opacity-60 grayscale"
               />
             ))}
           </div>
         </div>
 
         {/* Closing CTA */}
-        <div className="text-center bg-teal-600 rounded-2xl px-6 py-14 mb-16">
-          <h2 className="text-2xl sm:text-3xl font-light text-white mb-3">Ready to clear customs faster?</h2>
-          <p className="text-teal-50 mb-6">Join traders across Africa already moving goods faster with Sentra.</p>
+        <div className="text-center bg-teal-600 rounded-2xl px-6 py-16 mb-16">
+          <h2 className="text-3xl sm:text-4xl font-light text-white mb-3">Ready to clear customs faster?</h2>
+          <p className="text-teal-50 text-lg mb-8">Join traders across Africa already moving goods faster with Sentra.</p>
           <button
             type="button"
             onClick={() => navigate('/trader-signup')}

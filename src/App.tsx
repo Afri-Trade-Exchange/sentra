@@ -11,7 +11,7 @@ import { useState } from 'react';
 import CustomsDashboard from './Components/CustomsDashboard';
 import { AuthProvider } from './Components/AuthContext';
 import ProtectedRoute from './Components/ProtectedRoute';
-import TraderLogin from './Components/TraderLogin';
+import LoginPage from './Components/LoginPage';
 import { Dialog } from '@headlessui/react'
 import { motion } from 'framer-motion'
 import { FaClock, FaShieldAlt, FaChartLine, FaBriefcase, FaUserShield, FaFileUpload, FaQrcode, FaCheckCircle, FaArrowRight, FaPlay } from 'react-icons/fa';
@@ -66,8 +66,8 @@ export default function App() {
                 <Routes>
                   <Route path="/" element={<LandingPage />} />
                   <Route path="/trader-signup" element={<TraderSignup />} />
-                  <Route path="/login" element={<TraderLogin />} />
-                  <Route path="/customs-login" element={<TraderLogin />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/customs-login" element={<LoginPage />} />
                   <Route path="/contact" element={<ContactPage />} />
                   <Route
                     path="/dashboard"

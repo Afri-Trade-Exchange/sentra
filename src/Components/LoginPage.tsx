@@ -11,7 +11,7 @@ interface LoginFormData {
   rememberMe: boolean;
 }
 
-const LoginForm: React.FC = () => {
+const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<LoginFormData>({
     email: '',
@@ -169,4 +169,4 @@ const LoginForm: React.FC = () => {
   );
 };
 
-export default LoginForm;
+export default LoginPage;

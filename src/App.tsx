@@ -13,7 +13,8 @@ import { AuthProvider } from './Components/AuthContext';
 import ProtectedRoute from './Components/ProtectedRoute';
 import TraderLogin from './Components/TraderLogin';
 import { Dialog } from '@headlessui/react'
-import { FaClock, FaShieldAlt, FaChartLine, FaBriefcase, FaUserShield, FaFileUpload, FaQrcode, FaCheckCircle, FaArrowRight } from 'react-icons/fa';
+import { motion } from 'framer-motion'
+import { FaClock, FaShieldAlt, FaChartLine, FaBriefcase, FaUserShield, FaFileUpload, FaQrcode, FaCheckCircle, FaArrowRight, FaPlay } from 'react-icons/fa';
 import './Components/LandingPage.css';
 import Settings from './Components/Settings';
 import heroImg from './assets/images/customs-port-2.jpg';
@@ -187,12 +188,45 @@ function LandingPage () {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
 
-        {/* Choose your path */}
+        {/* See it in action */}
         <div className="mb-24">
-          <h2 className="text-center text-3xl font-medium mb-2">Wherever you're joining us from, you're in the right place</h2>
-          <p className="text-center text-gray-600 text-lg mb-10">Pick the side you're on and we'll get you set up.</p>
+          <div className="text-center mb-10">
+            <motion.span
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.6 }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-50 text-teal-700 text-xs font-semibold tracking-wide uppercase mb-5"
+            >
+              <FaPlay className="text-[9px]" /> See Sentra in action
+            </motion.span>
+            <motion.h2
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.6 }}
+              transition={{ duration: 0.5, ease: 'easeOut', delay: 0.1 }}
+              className="text-3xl font-medium mb-2"
+            >
+              From upload to cleared, in one flow
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.6 }}
+              transition={{ duration: 0.5, ease: 'easeOut', delay: 0.2 }}
+              className="text-gray-600 text-lg max-w-xl mx-auto"
+            >
+              Watch how a trader and a customs officer move a consignment through Sentra, start to finish.
+            </motion.p>
+          </div>
 
-          <div className="max-w-5xl mx-auto mb-12 rounded-2xl overflow-hidden shadow-lg bg-black">
+          <motion.div
+            initial={{ opacity: 0, y: 32 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6, ease: 'easeOut', delay: 0.3 }}
+            className="max-w-5xl mx-auto mb-16 rounded-2xl overflow-hidden shadow-lg bg-black"
+          >
             <video
               src={sentraMotion}
               autoPlay
@@ -203,6 +237,11 @@ function LandingPage () {
             >
               Sorry, your browser doesn't support embedded videos.
             </video>
+          </motion.div>
+
+          <div className="text-center mb-10">
+            <h3 className="text-2xl font-medium mb-2">Wherever you're joining us from, you're in the right place</h3>
+            <p className="text-gray-600 text-lg">Pick the side you're on and we'll get you set up.</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-3xl mx-auto">

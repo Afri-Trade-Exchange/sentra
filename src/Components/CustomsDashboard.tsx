@@ -1,809 +1,43 @@
-import React, { useState, useMemo, useReducer, useCallback, useEffect, useRef } from 'react';
-import { Timestamp } from 'firebase/firestore';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  FaSearch, 
-  FaFilter, 
-  FaEye, 
-  FaUserCircle, 
-  FaClipboardList,
-  FaCheckCircle,
-  FaTimesCircle,
-  FaExclamationTriangle,
-  FaChevronDown,
-  FaPlus,
-  FaFileExport,
-  FaChartBar,
-  FaHistory,
-  FaBell,
-  FaClock,
-  FaQrcode,
-  FaQuestion,
-} from 'react-icons/fa';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement } from 'chart.js';
-import { Pie, Line } from 'react-chartjs-2';
-import Footer from './Footer';
+import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FaClipboardList } from 'react-icons/fa';
 import { useAuth } from './AuthContext';
 import TraderDetailsModal from './TraderDetailsModal';
-import { saveAs } from 'file-saver';
-import * as XLSX from 'xlsx';
-import NewConsignmentModal from './NewConsignmentModal';
-import { Html5QrcodeScanner } from 'html5-qrcode';
-import { db } from '../firebase/firebaseConfig';
-import { doc, getDoc } from 'firebase/firestore';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
-import Papa from 'papaparse';
-import { format } from 'date-fns';
-
-// Register ChartJS components
-ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement);
-
-// Enhanced Type Definitions
-enum ConsignmentStatus {
-  Pending = 'Pending',
-  Approved = 'Approved',
-  Rejected = 'Rejected'
-}
-
-// Add this enum definition
-enum ActivityStatus {
-  Pending = 'Pending',
-  Completed = 'Completed',
-  Failed = 'Failed'
-}
-
-// Interfaces
-interface Consignment {
-  id: string;
-  traderName: string;
-  traderEmail: string;
-  documentType: string;
-  status: ConsignmentStatus;
-  uploadDate: Timestamp;
-  details?: {
-    declarationNumber?: string;
-    description?: string;
-    estimatedValue?: number;
-    goodsOrdered?: string[];
-    goodsStatus?: string;
-  };
-}
-
-// Additional Types
-interface Activity {
-  id: string;
-  description: string;
-  timestamp: Date;
-  type: 'status_change' | 'document_upload' | 'comment' | 'review';
-  userId: string;
-}
-
-interface TimelineEvent {
-  id: string;
-  title: string;
-  timestamp: Date;
-  status: ConsignmentStatus;
-  description: string;
-}
-
-interface NotificationType {
-  id: string;
-  message: string;
-  timestamp: Date;
-  read: boolean;
-  type: 'info' | 'warning' | 'success' | 'error';
-}
-
-// Add this near the top of the file where other interfaces are defined
-// interface User {
-//   displayName: string | null;
-// }
-
-// State Interface
-interface DashboardState {
-  consignments: Consignment[];
-  filteredConsignments: Consignment[];
-  searchTerm: string;
-  statusFilter: ConsignmentStatus | null;
-  currentPage: number;
-  itemsPerPage: number;
-  selectedConsignment: Consignment | null;
-  selectedItems: string[];
-  dateRange: {
-    start: Date | null;
-    end: Date | null;
-  };
-  documentTypeFilter: string | null;
-  valueRange: {
-    min: number | null;
-    max: number | null;
-  };
-  notifications: NotificationType[];
-  activities: Activity[];
-  showAdvancedFilters: boolean;
-  timelineEvents: TimelineEvent[];
-}
-
-// Action Types
-type DashboardAction = 
-  | { type: 'SET_SEARCH_TERM'; payload: string }
-  | { type: 'SET_STATUS_FILTER'; payload: ConsignmentStatus | null }
-  | { type: 'SET_PAGE'; payload: number }
-  | { type: 'SELECT_CONSIGNMENT'; payload: Consignment | null }
-  | { type: 'UPDATE_CONSIGNMENT_STATUS'; payload: { id: string; status: ConsignmentStatus } }
-  | { type: 'SET_SELECTED_ITEMS'; payload: string[] }
-  | { type: 'BULK_UPDATE_STATUS'; payload: { ids: string[]; status: ConsignmentStatus } }
-  | { type: 'TOGGLE_SELECTED_ITEM'; payload: string }
-  | { type: 'UPDATE_ACTIVITY_STATUS'; payload: { activityId: string; newStatus: ActivityStatus } };
-
-// Reducer Function
-const dashboardReducer = (state: DashboardState, action: DashboardAction): DashboardState => {
-  switch (action.type) {
-    case 'UPDATE_CONSIGNMENT_STATUS':
-      return {
-        ...state,
-        consignments: state.consignments.map(consignment => 
-          consignment.id === action.payload.id 
-            ? { ...consignment, status: action.payload.status }
-            : consignment
-        ),
-        filteredConsignments: state.filteredConsignments.map(consignment => 
-          consignment.id === action.payload.id 
-            ? { ...consignment, status: action.payload.status }
-            : consignment
-        )
-      };
-    case 'SET_SEARCH_TERM': {
-      const trimmedSearchTerm = action.payload.trim();
-      return {
-        ...state,
-        searchTerm: action.payload,
-        filteredConsignments: filterConsignments(
-          state.consignments, 
-          trimmedSearchTerm, 
-          state.statusFilter
-        ),
-        currentPage: 1
-      };
-    }
-    case 'SET_STATUS_FILTER':
-      return {
-        ...state,
-        statusFilter: action.payload,
-        filteredConsignments: filterConsignments(
-          state.consignments, 
-          state.searchTerm, 
-          action.payload
-        )
-      };
-    case 'SET_PAGE':
-      return { ...state, currentPage: action.payload };
-    case 'SELECT_CONSIGNMENT':
-      return { ...state, selectedConsignment: action.payload };
-    case 'SET_SELECTED_ITEMS':
-      return { ...state, selectedItems: action.payload };
-    case 'BULK_UPDATE_STATUS':
-      return {
-        ...state,
-        consignments: state.consignments.map(consignment => 
-          action.payload.ids.includes(consignment.id) 
-            ? { ...consignment, status: action.payload.status }
-            : consignment
-        ),
-        filteredConsignments: state.filteredConsignments.map(consignment => 
-          action.payload.ids.includes(consignment.id) 
-            ? { ...consignment, status: action.payload.status }
-            : consignment
-        )
-      };
-    case 'TOGGLE_SELECTED_ITEM':
-      return {
-        ...state,
-        selectedItems: state.selectedItems.includes(action.payload)
-          ? state.selectedItems.filter(id => id !== action.payload)
-          : [...state.selectedItems, action.payload]
-      };
-    default:
-      return state;
-  }
-};
-
-// Improved utility function for filtering
-const filterConsignments = (
-  consignments: Consignment[], 
-  searchTerm: string, 
-  statusFilter: ConsignmentStatus | null
-): Consignment[] => {
-  // Trim and convert search term to lowercase
-  const normalizedSearchTerm = searchTerm.trim().toLowerCase();
-
-  return consignments.filter(consignment => {
-    // If no search term, return all consignments
-    if (!normalizedSearchTerm) return true;
-
-    // Comprehensive search across multiple fields
-    const searchableFields = [
-      consignment.traderName,
-      consignment.documentType,
-      consignment.status,
-      consignment.details?.declarationNumber,
-      consignment.details?.description,
-      consignment.details?.estimatedValue?.toString()
-    ];
-
-    // Check if any field contains the search term
-    const matchesSearch = searchableFields.some(field => 
-      field && String(field).toLowerCase().includes(normalizedSearchTerm)
-    );
-    
-    // Status filter check
-    const matchesStatus = statusFilter 
-      ? consignment.status === statusFilter 
-      : true;
-    
-    return matchesSearch && matchesStatus;
-  });
-};
-
-// Mock Data Generation
-const generateMockConsignments = (): Consignment[] => {
-  const statuses = Object.values(ConsignmentStatus);
-  const documentTypes = ['Import', 'Export', 'Transit'];
-  const traderNames = [
-    { name: 'John Oludhe', email: 'Oludhe@gmail.com' },
-    { name: 'Bob Smith', email: 'bob@gmail.com' },
-    { name: 'Cynthia Wanjiru', email: 'cynthia@gmail.com' },
-    { name: 'Diana Induli', email: 'diana@gmail.com' },
-    { name: 'Ethan Kajala', email: 'ethan@gmail.com' },
-    { name: 'Fiona Wangari', email: 'fiona@gmail.com' },
-    { name: 'George Ouko', email: 'george@gmail.com' },
-    { name: 'Hannah Aoko', email: 'hannah@gmail.com' },
-    { name: 'Ian Malcolm', email: 'ian@gmail.com' },
-    { name: 'Jessica Wambui', email: 'jessica@gmail.com' }
-  ];
-  
-  return Array.from({ length: 20 }).map((_, index) => ({
-    id: `consignment-${index + 1}`,
-    traderName: traderNames[index % traderNames.length].name,
-    traderEmail: traderNames[index % traderNames.length].email,
-    documentType: documentTypes[index % documentTypes.length],
-    status: statuses[index % statuses.length] as ConsignmentStatus,
-    uploadDate: Timestamp.now(),
-    details: {
-      declarationNumber: `DCL-${index + 1000}`,
-      description: 'Commercial goods',
-      estimatedValue: Math.floor(Math.random() * 100000),
-      goodsOrdered: ['Item A', 'Item B', 'Item C'],
-      goodsStatus: 'In Transit'
-    }
-  }));
-};
-
-// Status Configuration
-const STATUS_CONFIG = {
-  [ConsignmentStatus.Pending]: {
-    icon: FaExclamationTriangle,
-    color: 'text-yellow-500 bg-yellow-50',
-    bgColor: 'bg-yellow-100'
-  },
-  [ConsignmentStatus.Approved]: {
-    icon: FaCheckCircle,
-    color: 'text-green-500 bg-green-50',
-    bgColor: 'bg-green-100'
-  },
-  [ConsignmentStatus.Rejected]: {
-    icon: FaTimesCircle,
-    color: 'text-red-500 bg-red-50',
-    bgColor: 'bg-red-100'
-  }
-};
-
-// Status Dropdown Component
-const StatusDropdown: React.FC<{
-  currentStatus: ConsignmentStatus;
-  onStatusChange: (newStatus: ConsignmentStatus) => void;
-}> = ({ currentStatus, onStatusChange }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  // Filter out current status from dropdown options
-  const statusOptions = Object.values(ConsignmentStatus)
-    .filter(status => status !== currentStatus);
-
-  return (
-    <div className="relative inline-block text-left">
-      <div>
-        <button
-          type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          className={`
-            inline-flex justify-center w-full px-4 py-2 text-sm font-medium 
-            rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-opacity-75
-            ${STATUS_CONFIG[currentStatus].color} 
-            ${STATUS_CONFIG[currentStatus].bgColor}
-          `}
-        >
-          <div className="flex items-center">
-            {React.createElement(STATUS_CONFIG[currentStatus].icon, {
-              className: "mr-2 h-5 w-5"
-            })}
-            {currentStatus}
-            <FaChevronDown className="ml-2 -mr-1 h-4 w-4" />
-          </div>
-        </button>
-      </div>
-
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="absolute z-10 w-full mt-2 origin-top-right bg-white 
-              rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-          >
-            <div className="py-1">
-              {statusOptions.map((status) => (
-                <button
-                  type="button"
-                  key={status}
-                  onClick={() => {
-                    onStatusChange(status);
-                    setIsOpen(false);
-                  }}
-                  className={`
-                    group flex items-center w-full px-4 py-2 text-sm 
-                    hover:bg-gray-100 transition-colors
-                    ${STATUS_CONFIG[status].color}
-                  `}
-                >
-                  {React.createElement(STATUS_CONFIG[status].icon, {
-                    className: "mr-3 h-5 w-5"
-                  })}
-                  {status}
-                </button>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-};
-
-// Consignment Card Component
-const ConsignmentCard: React.FC<{
-  consignment: Consignment;
-  onStatusChange: (id: string, status: ConsignmentStatus) => void;
-  onViewDetails: (consignment: Consignment) => void;
-  isSelected: boolean;
-  onSelect: (id: string) => void;
-}> = ({ consignment, onStatusChange, onViewDetails, isSelected, onSelect }) => {
-  return (
-    <motion.div 
-      layout
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className={`bg-white shadow-sm rounded-lg p-4 hover:shadow-md transition-shadow space-y-4 ${
-        isSelected ? 'ring-2 ring-teal-500' : ''
-      }`}
-      onClick={() => onSelect(consignment.id)}
-    >
-      <div className="flex justify-between items-start">
-        <div>
-          <h3 className="font-bold text-gray-800 text-lg">
-            {consignment.traderName}
-          </h3>
-          <p className="text-sm text-gray-500">
-            {consignment.documentType}
-          </p>
-        </div>
-        
-        <StatusDropdown 
-          currentStatus={consignment.status}
-          onStatusChange={(newStatus) => 
-            onStatusChange(consignment.id, newStatus)
-          }
-        />
-      </div>
-      
-      <div className="flex justify-between items-center">
-        <span className="text-sm text-gray-500">
-          {consignment.uploadDate.toDate().toLocaleDateString()}
-        </span>
-        <button
-          type="button"
-          onClick={() => onViewDetails(consignment)}
-          className="text-teal-600 hover:text-teal-700 flex items-center"
-        >
-          <FaEye className="h-5 w-5 mr-1 border-radius-15" />
-          View Details
-        </button>
-      </div>
-    </motion.div>
-  );
-};
-
-// Mock data generators
-const generateMockActivities = (): Activity[] => {
-  return Array.from({ length: 5 }).map((_, index) => ({
-    id: `activity-${index}`,
-    description: `Activity ${index + 1} description`,
-    timestamp: new Date(Date.now() - index * 86400000),
-    type: ['status_change', 'document_upload', 'comment', 'review'][index % 4] as Activity['type'],
-    userId: `user-${index}`
-  }));
-};
-
-const generateMockNotifications = (): NotificationType[] => {
-  return Array.from({ length: 3 }).map((_, index) => ({
-    id: `notification-${index}`,
-    message: `Notification ${index + 1} message`,
-    timestamp: new Date(Date.now() - index * 3600000),
-    read: index > 0,
-    type: ['info', 'warning', 'success', 'error'][index % 4] as NotificationType['type']
-  }));
-};
-
-const generateMockTimelineEvents = (): TimelineEvent[] => {
-  return Array.from({ length: 4 }).map((_, index) => ({
-    id: `timeline-${index}`,
-    title: `Event ${index + 1}`,
-    timestamp: new Date(Date.now() - index * 86400000),
-    status: Object.values(ConsignmentStatus)[index % 3],
-    description: `Timeline event ${index + 1} description`
-  }));
-};
-
-// Main Dashboard Component
-import { useNavigate } from 'react-router-dom';
-
-interface NewConsignmentFormData {
-  traderName: string;
-  traderEmail: string;
-  documentType: string;
-  description: string;
-  estimatedValue: number;
-  goodsOrdered: string[];
-  goodsStatus: string;
-}
-
-// Add new interface for QR data
-interface QrScannerData {
-  consignmentId: string;
-  traderName: string;
-  traderEmail: string;
-  documentType: string;
-  goodsStatus: string;
-  goodsOrdered: string[];
-  estimatedValue: number;
-  description: string;
-  documents?: { type: string; fileName: string; sizeKb: number }[];
-}
-
-// Updated QR Scanner Modal component
-const QrScannerModal: React.FC<{
-  isOpen: boolean;
-  onClose: () => void;
-  onScanSuccess: (data: QrScannerData) => void;
-}> = ({ isOpen, onClose, onScanSuccess }) => {
-  const [error, setError] = useState<string>('');
-  const scannerRef = useRef<Html5QrcodeScanner | null>(null);
-  
-  useEffect(() => {
-    if (!isOpen) return;
-
-    scannerRef.current = new Html5QrcodeScanner(
-      "qr-reader", 
-      { 
-        fps: 10,
-        qrbox: { width: 250, height: 250 },
-      },
-      false
-    );
-
-    scannerRef.current.render(
-      async (decodedText) => {
-        try {
-          const qrData = JSON.parse(decodedText);
-          if (!qrData.consignmentId || typeof qrData.consignmentId !== 'string') {
-            setError('Invalid QR code');
-            return;
-          }
-          const consignmentDoc = await getDoc(doc(db, 'consignments', qrData.consignmentId));
-          if (consignmentDoc.exists()) {
-            const consignmentData = {
-              ...consignmentDoc.data(),
-              consignmentId: consignmentDoc.id,
-            } as QrScannerData;
-            onScanSuccess(consignmentData);
-            if (scannerRef.current) {
-              await scannerRef.current.clear();
-            }
-            onClose();
-          } else {
-            setError('Consignment not found');
-          }
-        } catch (err) {
-          setError(err instanceof Error ? err.message : 'Invalid QR code');
-        }
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
-
-    return () => {
-      if (scannerRef.current) {
-        scannerRef.current.clear().catch(console.error);
-      }
-    };
-  }, [isOpen, onClose, onScanSuccess]);
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl p-6 max-w-md w-full">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold">Scan QR Code</h3>
-          <button 
-            type="button" 
-            onClick={onClose}
-            aria-label="Close QR code scanner"
-            className="text-gray-500 hover:text-gray-700"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        <div id="qr-reader" className="w-full"></div>
-        
-        {error && (
-          <p className="mt-2 text-red-500 text-sm">{error}</p>
-        )}
-      </div>
-    </div>
-  );
-};
-
-// Add this interface for export settings
-interface ExportSettings {
-  format: 'csv' | 'pdf' | 'excel';
-  includeFields: string[];
-  dateRange?: { start: Date; end: Date };
-  orientation?: 'portrait' | 'landscape';
-  customFileName?: string;
-}
-
-// Update the type declaration
-declare module 'jspdf' {
-  interface jsPDF {
-    autoTable: (options: {
-      head?: string[][];
-      body: (string | number)[][];
-      startY?: number;
-      styles?: {
-        fontSize?: number;
-        cellPadding?: number;
-      };
-      headStyles?: {
-        fillColor?: number[];
-        textColor?: number;
-      };
-      alternateRowStyles?: {
-        fillColor?: number[];
-      };
-    }) => jsPDF;
-    internal: {
-      events: PubSub;
-      scaleFactor: number;
-      pageSize: {
-        width: number;
-        getWidth: () => number;
-        height: number;
-        getHeight: () => number;
-      };
-      pages: number[];
-      getEncryptor(objectId: number): (data: string) => string;
-    };
-  }
-}
-
-interface TourStep {
-  element: string;
-  title: string;
-  content: string;
-  position?: 'top' | 'right' | 'bottom' | 'left';
-}
-
-const GuidedTour: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [isVisible, setIsVisible] = useState(true);
-  
-  const steps: TourStep[] = [
-    {
-      element: '#search',
-      title: 'Search',
-      content: 'Type to instantly filter consignments by trader name, ID, or status.',
-      position: 'bottom'
-    },
-    {
-      element: '#filters',
-      title: 'Filters',
-      content: 'Refine results using multiple criteria for precise control.',
-      position: 'right'
-    },
-    {
-      element: '#quick-actions',
-      title: 'Quick Actions',
-      content: 'Access common tasks like creating new consignments or generating reports.',
-      position: 'left'
-    },
-    {
-      element: '#analytics',
-      title: 'Analytics',
-      content: 'Monitor key metrics and trends at a glance.',
-      position: 'top'
-    }
-  ];
-
-  const handleSkip = () => {
-    setIsVisible(false);
-    // Save to user preferences that tour is completed
-    localStorage.setItem('tourCompleted', 'true');
-  };
-
-  if (!isVisible || currentStep >= steps.length) return null;
-
-  return (
-    <div className="fixed inset-0 z-50">
-      {/* Semi-transparent overlay */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-      
-      {/* Tour card */}
-      <div 
-        className="
-          absolute p-6 
-          bg-white 
-          rounded-none 
-          shadow-2xl 
-          max-w-md 
-          transform -translate-x-1/2 -translate-y-1/2
-          left-1/2 top-1/2
-        "
-      >
-        {/* Progress indicator */}
-        <div className="flex gap-1.5 mb-6">
-          {steps.map((_, index) => (
-            <div 
-              key={index}
-              className={`
-                h-1 flex-1 rounded-none
-                transition-colors duration-200
-                ${index <= currentStep ? 'bg-teal-600' : 'bg-gray-200'}
-              `}
-            />
-          ))}
-        </div>
-
-        {/* Content */}
-        <h4 className="font-helvetica text-xl mb-3">
-          {steps[currentStep].title}
-        </h4>
-        <p className="text-base leading-relaxed text-gray-600 mb-8">
-          {steps[currentStep].content}
-        </p>
-
-        {/* Navigation */}
-        <div className="flex items-center justify-between">
-          <div className="flex gap-4">
-            <button
-              type="button"
-              onClick={handleSkip}
-              className="
-                px-4 py-2
-                text-sm font-medium text-gray-600
-                hover:text-gray-900
-                transition-colors
-              "
-            >
-              Skip Tour
-            </button>
-            {currentStep > 0 && (
-              <button
-                type="button"
-                onClick={() => setCurrentStep(prev => prev - 1)}
-                className="
-                  px-4 py-2
-                  text-sm font-medium text-gray-600
-                  hover:text-gray-900
-                  transition-colors
-                "
-              >
-                Previous
-              </button>
-            )}
-          </div>
-          
-          <button
-            type="button"
-            onClick={() => setCurrentStep(prev => prev + 1)}
-            className="
-              px-6 py-2
-              bg-teal-600 text-white
-              hover:bg-teal-700
-              rounded-lg
-              transition-colors
-              text-sm font-medium
-              focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2
-            "
-          >
-            {currentStep === steps.length - 1 ? 'Finish' : 'Next'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const LoadingState: React.FC = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="space-y-4 text-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-4 border-teal-500 border-t-transparent"></div>
-      <p className="text-gray-600">Loading dashboard...</p>
-    </div>
-  </div>
-);
-
-const HelpButton: React.FC = () => {
-  const [showHelp, setShowHelp] = useState(false);
-  
-  return (
-    <div className="fixed bottom-4 left-4 z-50">
-      <button
-        type="button"
-        onClick={() => setShowHelp(!showHelp)}
-        className="p-3 bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors"
-        aria-label="Help"
-      >
-        <FaQuestion className="w-6 h-6 text-gray-600" />
-      </button>
-      
-      {showHelp && (
-        <div className="absolute bottom-full left-0 mb-2 p-4 bg-white rounded-lg shadow-xl w-64">
-          <h4 className="font-semibold mb-2">Quick Help</h4>
-          <ul className="space-y-2 text-sm">
-            <li>• Click cards to view details</li>
-            <li>• Use filters to narrow results</li>
-            <li>• Create a New Consignment for a trader</li>
-            <li>• Export data using quick actions</li>
-            <li>• Scan QR codes for consignment details</li>
-            <li>• Check notifications for any updates</li>
-            <li>• Contact support for any issues</li>
-          </ul>
-        </div>
-      )}
-    </div>
-  );
-};
+import { Consignment, ConsignmentStatus, DashboardState, NewConsignmentFormData } from './CustomsDashboard/types';
+import { dashboardReducer } from './CustomsDashboard/reducer';
+import {
+  generateMockActivities,
+  generateMockConsignments,
+  generateMockNotifications,
+  generateMockTimelineEvents,
+} from './CustomsDashboard/mockData';
+import ConsignmentCard from './CustomsDashboard/ConsignmentCard';
+import SearchInput from './CustomsDashboard/SearchInput';
+import StatusFilterDropdown from './CustomsDashboard/StatusFilterDropdown';
+import QuickActions from './CustomsDashboard/QuickActions';
+import AnalyticsOverview from './CustomsDashboard/AnalyticsOverview';
+import RecentActivity from './CustomsDashboard/RecentActivity';
+import AdvancedFilters from './CustomsDashboard/AdvancedFilters';
+import NotificationCenter from './CustomsDashboard/NotificationCenter';
+import BulkActions from './CustomsDashboard/BulkActions';
+import ConsignmentTimeline from './CustomsDashboard/ConsignmentTimeline';
+import GuidedTour from './CustomsDashboard/GuidedTour';
+import LoadingState from './CustomsDashboard/LoadingState';
+import HelpButton from './CustomsDashboard/HelpButton';
 
 export const CustomsDashboard: React.FC = () => {
-  const { user, signOut } = useAuth(); 
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
       await signOut();
-      navigate('/');  // Redirects to home page
+      navigate('/');
     } catch (error) {
       console.error('Logout failed:', error);
     }
   };
 
-  // Initial State Setup
   const initialState: DashboardState = {
     consignments: generateMockConsignments(),
     filteredConsignments: generateMockConsignments(),
@@ -828,28 +62,23 @@ export const CustomsDashboard: React.FC = () => {
     timelineEvents: generateMockTimelineEvents()
   };
 
-  // Using Reducer for State Management
   const [state, dispatch] = useReducer(dashboardReducer, initialState);
 
-  // Pagination Calculations
   const paginatedConsignments = useMemo(() => {
     const startIndex = (state.currentPage - 1) * state.itemsPerPage;
     return state.filteredConsignments.slice(
-      startIndex, 
+      startIndex,
       startIndex + state.itemsPerPage
     );
   }, [state.filteredConsignments, state.currentPage, state.itemsPerPage]);
 
-  // Handler for changing consignment status
   const handleStatusChange = useCallback((id: string, status: ConsignmentStatus) => {
     dispatch({
       type: 'UPDATE_CONSIGNMENT_STATUS',
       payload: { id, status }
     });
-    // Potential side effect for backend sync
   }, []);
 
-  // Handler for selecting consignment details
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTrader, setSelectedTrader] = useState<{ name: string; email: string; goodsOrdered: string[]; goodsStatus: string } | null>(null);
 
@@ -863,692 +92,6 @@ export const CustomsDashboard: React.FC = () => {
     setIsModalOpen(true);
   }, []);
 
-  // Enhanced Search Input Component
-  const SearchInput: React.FC = () => {
-    return (
-      <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <FaSearch className="text-gray-400 h-4 w-4" />
-        </div>
-        <input
-          type="text"
-          placeholder="Search consignments..."
-          value={state.searchTerm}
-          onChange={(e) => dispatch({ type: 'SET_SEARCH_TERM', payload: e.target.value })}
-          className="
-            w-full pl-11 pr-4 py-2.5 
-            bg-white border border-gray-200 
-            rounded-lg shadow-sm text-sm
-            focus:outline-none focus:ring-2 
-            focus:ring-teal-500 focus:border-teal-400
-            transition-all duration-200
-          "
-        />
-        {state.searchTerm && (
-          <button
-            type="button"
-            onClick={() => dispatch({ type: 'SET_SEARCH_TERM', payload: '' })}
-            className="absolute inset-y-0 right-0 pr-3 flex items-center"
-            aria-label="Clear search"
-          >
-            <span className="text-gray-400 hover:text-gray-600 cursor-pointer">
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </span>
-          </button>
-        )}
-      </div>
-    );
-  };
-
-  // Improved Status Filter Dropdown
-  const StatusFilterDropdown: React.FC = () => {
-    return (
-      <div className="relative">
-        <select
-          value={state.statusFilter || ''}
-          onChange={(e) => dispatch({ 
-            type: 'SET_STATUS_FILTER', 
-            payload: e.target.value as ConsignmentStatus | null 
-          })}
-          aria-label="Filter by status"
-          name="status-filter"
-          className="
-            appearance-none w-full pl-4 pr-10 py-2.5
-            bg-white border border-gray-200
-            rounded-lg shadow-sm text-sm
-            focus:outline-none focus:ring-2
-            focus:ring-teal-500 focus:border-teal-400
-            transition-all duration-200
-          "
-        >
-          <option value="" className="text-sm">All Statuses</option>
-          {Object.values(ConsignmentStatus).map(status => (
-            <option key={status} value={status} className="text-sm">
-              {status}
-            </option>
-          ))}
-        </select>
-        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3">
-          <FaChevronDown className="h-3 w-3 text-gray-500" />
-        </div>
-      </div>
-    );
-  };
-
-  const QuickActions: React.FC = () => {
-    const [showNewConsignmentModal, setShowNewConsignmentModal] = useState(false);
-    const [showScanner, setShowScanner] = useState(false);
-    const [scannedData, setScannedData] = useState<QrScannerData | null>(null);
-    const [exportSettings, setExportSettings] = useState<ExportSettings>({
-      format: 'pdf',
-      includeFields: ['traderName', 'documentType', 'status', 'uploadDate'],
-      orientation: 'portrait'
-    });
-
-    const handleNewConsignment = () => {
-      setShowNewConsignmentModal(true);
-    };
-
-    const formatConsignmentData = (consignments: Consignment[]) => {
-      return consignments.map(c => ({
-        'Trader Name': c.traderName,
-        'Email': c.traderEmail,
-        'Document Type': c.documentType,
-        'Status': c.status,
-        'Upload Date': format(c.uploadDate.toDate(), 'dd/MM/yyyy'),
-        'Declaration Number': c.details?.declarationNumber || '',
-        'Description': c.details?.description || '',
-        'Estimated Value': c.details?.estimatedValue?.toLocaleString() || '',
-        'Goods Status': c.details?.goodsStatus || ''
-      }));
-    };
-
-    const exportToPDF = (data: Consignment[]) => {
-      const doc = new jsPDF({
-        orientation: exportSettings.orientation,
-        unit: 'mm',
-        format: 'a4'
-      });
-
-      // Add header
-      doc.setFontSize(16);
-      doc.text('Consignments Report', 14, 15);
-      
-      // Add metadata
-      doc.setFontSize(10);
-      doc.text(`Generated on: ${format(new Date(), 'dd/MM/yyyy HH:mm')}`, 14, 25);
-      doc.text(`Total Records: ${data.length}`, 14, 30);
-
-      // Prepare table data
-      const formattedData = formatConsignmentData(data);
-      const tableData = formattedData.map(item => 
-        exportSettings.includeFields.map(field => item[field as keyof typeof item])
-      );
-
-      // Add table
-      doc.autoTable({
-        head: [exportSettings.includeFields.map(field => 
-          field.replace(/([A-Z])/g, ' $1').trim() // Convert camelCase to Title Case
-        )],
-        body: tableData,
-        startY: 35,
-        styles: {
-          fontSize: 8,
-          cellPadding: 2
-        },
-        headStyles: {
-          fillColor: [41, 128, 185],
-          textColor: 255
-        },
-        alternateRowStyles: {
-          fillColor: [245, 245, 245]
-        }
-      });
-
-      // Add footer
-      const pageCount = doc.internal.pages.length - 1;
-      for(let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.text(
-          `Page ${i} of ${pageCount}`,
-          doc.internal.pageSize.width - 20,
-          doc.internal.pageSize.height - 10
-        );
-      }
-
-      // Save the PDF
-      const fileName = exportSettings.customFileName || 
-        `consignments_report_${format(new Date(), 'yyyyMMdd_HHmm')}.pdf`;
-      doc.save(fileName);
-    };
-
-    const exportToExcel = (data: Consignment[]) => {
-      const formattedData = formatConsignmentData(data);
-      
-      // Create workbook and worksheet
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.json_to_sheet(formattedData);
-
-      // Add column widths
-      const colWidths = exportSettings.includeFields.map(() => ({ wch: 15 }));
-      ws['!cols'] = colWidths;
-
-      // Add worksheet to workbook
-      XLSX.utils.book_append_sheet(wb, ws, 'Consignments');
-
-      // Add summary sheet
-      const summaryData = [
-        ['Report Summary'],
-        ['Generated Date', format(new Date(), 'dd/MM/yyyy HH:mm')],
-        ['Total Records', data.length.toString()],
-        ['Status Breakdown'],
-        ...Object.values(ConsignmentStatus).map(status => [
-          status,
-          data.filter(c => c.status === status).length
-        ])
-      ];
-      const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
-      XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
-
-      // Save the file
-      const fileName = exportSettings.customFileName || 
-        `consignments_report_${format(new Date(), 'yyyyMMdd_HHmm')}.xlsx`;
-      XLSX.writeFile(wb, fileName);
-    };
-
-    const exportToCSV = (data: Consignment[]) => {
-      const formattedData = formatConsignmentData(data);
-      const csv = Papa.unparse(formattedData);
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const fileName = exportSettings.customFileName || 
-        `consignments_report_${format(new Date(), 'yyyyMMdd_HHmm')}.csv`;
-      saveAs(blob, fileName);
-    };
-
-    const handleExport = () => {
-      // Get filtered data based on date range if specified
-      let dataToExport = state.selectedItems.length > 0
-        ? state.consignments.filter(c => state.selectedItems.includes(c.id))
-        : state.consignments;
-
-      if (exportSettings.dateRange) {
-        dataToExport = dataToExport.filter(c => {
-          const date = c.uploadDate.toDate();
-          return date >= exportSettings.dateRange!.start && 
-                 date <= exportSettings.dateRange!.end;
-        });
-      }
-
-      // Export based on selected format
-      switch (exportSettings.format) {
-        case 'pdf':
-          exportToPDF(dataToExport);
-          break;
-        case 'excel':
-          exportToExcel(dataToExport);
-          break;
-        case 'csv':
-          exportToCSV(dataToExport);
-          break;
-      }
-    };
-
-    const handleScanSuccess = (data: QrScannerData) => {
-      setScannedData(data);
-      // You can also auto-populate a form or display the data in a modal
-    };
-
-    const handleExportSettingsChange = (newSettings: Partial<ExportSettings>) => {
-      setExportSettings(prev => ({ ...prev, ...newSettings }));
-    };
-
-    const handleGenerateReport = () => {
-      // Add report generation logic here
-      console.log('Generating report...');
-    };
-
-    return (
-      <>
-        <div className="flex flex-wrap gap-4 mb-8">
-          <button
-            type="button"
-            onClick={handleNewConsignment}
-            className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
-          >
-            <FaPlus className="mr-2" /> New Consignment
-          </button>
-          <button
-            type="button"
-            className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
-            onClick={handleExport}
-          >
-            <FaFileExport className="mr-2" /> Export Data
-          </button>
-          <button
-            type="button"
-            onClick={handleGenerateReport}
-            className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
-          >
-            <FaChartBar className="mr-2" /> Generate Report
-          </button>
-          <button
-            type="button"
-            onClick={() => setShowScanner(true)}
-            className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
-          >
-            <FaQrcode className="mr-2" /> Scan Document
-          </button>
-          <button
-            type="button"
-            onClick={() => handleExportSettingsChange({ format: 'pdf' })}
-            className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-          >
-            Export Settings
-          </button>
-        </div>
-
-        {/* New Consignment Modal */}
-        <NewConsignmentModal 
-          isOpen={showNewConsignmentModal}
-          onClose={() => setShowNewConsignmentModal(false)}
-          onSubmit={handleSubmitNewConsignment}
-        />
-
-        <QrScannerModal
-          isOpen={showScanner}
-          onClose={() => setShowScanner(false)}
-          onScanSuccess={handleScanSuccess}
-        />
-
-        {/* Display scanned data */}
-        {scannedData && (
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <h3 className="text-lg font-medium mb-4">Scanned Consignment Details</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Trader Name</p>
-                <p className="mt-1">{scannedData.traderName}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Trader Email</p>
-                <p className="mt-1">{scannedData.traderEmail}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Document Type</p>
-                <p className="mt-1">{scannedData.documentType}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Status</p>
-                <p className="mt-1">{scannedData.goodsStatus}</p>
-              </div>
-              <div className="col-span-2">
-                <p className="text-sm font-medium text-gray-500">Goods Description</p>
-                <p className="mt-1">{scannedData.description}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Estimated Value</p>
-                <p className="mt-1">{scannedData.estimatedValue}</p>
-              </div>
-            </div>
-
-            {scannedData.documents && scannedData.documents.length > 0 && (
-              <div className="mt-4 pt-4 border-t border-gray-100">
-                <p className="text-sm font-medium text-gray-500 mb-2">Submitted Documents</p>
-                <ul className="space-y-1">
-                  {scannedData.documents.map((docItem, index) => (
-                    <li key={index} className="text-sm text-gray-700">
-                      • {docItem.type} — {docItem.fileName} ({docItem.sizeKb}KB)
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        )}
-      </>
-    );
-  };
-
-  const AnalyticsOverview: React.FC<{ consignments: Consignment[] }> = ({ consignments }) => {
-    const chartData = useMemo(() => {
-      const statusCounts = Object.values(ConsignmentStatus).reduce((acc, status) => {
-        acc[status] = consignments.filter(c => c.status === status).length;
-        return acc;
-      }, {} as Record<ConsignmentStatus, number>);
-
-      return {
-        labels: Object.keys(statusCounts),
-        datasets: [
-          {
-            data: Object.values(statusCounts),
-            backgroundColor: [
-              'rgba(255, 99, 132, 0.2)',
-              'rgba(54, 162, 235, 0.2)',
-              'rgba(255, 206, 86, 0.2)',
-            ],
-            borderColor: [
-              'rgba(255, 99, 132, 1)',
-              'rgba(54, 162, 235, 1)',
-              'rgba(255, 206, 86, 1)',
-            ],
-            borderWidth: 1,
-          },
-        ],
-      };
-    }, [consignments]);
-
-    return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-lg shadow-sm">
-          <h3 className="text-lg font-semibold mb-4">Status Distribution</h3>
-          <div className="h-64">
-            <Pie data={chartData} options={{ maintainAspectRatio: false }} />
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-sm">
-          <h3 className="text-lg font-semibold mb-4">Processing Timeline</h3>
-          <div className="h-64">
-            <Line 
-              data={{
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                datasets: [
-                  {
-                    label: 'Processing Time (days)',
-                    data: [5, 3, 4, 2, 3, 2],
-                    borderColor: 'rgb(75, 192, 192)',
-                    tension: 0.1,
-                  },
-                ],
-              }}
-              options={{ maintainAspectRatio: false }}
-            />
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const RecentActivity: React.FC<{ activities: Activity[] }> = ({ activities }) => {
-    return (
-      <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold">Recent Activity</h3>
-          <button type="button" className="text-sm text-teal-600 hover:text-teal-700">
-            View All
-          </button>
-        </div>
-        <div className="space-y-4">
-          {activities.map((activity) => (
-            <div 
-              key={activity.id} 
-              className="flex items-start gap-4 p-3 hover:bg-gray-50 rounded-md transition-colors"
-            >
-              <div className="mt-1">
-                {activity.type === 'status_change' && (
-                  <FaHistory className="w-5 h-5 text-blue-500" />
-                )}
-                {activity.type === 'document_upload' && (
-                  <FaClipboardList className="w-5 h-5 text-green-500" />
-                )}
-                {activity.type === 'comment' && (
-                  <FaUserCircle className="w-5 h-5 text-purple-500" />
-                )}
-                {activity.type === 'review' && (
-                  <FaEye className="w-5 h-5 text-teal-500" />
-                )}
-              </div>
-              <div className="flex-1">
-                <p className="text-sm text-gray-900">{activity.description}</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <FaClock className="w-3 h-3 text-gray-400" />
-                  <p className="text-xs text-gray-500">
-                    {new Date(activity.timestamp).toLocaleDateString()}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  const AdvancedFilters: React.FC = () => {
-    const [isOpen, setIsOpen] = useState(false);
-
-    return (
-      <div className="bg-white rounded-lg shadow-sm mb-8">
-        <button
-          type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          className="w-full px-6 py-4 flex items-center justify-between text-left"
-        >
-          <div className="flex items-center gap-2">
-            <FaFilter className="text-gray-400" />
-            <span className="font-medium">Advanced Filters</span>
-          </div>
-          <FaChevronDown
-            className={`transform transition-transform ${
-              isOpen ? 'rotate-180' : ''
-            }`}
-          />
-        </button>
-        
-        <AnimatePresence>
-          {isOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="overflow-hidden"
-            >
-              <div className="p-6 border-t border-gray-100">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Date Range
-                    </label>
-                    <div className="space-y-2">
-                      <input
-                        type="date"
-                        className="w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
-                        placeholder="Start Date"
-                      />
-                      <input
-                        type="date"
-                        className="w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
-                        placeholder="End Date"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="documentType" className="block text-sm font-medium text-gray-700 mb-2">
-                      Document Type
-                    </label>
-                    <select 
-                      id="documentType"
-                      name="documentType"
-                      className="w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
-                    >
-                      <option value="">All Types</option>
-                      <option value="import">Import</option>
-                      <option value="export">Export</option>
-                      <option value="transit">Transit</option>
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Value Range
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <input
-                        type="number"
-                        placeholder="Min"
-                        className="w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
-                      />
-                      <input
-                        type="number"
-                        placeholder="Max"
-                        className="w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
-                      />
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex justify-end mt-6 gap-3">
-                  <button type="button" className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
-                    Reset
-                  </button>
-                  <button type="button" className="px-4 py-2 bg-teal-600 text-white rounded-md text-sm font-medium hover:bg-teal-700">
-                    Apply Filters
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    );
-  };
-
-  const NotificationCenter: React.FC<{ notifications: NotificationType[] }> = ({ notifications }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const unreadCount = notifications.filter(n => !n.read).length;
-
-    return (
-      <div className="fixed bottom-4 right-4 z-50">
-        <button
-          type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          className="relative p-3 bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors"
-        >
-          <FaBell className="w-6 h-6 text-gray-600" />
-          {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-              {unreadCount}
-            </span>
-          )}
-        </button>
-
-        <AnimatePresence>
-          {isOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              className="absolute bottom-full right-0 mb-2 w-80 bg-white rounded-lg shadow-xl"
-            >
-              <div className="p-4 border-b border-gray-100">
-                <h3 className="font-semibold">Notifications</h3>
-              </div>
-              <div className="max-h-96 overflow-y-auto">
-                {notifications.map((notification) => (
-                  <div
-                    key={notification.id}
-                    className={`p-4 border-b border-gray-100 hover:bg-gray-50 ${
-                      !notification.read ? 'bg-teal-50' : ''
-                    }`}
-                  >
-                    <p className="text-sm text-gray-900">{notification.message}</p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <FaClock className="w-3 h-3 text-gray-400" />
-                      <span className="text-xs text-gray-500">
-                        {new Date(notification.timestamp).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    );
-  };
-
-  const BulkActions: React.FC<{
-    selectedItems: string[];
-    onSelectAll: () => void;
-    onAction: (action: string) => void;
-  }> = ({ selectedItems, onSelectAll, onAction }) => {
-    return (
-      <div className="bg-white p-4 rounded-lg shadow-sm mb-6 flex items-center gap-4">
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={selectedItems.length > 0}
-            onChange={onSelectAll}
-            className="rounded text-teal-600 focus:ring-teal-500"
-            aria-label="Select all items"
-          />
-          <span className="text-sm text-gray-600">
-            {selectedItems.length} selected
-          </span>
-        </div>
-        
-        <select
-          aria-label="Select bulk action"
-          onChange={(e) => onAction(e.target.value)}
-          className="rounded-md border-gray-300 text-sm focus:border-teal-500 focus:ring-teal-500"
-          disabled={selectedItems.length === 0}
-        >
-          <option value="">Bulk Actions</option>
-          <option value="approve">Approve Selected</option>
-          <option value="reject">Reject Selected</option>
-          <option value="export">Export Selected</option>
-        </select>
-        
-        <button
-          type="button"
-          disabled={selectedItems.length === 0}
-          className="px-4 py-2 bg-teal-600 text-white text-sm rounded-md hover:bg-teal-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
-        >
-          Apply
-        </button>
-      </div>
-    );
-  };
-
-  const ConsignmentTimeline: React.FC<{ timelineEvents: TimelineEvent[] }> = ({ timelineEvents }) => {
-    return (
-      <div className="bg-white p-6 rounded-lg shadow-sm mb-8">
-        <h3 className="text-lg font-semibold mb-4">Processing Timeline</h3>
-        <div className="relative">
-          <div className="border-l-2 border-gray-200 ml-4 space-y-6">
-            {timelineEvents.map((event) => (
-              <div key={event.id} className="relative">
-                <div className="absolute -left-[9px] mt-2">
-                  <div className={`
-                    w-4 h-4 rounded-full border-2 border-white
-                    ${event.status === ConsignmentStatus.Approved ? 'bg-green-500' :
-                      event.status === ConsignmentStatus.Rejected ? 'bg-red-500' :
-                      'bg-teal-500'}
-                  `} />
-                </div>
-                <div className="ml-6 pb-6">
-                  <div className="flex items-center">
-                    <p className="text-sm font-medium text-gray-900">{event.title}</p>
-                    <span className="ml-2 text-xs text-gray-500">
-                      {event.timestamp.toLocaleDateString()}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-sm text-gray-600">{event.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Add new handlers
   const handleSelectAll = useCallback(() => {
     const allIds = state.filteredConsignments.map(c => c.id);
     const newSelectedItems = state.selectedItems.length === allIds.length ? [] : allIds;
@@ -1558,55 +101,32 @@ export const CustomsDashboard: React.FC = () => {
   const handleBulkAction = useCallback((action: string) => {
     switch (action) {
       case 'approve':
-        dispatch({ 
-          type: 'BULK_UPDATE_STATUS', 
-          payload: { ids: state.selectedItems, status: ConsignmentStatus.Approved } 
+        dispatch({
+          type: 'BULK_UPDATE_STATUS',
+          payload: { ids: state.selectedItems, status: ConsignmentStatus.Approved }
         });
         break;
       case 'reject':
-        dispatch({ 
-          type: 'BULK_UPDATE_STATUS', 
-          payload: { ids: state.selectedItems, status: ConsignmentStatus.Rejected } 
+        dispatch({
+          type: 'BULK_UPDATE_STATUS',
+          payload: { ids: state.selectedItems, status: ConsignmentStatus.Rejected }
         });
         break;
       case 'export':
-        // Implement export logic
         console.log('Exporting selected items:', state.selectedItems);
         break;
     }
   }, [state.selectedItems]);
 
-  const updateActivityStatus = (activityId: string, newStatus: ActivityStatus) => {
-    dispatch({
-      type: 'UPDATE_ACTIVITY_STATUS',
-      payload: { activityId, newStatus }
-    });
-  };
-
-  // Call updateActivityStatus when needed, for example, in a button click handler
-  const handleActivityStatusChange = (activityId: string, newStatus: ActivityStatus) => {
-    updateActivityStatus(activityId, newStatus);
-  };
-
-  // Example usage in a button click (add this where appropriate)
-  {state.activities.map(activity => (
-    <button type="button" key={activity.id} onClick={() => handleActivityStatusChange(activity.id, ActivityStatus.Completed)}>
-      Mark as Completed
-    </button>
-  ))}
-
   const handleSubmitNewConsignment = (formData: NewConsignmentFormData) => {
-    // Handle the new consignment submission
     console.log('New consignment:', formData);
-    // Add implementation details here
   };
 
-  // loading state
   const [isLoading, setIsLoading] = useState(true);
-  
+
   useEffect(() => {
-    // Simulate loading time or use real data loading
-    setTimeout(() => setIsLoading(false), 1000);
+    const timer = setTimeout(() => setIsLoading(false), 1000);
+    return () => clearTimeout(timer);
   }, []);
 
   if (isLoading) return <LoadingState />;
@@ -1615,7 +135,6 @@ export const CustomsDashboard: React.FC = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <GuidedTour />
       <div className="flex-grow px-6 py-8 max-w-7xl mx-auto w-full">
-        {/* Header Section */}
         <div className="mb-8 flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
@@ -1625,7 +144,7 @@ export const CustomsDashboard: React.FC = () => {
               Manage and track your customs declarations and documents
             </p>
           </div>
-          
+
           <button
             type="button"
             onClick={handleLogout}
@@ -1635,35 +154,37 @@ export const CustomsDashboard: React.FC = () => {
           </button>
         </div>
 
-        {/* Quick Actions */}
-        <QuickActions />
+        <QuickActions
+          consignments={state.consignments}
+          selectedItems={state.selectedItems}
+          onSubmitNewConsignment={handleSubmitNewConsignment}
+        />
 
-        {/* Analytics Overview */}
         <AnalyticsOverview consignments={state.consignments} />
 
-        {/* Advanced Filters */}
         <AdvancedFilters />
 
-        {/* Bulk Actions */}
-        <BulkActions 
+        <BulkActions
           selectedItems={state.selectedItems}
           onSelectAll={handleSelectAll}
           onAction={handleBulkAction}
         />
 
-        {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Consignments Section */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Search and Filter Section */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
               <div className="grid md:grid-cols-2 gap-4">
-                <SearchInput />
-                <StatusFilterDropdown />
+                <SearchInput
+                  searchTerm={state.searchTerm}
+                  onSearchChange={(value) => dispatch({ type: 'SET_SEARCH_TERM', payload: value })}
+                />
+                <StatusFilterDropdown
+                  statusFilter={state.statusFilter}
+                  onStatusFilterChange={(value) => dispatch({ type: 'SET_STATUS_FILTER', payload: value })}
+                />
               </div>
             </div>
 
-            {/* Consignments Grid */}
             {paginatedConsignments.length === 0 ? (
               <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-8 text-center">
                 <div className="text-gray-400 mb-3">
@@ -1677,7 +198,7 @@ export const CustomsDashboard: React.FC = () => {
             ) : (
               <div className="grid md:grid-cols-2 gap-6">
                 {paginatedConsignments.map(consignment => (
-                  <ConsignmentCard 
+                  <ConsignmentCard
                     key={consignment.id}
                     consignment={consignment}
                     onStatusChange={handleStatusChange}
@@ -1689,12 +210,11 @@ export const CustomsDashboard: React.FC = () => {
               </div>
             )}
 
-            {/* Pagination */}
             {paginatedConsignments.length > 0 && (
               <div className="flex justify-center mt-8">
                 <nav className="flex space-x-2" aria-label="Pagination">
-                  {Array.from({ 
-                    length: Math.ceil(state.filteredConsignments.length / state.itemsPerPage) 
+                  {Array.from({
+                    length: Math.ceil(state.filteredConsignments.length / state.itemsPerPage)
                   }).map((_, index) => (
                     <button
                       type="button"
@@ -1702,7 +222,7 @@ export const CustomsDashboard: React.FC = () => {
                       onClick={() => dispatch({ type: 'SET_PAGE', payload: index + 1 })}
                       className={`
                         px-3 py-2 text-sm font-medium rounded-md
-                        ${state.currentPage === index + 1 
+                        ${state.currentPage === index + 1
                           ? 'bg-teal-600 text-white'
                           : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
                         }
@@ -1717,7 +237,6 @@ export const CustomsDashboard: React.FC = () => {
             )}
           </div>
 
-          {/* Sidebar */}
           <div className="space-y-6">
             <RecentActivity activities={state.activities} />
             <ConsignmentTimeline timelineEvents={state.timelineEvents} />
@@ -1725,11 +244,7 @@ export const CustomsDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Notification Center */}
       <NotificationCenter notifications={state.notifications} />
-
-      {/* Footer */}
-      <Footer />
 
       <TraderDetailsModal
         traderName={selectedTrader?.name || ''}
@@ -1745,4 +260,4 @@ export const CustomsDashboard: React.FC = () => {
   );
 };
 
-export default CustomsDashboard; 
+export default CustomsDashboard;

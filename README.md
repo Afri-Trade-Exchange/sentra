@@ -35,7 +35,6 @@ Sentra is a web platform that clears cross-border trade paperwork between trader
 - **Charts**: Recharts, Chart.js (`react-chartjs-2`)
 - **Documents/exports**: jsPDF + jspdf-autotable, html2canvas, `xlsx`, PapaParse, FileSaver
 - **Notifications**: react-hot-toast, react-toastify
-- **Testing**: Cypress (component + e2e), run in CI via GitHub Actions
 - **Linting**: ESLint + typescript-eslint
 
 ## 💻 Local Development
@@ -75,7 +74,7 @@ npm run preview   # preview the production build locally
 npm run lint      # run ESLint
 ```
 
-Cypress tests run in CI on every push (`.github/workflows/cypress.yml`); there's no `npm test` script yet, so run Cypress directly (`npx cypress open` / `npx cypress run`) if you want to run them locally.
+> There's no automated test suite yet — no `npm test` script, no CI. That's a known gap, not an oversight.
 
 ## 🗺️ Routes
 
@@ -109,8 +108,6 @@ afritrade-xchange/
 │   ├── firebase/                   # Firebase auth + Firestore config
 │   ├── types/                      # Shared TypeScript types
 │   └── assets/                     # Images, video, icons
-├── cypress/                        # Cypress test setup
-├── .github/workflows/              # CI (Cypress)
 └── dist/                           # Production build output
 ```
 

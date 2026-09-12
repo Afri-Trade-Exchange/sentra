@@ -1,4 +1,4 @@
-import { Suspense, lazy } from 'react'
+import { Suspense, lazy, useEffect, useRef } from 'react'
 import { FiSearch } from 'react-icons/fi'
 import './index.css'
 import TraderSignup from './Components/TraderSignup'
@@ -19,6 +19,7 @@ import './Components/LandingPage.css';
 import Settings from './Components/Settings';
 import heroImg from './assets/images/customs-port-2.jpg';
 import sentraMotion from './assets/images/sentra-motion.mp4';
+import videoPoster from './assets/images/hero-port-poster.jpg';
 import accelerLogo from './assets/images/acceler.png';
 import kuehneNagelLogo from './assets/images/kuehne-nagel.png';
 import alslLogo from './assets/images/ALSL-Logo.png';
@@ -35,6 +36,79 @@ const trustedLogos = [
   { src: omlAfricaLogo, alt: 'Omla Africa' },
   { src: siginonLogo, alt: 'Siginon Group' },
 ];
+
+function DemoVideo() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isNearViewport, setIsNearViewport] = useState(false);
+  const [canAutoplay, setCanAutoplay] = useState(true);
+  const [userStarted, setUserStarted] = useState(false);
+
+  useEffect(() => {
+    const node = containerRef.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setIsNearViewport(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '300px' }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const connection = (navigator as unknown as { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+    const isSlowOrSaveData = connection?.saveData || connection?.effectiveType === 'slow-2g' || connection?.effectiveType === '2g';
+    setCanAutoplay(!prefersReducedMotion && !isSlowOrSaveData);
+  }, []);
+
+  const shouldLoadVideo = isNearViewport && (canAutoplay || userStarted);
+
+  return (
+    <div ref={containerRef} className="relative w-full aspect-video bg-black">
+      {shouldLoadVideo ? (
+        <video
+          src={sentraMotion}
+          poster={videoPoster}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="none"
+          className="absolute inset-0 w-full h-full object-cover"
+        >
+          Sorry, your browser doesn't support embedded videos.
+        </video>
+      ) : (
+        <>
+          <img
+            src={videoPoster}
+            alt="Preview of the Sentra platform in action"
+            loading="lazy"
+            decoding="async"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          {isNearViewport && (
+            <button
+              type="button"
+              onClick={() => setUserStarted(true)}
+              aria-label="Play video: Sentra in action"
+              className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/40 transition-colors"
+            >
+              <span className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
+                <FaPlay className="text-teal-600 text-xl ml-1" />
+              </span>
+            </button>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
 
 // Add this interface for order information
 interface OrderInfo {
@@ -227,16 +301,7 @@ function LandingPage () {
             transition={{ duration: 0.6, ease: 'easeOut', delay: 0.3 }}
             className="max-w-5xl mx-auto mb-16 rounded-2xl overflow-hidden shadow-lg bg-black"
           >
-            <video
-              src={sentraMotion}
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="w-full h-auto block"
-            >
-              Sorry, your browser doesn't support embedded videos.
-            </video>
+            <DemoVideo />
           </motion.div>
 
           <motion.div
@@ -489,6 +554,8 @@ function LandingPage () {
                 key={logo.alt}
                 src={logo.src}
                 alt={logo.alt}
+                loading="lazy"
+                decoding="async"
                 initial={{ opacity: 0, y: 12 }}
                 whileInView={{ opacity: 0.6, y: 0 }}
                 viewport={{ once: true, amount: 0.8 }}

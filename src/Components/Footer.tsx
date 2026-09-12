@@ -27,7 +27,7 @@ const Footer: React.FC = () => (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
       <div className="grid grid-cols-1 md:grid-cols-12 gap-10 text-center md:text-left">
         <div className="md:col-span-4 flex flex-col items-center md:items-start">
-          <img src={sentraLogo} alt="Sentra" className="h-7 w-auto mb-4 brightness-0 invert" />
+          <img src={sentraLogo} alt="Sentra" loading="lazy" decoding="async" className="h-7 w-auto mb-4 brightness-0 invert" />
           <p className="text-sm text-gray-400 mb-6 max-w-xs">
             Smart Solutions, Global Impact. One platform for traders and customs officers across Africa.
           </p>
@@ -71,7 +71,7 @@ const Footer: React.FC = () => (
               aria-label="Download Sentra on Google Play"
               className="inline-block transition-transform duration-200 hover:scale-105"
             >
-              <img src={googlePlayBadge} alt="Get it on Google Play" className="h-11 w-auto" />
+              <img src={googlePlayBadge} alt="Get it on Google Play" loading="lazy" decoding="async" className="h-11 w-auto" />
             </a>
             <a
               href={APP_STORE_URL}
@@ -80,7 +80,7 @@ const Footer: React.FC = () => (
               aria-label="Download Sentra on the App Store"
               className="inline-block transition-transform duration-200 hover:scale-105"
             >
-              <img src={appStoreBadge} alt="Download on the App Store" className="h-11 w-auto" />
+              <img src={appStoreBadge} alt="Download on the App Store" loading="lazy" decoding="async" className="h-11 w-auto" />
             </a>
           </div>
         </div>

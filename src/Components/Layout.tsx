@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import { FaTwitter, FaLinkedinIn, FaInstagram, FaFacebookF } from 'react-icons/fa';
-import { HiPhone, HiMail } from 'react-icons/hi';
 import sentraLogo from '../assets/images/Sentralogo.png';
 
 interface LayoutProps {
@@ -35,7 +35,7 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="fixed top-4 inset-x-4 sm:inset-x-6 lg:inset-x-10 z-20">
+      <header className="fixed top-4 inset-x-4 sm:inset-x-6 lg:inset-x-10 z-50">
         <nav className={`mx-auto max-w-6xl flex items-center justify-between gap-4 rounded-full px-5 sm:px-6 py-2.5 transition-colors duration-300 ${
           overHero
             ? 'bg-transparent backdrop-blur-[2px]'
@@ -51,17 +51,21 @@ export default function Layout({ children }: LayoutProps) {
           {/* Hamburger Menu */}
           <button
             type="button"
-            className={`md:hidden p-2 -mr-2 rounded-full transition-colors ${overHero ? 'text-white hover:bg-white/10' : 'text-gray-900 hover:bg-gray-100'}`}
+            className={`md:hidden relative -mr-1 w-9 h-9 rounded-full flex items-center justify-center transition-colors ${overHero ? 'text-white hover:bg-white/10' : 'text-gray-900 hover:bg-gray-100'}`}
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle menu"
+            aria-expanded={isOpen}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {isOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
+            <motion.span
+              className="absolute w-4 h-0.5 rounded-full bg-current"
+              animate={{ rotate: isOpen ? 45 : 0, y: isOpen ? 0 : -3 }}
+              transition={{ duration: 0.2, ease: 'easeInOut' }}
+            />
+            <motion.span
+              className="absolute w-4 h-0.5 rounded-full bg-current"
+              animate={{ rotate: isOpen ? -45 : 0, y: isOpen ? 0 : 3 }}
+              transition={{ duration: 0.2, ease: 'easeInOut' }}
+            />
           </button>
 
           {/* Desktop Navigation */}
@@ -84,98 +88,77 @@ export default function Layout({ children }: LayoutProps) {
           </div>
         </nav>
 
-        {/* Mobile Menu Backdrop */}
-        {isOpen && (
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
-            onClick={() => setIsOpen(false)}
-          />
-        )}
-
         {/* Mobile Navigation */}
-        <div className={`
-          fixed top-0 right-0 h-screen
-          w-full sm:w-[350px] md:w-[400px] lg:hidden
-          bg-white z-40
-          transform transition-all duration-300 ease-in-out
-          ${isOpen ? 'translate-x-0' : 'translate-x-full'}
-        `}>
-          {/* Mobile Header */}
-          <div className="flex justify-between items-center p-4 border-b">
-            <img src={sentraLogo} alt="Sentra" className="h-7 w-auto" />
-            <button
-              type="button"
-              onClick={() => setIsOpen(false)}
-              aria-label="Close menu"
-              className="p-2 hover:bg-gray-100 rounded-full transition-all"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
+        <AnimatePresence>
+          {isOpen && (
+            <>
+              <motion.div
+                key="backdrop"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 bg-black/20 backdrop-blur-sm z-30 md:hidden"
+                onClick={() => setIsOpen(false)}
+              />
+              <motion.div
+                key="menu"
+                initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+                className="fixed top-[4.5rem] inset-x-4 sm:inset-x-6 sm:left-auto sm:w-96 z-40 md:hidden bg-white/90 backdrop-blur-xl rounded-3xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_20px_40px_rgba(0,0,0,0.15)] border border-white/60 max-h-[calc(100vh-6.5rem)] overflow-y-auto"
+              >
+                <div className="px-5 py-5 space-y-5">
+                  <div className="space-y-1">
+                    <a href="/trader-signup" className="block py-2.5 px-3 hover:bg-teal-50 rounded-xl transition-colors" onClick={() => setIsOpen(false)}>
+                      <span className="text-gray-700 hover:text-teal-600">I'm a Trader</span>
+                    </a>
+                    <a href="/customs-login" className="block py-2.5 px-3 hover:bg-teal-50 rounded-xl transition-colors" onClick={() => setIsOpen(false)}>
+                      <span className="text-gray-700 hover:text-teal-600">I'm a Customs Officer</span>
+                    </a>
+                    <a href="/contact" className="block py-2.5 px-3 hover:bg-teal-50 rounded-xl transition-colors" onClick={() => setIsOpen(false)}>
+                      <span className="text-gray-700 hover:text-teal-600">Company</span>
+                    </a>
+                    <a href="/contact" className="block py-2.5 px-3 hover:bg-teal-50 rounded-xl transition-colors" onClick={() => setIsOpen(false)}>
+                      <span className="text-gray-700 hover:text-teal-600">Tracking</span>
+                    </a>
+                  </div>
 
-          {/* Mobile Menu Items */}
-          <div className="px-4 py-6 space-y-6 overflow-y-auto h-[calc(100vh-70px)]">
-            <div className="space-y-2">
-              <a href="/trader-signup" className="block py-3 px-4 hover:bg-teal-50 rounded-lg transition-all">
-                <span className="text-gray-700 hover:text-teal-600">I'm a Trader</span>
-              </a>
-              <a href="/customs-login" className="block py-3 px-4 hover:bg-teal-50 rounded-lg transition-all">
-                <span className="text-gray-700 hover:text-teal-600">I'm a Customs Officer</span>
-              </a>
-              <a href="/contact" className="block py-3 px-4 hover:bg-teal-50 rounded-lg transition-all">
-                <span className="text-gray-700 hover:text-teal-600">Company</span>
-              </a>
-              <a href="/contact" className="block py-3 px-4 hover:bg-teal-50 rounded-lg transition-all">
-                <span className="text-gray-700 hover:text-teal-600">Tracking</span>
-              </a>
-            </div>
+                  <div className="space-y-2 pt-5 border-t border-gray-100">
+                    <button type="button" onClick={() => { navigate('/trader-signup'); setIsOpen(false); }}
+                      className="w-full py-2.5 px-4 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-colors font-medium">
+                      Register
+                    </button>
+                    <button type="button" onClick={() => { navigate('/login'); setIsOpen(false); }}
+                      className="w-full py-2.5 px-4 border border-teal-600 text-teal-600 rounded-xl hover:bg-teal-50 transition-colors font-medium">
+                      Login
+                    </button>
+                  </div>
 
-            <div className="space-y-3 pt-6 border-t">
-              <button type="button" onClick={() => navigate('/trader-signup')}
-                className="w-full py-3 px-4 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors font-medium">
-                Register
-              </button>
-              <button type="button" onClick={() => navigate('/login')}
-                className="w-full py-3 px-4 border border-teal-600 text-teal-600 rounded-lg hover:bg-teal-50 transition-colors font-medium">
-                Login
-              </button>
-            </div>
-
-            {/* Social Links */}
-            <div className="pt-6 border-t">
-              <p className="text-sm text-gray-500 mb-4">Follow us on social media</p>
-              <div className="flex space-x-4">
-                <a href="#" aria-label="Twitter" className="p-3 text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-full transition-colors">
-                  <FaTwitter className="w-5 h-5" />
-                </a>
-                <a href="#" aria-label="LinkedIn" className="p-3 text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-full transition-colors">
-                  <FaLinkedinIn className="w-5 h-5" />
-                </a>
-                <a href="#" aria-label="Instagram" className="p-3 text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-full transition-colors">
-                  <FaInstagram className="w-5 h-5" />
-                </a>
-                <a href="#" aria-label="Facebook" className="p-3 text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-full transition-colors">
-                  <FaFacebookF className="w-5 h-5" />
-                </a>
-              </div>
-            </div>
-
-            {/* Contact Info */}
-            <div className="pt-6 border-t space-y-4">
-              <p className="text-sm text-gray-500">Need help?</p>
-              <a href="tel:+1234567890" className="flex items-center text-teal-600 hover:text-teal-700">
-                <HiPhone className="w-5 h-5 mr-2" />
-                +123 456 7890
-              </a>
-              <a href="mailto:support@sentra.com" className="flex items-center text-teal-600 hover:text-teal-700">
-                <HiMail className="w-5 h-5 mr-2" />
-                support@sentra.com
-              </a>
-            </div>
-          </div>
-        </div>
+                  {/* Social Links */}
+                  <div className="pt-5 border-t border-gray-100">
+                    <p className="text-sm text-gray-500 mb-3">Follow us on social media</p>
+                    <div className="flex gap-2">
+                      <a href="#" aria-label="Twitter" className="p-2.5 text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-full transition-colors">
+                        <FaTwitter className="w-4 h-4" />
+                      </a>
+                      <a href="#" aria-label="LinkedIn" className="p-2.5 text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-full transition-colors">
+                        <FaLinkedinIn className="w-4 h-4" />
+                      </a>
+                      <a href="#" aria-label="Instagram" className="p-2.5 text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-full transition-colors">
+                        <FaInstagram className="w-4 h-4" />
+                      </a>
+                      <a href="#" aria-label="Facebook" className="p-2.5 text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-full transition-colors">
+                        <FaFacebookF className="w-4 h-4" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
       </header>
       <main className="flex-grow pt-24">
         {children}

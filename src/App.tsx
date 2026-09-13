@@ -13,8 +13,8 @@ import { AuthProvider } from './Components/AuthContext';
 import ProtectedRoute from './Components/ProtectedRoute';
 import LoginPage from './Components/LoginPage';
 import { Dialog } from '@headlessui/react'
-import { motion } from 'framer-motion'
-import { FaClock, FaShieldAlt, FaChartLine, FaBriefcase, FaUserShield, FaFileUpload, FaQrcode, FaCheckCircle, FaArrowRight, FaPlay } from 'react-icons/fa';
+import { motion, useReducedMotion } from 'framer-motion'
+import { FaClock, FaShieldAlt, FaChartLine, FaBriefcase, FaUserShield, FaFileUpload, FaQrcode, FaCheckCircle, FaArrowRight, FaPlay, FaExclamationCircle } from 'react-icons/fa';
 import './Components/LandingPage.css';
 import Settings from './Components/Settings';
 import heroImg from './assets/images/customs-port-2.jpg';
@@ -178,6 +178,7 @@ function LandingPage () {
   const [orderInfo, setOrderInfo] = useState<OrderInfo | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
 
   const fetchOrderInfo = async (orderNumber: string) => {
     setIsSearching(true);
@@ -465,20 +466,20 @@ function LandingPage () {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
-          className="max-w-3xl mx-auto mb-24 bg-stone-50 rounded-2xl shadow-sm p-6 sm:p-10 text-center"
+          className="max-w-xl mx-auto mb-24 text-center"
         >
           <div className="w-12 h-12 rounded-full bg-teal-50 flex items-center justify-center mx-auto mb-4">
             <FaQrcode className="text-teal-600 text-lg" />
           </div>
           <h2 className="text-xl font-medium mb-1">Already shipping with us?</h2>
-          <p className="text-gray-600 mb-6 text-sm">Track your order below.</p>
+          <p className="text-gray-600 mb-8 text-sm">Track your order below.</p>
           <div className="flex flex-col gap-4">
-            <div className="flex flex-col sm:flex-row items-stretch bg-gray-50 rounded-2xl overflow-hidden border border-gray-200">
-              <div className="flex-grow flex items-center px-4 sm:px-6 min-w-0">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-3 border-b-2 border-gray-300 focus-within:border-teal-600 transition-colors pb-2">
+              <div className="flex-grow flex items-center min-w-0">
                 <FiSearch className="text-gray-400 text-xl mr-3 shrink-0" aria-hidden="true" />
                 <input
                   type="text"
-                  className="w-full min-w-0 py-4 text-base bg-transparent focus:outline-none"
+                  className="w-full min-w-0 py-2 text-lg bg-transparent focus:outline-none placeholder:text-gray-400"
                   aria-label="Search orders"
                   placeholder="Search order, e.g. ORD-001"
                   value={orderNumber}
@@ -488,17 +489,17 @@ function LandingPage () {
               </div>
               <button
                 type="button"
-                className="bg-teal-600 text-white px-8 py-4 flex items-center justify-center gap-2 hover:bg-teal-700 transition-colors font-medium"
+                className="shrink-0 inline-flex items-center justify-center gap-2 text-teal-600 hover:text-teal-700 font-medium pb-1 sm:pb-2"
                 onClick={handleSearch}
               >
-                <span>Track Shipment</span>
-                <FiSearch />
+                Track Shipment <FiSearch />
               </button>
             </div>
 
             {/* Order Information Display */}
             {isSearching && (
-              <div className="text-center text-gray-600">
+              <div className="flex items-center justify-center gap-2 text-gray-600 text-sm">
+                <span className="w-4 h-4 rounded-full border-2 border-gray-300 border-t-teal-600 animate-spin" aria-hidden="true" />
                 Searching...
               </div>
             )}
@@ -527,12 +528,13 @@ function LandingPage () {
             </Dialog>
 
             {orderNumber && !orderInfo && !isSearching && (
-              <div className="text-center text-red-500">
+              <div className="flex items-center justify-center gap-2 text-red-600 text-sm">
+                <FaExclamationCircle className="shrink-0" />
                 No order found with the specified number.
               </div>
             )}
           </div>
-          <div className="text-center mt-3">
+          <div className="text-center mt-4">
             <a href="./contact" className="text-sm text-gray-500 hover:text-teal-600">Need Help?</a>
           </div>
         </motion.div>
@@ -548,56 +550,27 @@ function LandingPage () {
           >
             Trusted by global companies
           </motion.h3>
-          <div className="flex flex-wrap items-center justify-center gap-x-8 sm:gap-x-14 gap-y-6 sm:gap-y-8 px-4">
-            {trustedLogos.map((logo, index) => (
-              <motion.img
-                key={logo.alt}
-                src={logo.src}
-                alt={logo.alt}
-                loading="lazy"
-                decoding="async"
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 0.6, y: 0 }}
-                viewport={{ once: true, amount: 0.8 }}
-                transition={{ duration: 0.4, ease: 'easeOut', delay: index * 0.06 }}
-                whileHover={{ opacity: 1 }}
-                className="h-8 sm:h-11 grayscale hover:grayscale-0 transition-[filter] duration-300"
-              />
-            ))}
+          <div className={`relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)] ${prefersReducedMotion ? 'flex flex-wrap items-center justify-center gap-x-14 sm:gap-x-20 gap-y-6' : ''}`}>
+            <motion.div
+              className={prefersReducedMotion ? 'contents' : 'flex items-center w-max gap-x-14 sm:gap-x-20'}
+              animate={prefersReducedMotion ? undefined : { x: ['0%', '-50%'] }}
+              transition={prefersReducedMotion ? undefined : { duration: 22, ease: 'linear', repeat: Infinity }}
+            >
+              {(prefersReducedMotion ? trustedLogos : [...trustedLogos, ...trustedLogos]).map((logo, index) => (
+                <img
+                  key={`${logo.alt}-${index}`}
+                  src={logo.src}
+                  alt={index < trustedLogos.length ? logo.alt : ''}
+                  aria-hidden={index >= trustedLogos.length}
+                  loading="lazy"
+                  decoding="async"
+                  className="h-8 sm:h-11 w-auto shrink-0"
+                />
+              ))}
+            </motion.div>
           </div>
         </div>
 
-        {/* Closing CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
-          className="relative text-center bg-teal-600 rounded-2xl px-6 py-12 sm:py-16 mb-16 overflow-hidden"
-        >
-          <div className="pointer-events-none absolute -top-20 -left-16 w-64 h-64 rounded-full bg-teal-400/30 blur-3xl" aria-hidden="true" />
-          <div className="pointer-events-none absolute -bottom-24 -right-10 w-72 h-72 rounded-full bg-teal-800/30 blur-3xl" aria-hidden="true" />
-          <div className="relative">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-light text-white mb-3">Ready to clear customs faster?</h2>
-            <p className="text-teal-50 text-base sm:text-lg mb-8">Join traders across Africa already moving goods faster with Sentra.</p>
-            <div className="flex flex-col sm:flex-row justify-center gap-3">
-              <button
-                type="button"
-                onClick={() => navigate('/trader-signup')}
-                className="w-full sm:w-auto px-10 py-3 bg-white text-teal-700 rounded-xl hover:bg-teal-50 transition-colors font-medium"
-              >
-                Try for free
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate('/contact')}
-                className="w-full sm:w-auto px-10 py-3 text-white border border-white/40 rounded-xl hover:bg-white/10 transition-colors font-medium"
-              >
-                Talk to us
-              </button>
-            </div>
-          </div>
-        </motion.div>
       </div>
     </div>
   )

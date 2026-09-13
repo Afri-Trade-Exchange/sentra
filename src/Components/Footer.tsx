@@ -1,9 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaFacebook, FaLinkedin, FaInstagram } from 'react-icons/fa';
+import { FaFacebook, FaLinkedin, FaInstagram, FaGooglePlay, FaApple } from 'react-icons/fa';
 import sentraLogo from '../assets/images/Sentralogo.png';
-import googlePlayBadge from '../assets/images/google-play-badge.png';
-import appStoreBadge from '../assets/images/app-store-badge.svg';
 
 // TODO: swap in the real listing URLs once the app is published
 const GOOGLE_PLAY_URL = '#';
@@ -69,18 +67,26 @@ const Footer: React.FC = () => (
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Download Sentra on Google Play"
-              className="inline-block transition-transform duration-200 hover:scale-105"
+              className="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 transition-colors duration-200"
             >
-              <img src={googlePlayBadge} alt="Get it on Google Play" loading="lazy" decoding="async" className="h-11 w-auto" />
+              <FaGooglePlay className="text-xl text-white shrink-0" />
+              <span className="flex flex-col items-start leading-none text-left">
+                <span className="text-[10px] text-gray-400">GET IT ON</span>
+                <span className="text-sm font-medium text-white">Google Play</span>
+              </span>
             </a>
             <a
               href={APP_STORE_URL}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Download Sentra on the App Store"
-              className="inline-block transition-transform duration-200 hover:scale-105"
+              className="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 transition-colors duration-200"
             >
-              <img src={appStoreBadge} alt="Download on the App Store" loading="lazy" decoding="async" className="h-11 w-auto" />
+              <FaApple className="text-2xl text-white shrink-0" />
+              <span className="flex flex-col items-start leading-none text-left">
+                <span className="text-[10px] text-gray-400">Download on the</span>
+                <span className="text-sm font-medium text-white">App Store</span>
+              </span>
             </a>
           </div>
         </div>

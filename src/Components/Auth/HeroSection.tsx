@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaFileAlt, FaBolt, FaShieldAlt } from 'react-icons/fa';
-import sentraLogo from '../assets/images/Sentralogo.png';
+import sentraLogo from '../../assets/images/Sentralogo.png';
 
 const features = [
   { icon: FaFileAlt, label: 'Seamless documentation' },

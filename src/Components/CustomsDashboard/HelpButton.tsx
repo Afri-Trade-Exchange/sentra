@@ -16,10 +16,10 @@ const HelpButton: React.FC = () => {
       </button>
 
       {showHelp && (
-        <div className="absolute bottom-full left-0 mb-2 p-4 bg-white rounded-lg shadow-xl w-64">
+        <div className="absolute bottom-full left-0 mb-2 p-4 bg-white rounded-2xl shadow-xl border border-gray-100 w-64">
           <h4 className="font-semibold mb-2">Quick Help</h4>
           <ul className="space-y-2 text-sm">
-            <li>• Click cards to view details</li>
+            <li>• Click a card to select it, or "View Details" to inspect it</li>
             <li>• Use filters to narrow results</li>
             <li>• Create a New Consignment for a trader</li>
             <li>• Export data using quick actions</li>

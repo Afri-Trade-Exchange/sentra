@@ -3,7 +3,7 @@ import { TourStep } from './types';
 
 const GuidedTour: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(() => localStorage.getItem('tourCompleted') !== 'true');
 
   const steps: TourStep[] = [
     {
@@ -32,12 +32,14 @@ const GuidedTour: React.FC = () => {
     }
   ];
 
-  const handleSkip = () => {
+  const completeTour = () => {
     setIsVisible(false);
     localStorage.setItem('tourCompleted', 'true');
   };
 
   if (!isVisible || currentStep >= steps.length) return null;
+
+  const isLastStep = currentStep === steps.length - 1;
 
   return (
     <div className="fixed inset-0 z-50">
@@ -47,7 +49,7 @@ const GuidedTour: React.FC = () => {
         className="
           absolute p-6
           bg-white
-          rounded-none
+          rounded-2xl
           shadow-2xl
           max-w-md
           transform -translate-x-1/2 -translate-y-1/2
@@ -59,7 +61,7 @@ const GuidedTour: React.FC = () => {
             <div
               key={index}
               className={`
-                h-1 flex-1 rounded-none
+                h-1 flex-1 rounded-full
                 transition-colors duration-200
                 ${index <= currentStep ? 'bg-teal-600' : 'bg-gray-200'}
               `}
@@ -67,7 +69,7 @@ const GuidedTour: React.FC = () => {
           ))}
         </div>
 
-        <h4 className="font-helvetica text-xl mb-3">
+        <h4 className="font-semibold text-xl mb-3">
           {steps[currentStep].title}
         </h4>
         <p className="text-base leading-relaxed text-gray-600 mb-8">
@@ -78,7 +80,7 @@ const GuidedTour: React.FC = () => {
           <div className="flex gap-4">
             <button
               type="button"
-              onClick={handleSkip}
+              onClick={completeTour}
               className="
                 px-4 py-2
                 text-sm font-medium text-gray-600
@@ -106,18 +108,18 @@ const GuidedTour: React.FC = () => {
 
           <button
             type="button"
-            onClick={() => setCurrentStep(prev => prev + 1)}
+            onClick={() => isLastStep ? completeTour() : setCurrentStep(prev => prev + 1)}
             className="
               px-6 py-2
               bg-teal-600 text-white
               hover:bg-teal-700
-              rounded-lg
+              rounded-xl
               transition-colors
               text-sm font-medium
               focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2
             "
           >
-            {currentStep === steps.length - 1 ? 'Finish' : 'Next'}
+            {isLastStep ? 'Finish' : 'Next'}
           </button>
         </div>
       </div>

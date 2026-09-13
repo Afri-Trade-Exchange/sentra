@@ -211,13 +211,13 @@ const QuickActions: React.FC<{
         <button
           type="button"
           onClick={handleNewConsignment}
-          className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+          className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-colors"
         >
           <FaPlus className="mr-2" /> New Consignment
         </button>
         <button
           type="button"
-          className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+          className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-colors"
           onClick={handleExport}
         >
           <FaFileExport className="mr-2" /> Export Data
@@ -225,21 +225,21 @@ const QuickActions: React.FC<{
         <button
           type="button"
           onClick={handleGenerateReport}
-          className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+          className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-colors"
         >
           <FaChartBar className="mr-2" /> Generate Report
         </button>
         <button
           type="button"
           onClick={() => setShowScanner(true)}
-          className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+          className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-colors"
         >
           <FaQrcode className="mr-2" /> Scan Document
         </button>
         <button
           type="button"
           onClick={() => handleExportSettingsChange({ format: 'pdf' })}
-          className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+          className="flex items-center px-4 py-2 border border-teal-600 text-teal-600 bg-white rounded-xl hover:bg-teal-50 transition-colors"
         >
           Export Settings
         </button>
@@ -258,7 +258,7 @@ const QuickActions: React.FC<{
       />
 
       {scannedData && (
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
           <h3 className="text-lg font-medium mb-4">Scanned Consignment Details</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>

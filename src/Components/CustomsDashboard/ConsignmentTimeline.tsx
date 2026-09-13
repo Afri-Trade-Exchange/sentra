@@ -3,8 +3,8 @@ import { ConsignmentStatus, TimelineEvent } from './types';
 
 const ConsignmentTimeline: React.FC<{ timelineEvents: TimelineEvent[] }> = ({ timelineEvents }) => {
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm mb-8">
-      <h3 className="text-lg font-semibold mb-4">Processing Timeline</h3>
+    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+      <h3 className="text-lg font-semibold mb-4">Consignment Timeline</h3>
       <div className="relative">
         <div className="border-l-2 border-gray-200 ml-4 space-y-6">
           {timelineEvents.map((event) => (

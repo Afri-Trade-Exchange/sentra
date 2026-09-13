@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback } from 'react';
-import { FaUpload, FaDownload, FaBox, FaSignOutAlt, FaFileInvoice, FaHistory, FaCog, FaApplePay, FaPlusCircle } from 'react-icons/fa';
+import { FaUpload, FaDownload, FaBox, FaSignOutAlt, FaCog } from 'react-icons/fa';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import UploadModal from './UploadModal';
 import InvoiceDetailModal from './InvoiceDetailModal';
 import { useAuth } from './AuthContext';
@@ -20,7 +20,6 @@ import {
   Invoice,
   RiskAssessment,
   StatusUpdate,
-  User,
 } from '../types/dashboard';
 import {
   calculateAverageProcessingTime,
@@ -55,7 +54,8 @@ const EMPTY_INVOICE: Invoice = {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const location = useLocation();
+  const { user, signOut } = useAuth();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
@@ -64,7 +64,6 @@ export default function Dashboard() {
   const [showAllInvoices, setShowAllInvoices] = useState(false);
   const [enhancedInsights, setEnhancedInsights] = useState<EnhancedInsights | null>(null);
   const [riskAssessment, setRiskAssessment] = useState<RiskAssessment | null>(null);
-  const [user, setUser] = useState<User | null>(null);
   const [isConsignmentModalOpen, setIsConsignmentModalOpen] = useState(false);
   const [activeConsignmentId, setActiveConsignmentId] = useState<string | null>(null);
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
@@ -96,16 +95,6 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-      } catch (error) {
-        console.error('Error parsing user data:', error);
-      }
-    }
-
     // Simulating fetching activities from an API
     const initialActivities = [
       { id: 'ORD-001', category: 'Order', date: '2023-05-01', status: 'Completed', amount: 5500 },
@@ -142,16 +131,10 @@ export default function Dashboard() {
 
   const handleSignOut = async () => {
     await signOut();
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
     navigate('/');
   };
 
   const navItems = [
-    { label: 'Requests', icon: FaPlusCircle, path: '/requests' },
-    { label: 'Invoices', icon: FaFileInvoice, path: '/invoices' },
-    { label: 'Payments', icon: FaApplePay, path: '/payments' },
-    { label: 'History', icon: FaHistory, path: '/history' },
     { label: 'Settings', icon: FaCog, path: '/settings' },
     { label: 'Log Out', icon: FaSignOutAlt, action: handleSignOut },
   ];
@@ -204,7 +187,7 @@ export default function Dashboard() {
     const newInvoice: Invoice = {
       id: `INV-${newActivity.id}`,
       invoiceNumber: `INV-${newActivity.id}`,
-      customerName: user?.name || 'Customer',
+      customerName: user?.displayName || 'Customer',
       businessName: 'Afritrade',
       activity: newActivity,
       invoiceDate: newActivity.date,
@@ -232,7 +215,7 @@ export default function Dashboard() {
     const update: StatusUpdate = {
       activityId,
       status: newStatus,
-      updatedBy: user?.name || 'Unknown Officer',
+      updatedBy: user?.displayName || 'Unknown Officer',
       timestamp: new Date()
     };
 
@@ -271,12 +254,12 @@ export default function Dashboard() {
               <div className="flex items-center space-x-3">
                 <div className="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center">
                   <span className="text-xl font-medium text-teal-600">
-                    {user?.name?.charAt(0) || 'G'}
+                    {(user?.displayName || user?.email || 'G').charAt(0).toUpperCase()}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <h2 className="text-sm font-semibold text-gray-900 truncate">
-                    {user?.name || 'Guest'}
+                    {user?.displayName || user?.email?.split('@')[0] || 'Guest'}
                   </h2>
                   <p className="text-xs text-gray-500 truncate">
                     {user?.email || 'guest@example.com'}

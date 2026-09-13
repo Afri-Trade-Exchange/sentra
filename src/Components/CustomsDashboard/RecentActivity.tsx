@@ -4,7 +4,7 @@ import { Activity } from './types';
 
 const RecentActivity: React.FC<{ activities: Activity[] }> = ({ activities }) => {
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-semibold">Recent Activity</h3>
         <button type="button" className="text-sm text-teal-600 hover:text-teal-700">
@@ -15,7 +15,7 @@ const RecentActivity: React.FC<{ activities: Activity[] }> = ({ activities }) =>
         {activities.map((activity) => (
           <div
             key={activity.id}
-            className="flex items-start gap-4 p-3 hover:bg-gray-50 rounded-md transition-colors"
+            className="flex items-start gap-4 p-3 hover:bg-gray-50 rounded-xl transition-colors"
           >
             <div className="mt-1">
               {activity.type === 'status_change' && (

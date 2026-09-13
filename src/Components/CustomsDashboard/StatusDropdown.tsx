@@ -18,10 +18,13 @@ const StatusDropdown: React.FC<{
       <div>
         <button
           type="button"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsOpen(!isOpen);
+          }}
           className={`
             inline-flex justify-center w-full px-4 py-2 text-sm font-medium
-            rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-opacity-75
+            rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-opacity-75
             ${STATUS_CONFIG[currentStatus].color}
             ${STATUS_CONFIG[currentStatus].bgColor}
           `}
@@ -43,14 +46,15 @@ const StatusDropdown: React.FC<{
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             className="absolute z-10 w-full mt-2 origin-top-right bg-white
-              rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+              rounded-xl shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
           >
             <div className="py-1">
               {statusOptions.map((status) => (
                 <button
                   type="button"
                   key={status}
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     onStatusChange(status);
                     setIsOpen(false);
                   }}

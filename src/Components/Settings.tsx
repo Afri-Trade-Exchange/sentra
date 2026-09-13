@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-// import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import { useAuth } from './AuthContext';
+import { updateUserName } from '../firebase/authService';
 
 interface UserSettings {
   name: string;
-  email: string;
   notifications: {
     email: boolean;
     push: boolean;
@@ -14,10 +14,10 @@ interface UserSettings {
 }
 
 const Settings: React.FC = () => {
+  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [settings, setSettings] = useState<UserSettings>({
     name: '',
-    email: '',
     notifications: {
       email: true,
       push: true,
@@ -27,24 +27,14 @@ const Settings: React.FC = () => {
   });
 
   useEffect(() => {
-    const loadUserSettings = () => {
-      const userData = localStorage.getItem('user');
-      if (userData) {
-        const user = JSON.parse(userData);
-        setSettings(prevSettings => ({
-          ...prevSettings,
-          name: user.name || '',
-          email: user.email || '',
-        }));
-      }
-    };
-
-    loadUserSettings();
-  }, []);
+    if (user?.displayName) {
+      setSettings(prev => ({ ...prev, name: user.displayName || '' }));
+    }
+  }, [user]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    
+
     if (type === 'checkbox') {
       setSettings(prev => ({
         ...prev,
@@ -70,20 +60,13 @@ const Settings: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) return;
+
     setIsLoading(true);
-
     try {
-      // Save to localStorage for now (replace with API call later)
-      const userData = localStorage.getItem('user');
-      if (userData) {
-        const user = JSON.parse(userData);
-        localStorage.setItem('user', JSON.stringify({
-          ...user,
-          name: settings.name,
-          email: settings.email,
-        }));
-      }
-
+      await updateUserName(user, settings.name);
+      // Notification and theme preferences aren't persisted anywhere yet —
+      // there's no backend field for them, so only the name change is real for now.
       toast.success('Settings updated successfully');
     } catch (error) {
       toast.error('Failed to update settings');
@@ -125,11 +108,11 @@ const Settings: React.FC = () => {
               <input
                 type="email"
                 id="email"
-                name="email"
-                value={settings.email}
-                onChange={handleInputChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                value={user?.email || ''}
+                disabled
+                className="mt-1 block w-full rounded-md border-gray-300 bg-gray-50 text-gray-500 shadow-sm cursor-not-allowed"
               />
+              <p className="mt-1 text-xs text-gray-500">Your email can't be changed here yet.</p>
             </div>
           </div>
         </div>

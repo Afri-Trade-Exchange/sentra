@@ -1,9 +1,3 @@
-export interface User {
-  name: string;
-  email: string;
-  displayName?: string;
-}
-
 export interface Activity {
   id: string;
   category: string;

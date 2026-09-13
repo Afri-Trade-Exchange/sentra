@@ -6,7 +6,7 @@ const AdvancedFilters: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm mb-8">
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-8">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
@@ -41,12 +41,12 @@ const AdvancedFilters: React.FC = () => {
                   <div className="space-y-2">
                     <input
                       type="date"
-                      className="w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                      className="w-full rounded-xl border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
                       placeholder="Start Date"
                     />
                     <input
                       type="date"
-                      className="w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                      className="w-full rounded-xl border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
                       placeholder="End Date"
                     />
                   </div>
@@ -59,7 +59,7 @@ const AdvancedFilters: React.FC = () => {
                   <select
                     id="documentType"
                     name="documentType"
-                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                    className="w-full rounded-xl border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
                   >
                     <option value="">All Types</option>
                     <option value="import">Import</option>
@@ -76,22 +76,22 @@ const AdvancedFilters: React.FC = () => {
                     <input
                       type="number"
                       placeholder="Min"
-                      className="w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                      className="w-full rounded-xl border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
                     />
                     <input
                       type="number"
                       placeholder="Max"
-                      className="w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                      className="w-full rounded-xl border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
                     />
                   </div>
                 </div>
               </div>
 
               <div className="flex justify-end mt-6 gap-3">
-                <button type="button" className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                <button type="button" className="px-4 py-2 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50">
                   Reset
                 </button>
-                <button type="button" className="px-4 py-2 bg-teal-600 text-white rounded-md text-sm font-medium hover:bg-teal-700">
+                <button type="button" className="px-4 py-2 bg-teal-600 text-white rounded-xl text-sm font-medium hover:bg-teal-700">
                   Apply Filters
                 </button>
               </div>

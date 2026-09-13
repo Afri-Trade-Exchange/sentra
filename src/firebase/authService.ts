@@ -98,6 +98,11 @@ export async function resetPassword(email: string): Promise<void> {
   await sendPasswordResetEmail(auth, email);
 }
 
+export async function updateUserName(user: User, name: string): Promise<void> {
+  await updateProfile(user, { displayName: name });
+  await setDoc(doc(firestore, 'users', user.uid), { name }, { merge: true });
+}
+
 // Translate Firebase auth error codes into copy safe to show a signing-up user.
 // (Login intentionally stays generic — see LoginPage — to avoid leaking whether
 // an email is registered; signup errors don't have that concern.)

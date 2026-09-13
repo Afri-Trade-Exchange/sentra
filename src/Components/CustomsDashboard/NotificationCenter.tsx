@@ -28,7 +28,7 @@ const NotificationCenter: React.FC<{ notifications: NotificationType[] }> = ({ n
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
-            className="absolute bottom-full right-0 mb-2 w-80 bg-white rounded-lg shadow-xl"
+            className="absolute bottom-full right-0 mb-2 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden"
           >
             <div className="p-4 border-b border-gray-100">
               <h3 className="font-semibold">Notifications</h3>

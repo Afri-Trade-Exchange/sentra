@@ -16,7 +16,7 @@ const ConsignmentCard: React.FC<{
       layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`bg-white shadow-sm rounded-lg p-4 hover:shadow-md transition-shadow space-y-4 ${
+      className={`bg-white shadow-sm border border-gray-100 rounded-2xl p-4 hover:shadow-md transition-shadow space-y-4 cursor-pointer ${
         isSelected ? 'ring-2 ring-teal-500' : ''
       }`}
       onClick={() => onSelect(consignment.id)}
@@ -45,10 +45,13 @@ const ConsignmentCard: React.FC<{
         </span>
         <button
           type="button"
-          onClick={() => onViewDetails(consignment)}
-          className="text-teal-600 hover:text-teal-700 flex items-center"
+          onClick={(e) => {
+            e.stopPropagation();
+            onViewDetails(consignment);
+          }}
+          className="text-teal-600 hover:text-teal-700 flex items-center font-medium"
         >
-          <FaEye className="h-5 w-5 mr-1 border-radius-15" />
+          <FaEye className="h-4 w-4 mr-1.5" />
           View Details
         </button>
       </div>

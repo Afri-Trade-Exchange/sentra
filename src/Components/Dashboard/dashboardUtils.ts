@@ -4,13 +4,13 @@ import {
   EnhancedInsights,
   Invoice,
   RiskAssessment,
-  User,
 } from '../../types/dashboard';
+import type { User } from 'firebase/auth';
 
 export const generateInvoice = (activity: Activity, user?: User | null): Invoice => ({
   id: `INV-${activity.id}`,
   invoiceNumber: `INV-${activity.id}`,
-  customerName: user?.name || 'Customer',
+  customerName: user?.displayName || 'Customer',
   businessName: 'Afritrade',
   activity,
   invoiceDate: activity.date,

@@ -12,6 +12,7 @@ import CustomsDashboard from './Components/CustomsDashboard';
 import { AuthProvider } from './Components/AuthContext';
 import ProtectedRoute from './Components/ProtectedRoute';
 import LoginPage from './Components/LoginPage';
+import ForgotPassword from './Components/ForgotPassword';
 import { Dialog } from '@headlessui/react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { FaClock, FaShieldAlt, FaChartLine, FaBriefcase, FaUserShield, FaFileUpload, FaQrcode, FaCheckCircle, FaArrowRight, FaPlay, FaExclamationCircle } from 'react-icons/fa';
@@ -142,6 +143,7 @@ export default function App() {
                   <Route path="/trader-signup" element={<TraderSignup />} />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/customs-login" element={<LoginPage />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
                   <Route path="/contact" element={<ContactPage />} />
                   <Route
                     path="/dashboard"

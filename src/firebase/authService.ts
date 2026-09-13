@@ -1,6 +1,7 @@
 import { auth, firestore } from './firebaseConfig';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updateProfile, type User } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { FirebaseError } from 'firebase/app';
 
 // Define user roles
 export type UserRole = 'trader' | 'customs';
@@ -46,11 +47,15 @@ export const signupUser = async (userData: {
   try {
     // Create user in Firebase Authentication
     const userCredential = await createUserWithEmailAndPassword(
-      auth, 
-      userData.email, 
+      auth,
+      userData.email,
       userData.password
     );
-    
+
+    if (userData.name) {
+      await updateProfile(userCredential.user, { displayName: userData.name });
+    }
+
     // Create user document in Firestore with role
     await setDoc(
       doc(firestore, 'users', userCredential.user.uid), 
@@ -68,6 +73,53 @@ export const signupUser = async (userData: {
     throw error;
   }
 }; 
+
+// Resolve the Firestore role for an OAuth-authenticated user (Google, Apple, ...),
+// provisioning a trader account on first sign-in (customs officers are provisioned separately).
+export async function resolveOAuthUserRole(user: User): Promise<UserRole> {
+  const userDocRef = doc(firestore, 'users', user.uid);
+  const userDoc = await getDoc(userDocRef);
+
+  if (userDoc.exists()) {
+    return userDoc.data().role as UserRole;
+  }
+
+  const role: UserRole = 'trader';
+  await setDoc(userDocRef, {
+    name: user.displayName || '',
+    email: user.email || '',
+    role,
+    createdAt: new Date()
+  });
+  return role;
+}
+
+export async function resetPassword(email: string): Promise<void> {
+  await sendPasswordResetEmail(auth, email);
+}
+
+// Translate Firebase auth error codes into copy safe to show a signing-up user.
+// (Login intentionally stays generic — see LoginPage — to avoid leaking whether
+// an email is registered; signup errors don't have that concern.)
+export function getAuthErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof FirebaseError) {
+    switch (error.code) {
+      case 'auth/email-already-in-use':
+        return 'An account with this email already exists. Try signing in instead.';
+      case 'auth/invalid-email':
+        return 'That email address looks invalid.';
+      case 'auth/weak-password':
+        return 'Please choose a stronger password (at least 8 characters).';
+      case 'auth/network-request-failed':
+        return 'Network error. Check your connection and try again.';
+      case 'auth/popup-closed-by-user':
+        return 'Sign-in was cancelled.';
+      default:
+        return fallback;
+    }
+  }
+  return fallback;
+}
 
 // Keep only the email validation function for potential reuse
 export const isValidEmail = (email: string): boolean => {

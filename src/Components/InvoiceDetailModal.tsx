@@ -384,7 +384,7 @@ export default function InvoiceDetailModal({
             <div className="text-right">
               <p>Subtotal: ${invoice.totalAmount.toFixed(2)}</p>
               <p>Tax ({invoice.taxRate * 100}%): ${(invoice.totalAmount * invoice.taxRate).toFixed(2)}</p>
-              <p className="font-semibold text-xl">Total: ${invoice.totalAmount.toFixed(2)}</p>
+              <p className="font-semibold text-xl">Total: ${(invoice.totalAmount * (1 + invoice.taxRate)).toFixed(2)}</p>
             </div>
           </div>
 

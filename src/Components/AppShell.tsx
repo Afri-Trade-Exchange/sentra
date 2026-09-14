@@ -41,21 +41,36 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     const sectionIds = primaryNav.filter((item) => item.href).map((item) => item.href!.slice(1));
     if (sectionIds.length === 0) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) setActiveSection(entry.target.id);
-        });
-      },
-      { rootMargin: '-35% 0px -55% 0px' }
-    );
+    // Highlights the last section whose top has scrolled above a line near
+    // the top of the viewport - the standard scroll-spy approach. A pure
+    // IntersectionObserver band can never trigger for a short trailing
+    // section on a short page (its top can't be scrolled far enough up to
+    // reach the band), so the last section is forced active once the page
+    // is scrolled to its bottom.
+    const THRESHOLD = 120;
 
-    sectionIds.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
+    const handleScroll = () => {
+      const scrolledToBottom =
+        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
 
-    return () => observer.disconnect();
+      if (scrolledToBottom) {
+        setActiveSection(sectionIds[sectionIds.length - 1]);
+        return;
+      }
+
+      let current = sectionIds[0];
+      for (const id of sectionIds) {
+        const el = document.getElementById(id);
+        if (el && el.getBoundingClientRect().top <= THRESHOLD) {
+          current = id;
+        }
+      }
+      setActiveSection(current);
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 

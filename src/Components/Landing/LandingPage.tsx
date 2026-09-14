@@ -74,7 +74,7 @@ export default function LandingPage() {
 
   return (
     <div
-      className="min-h-screen bg-stone-100 text-gray-800 font-['Montserrat'] flex flex-col relative"
+      className="w-full min-h-screen bg-stone-100 text-gray-800 font-['Montserrat'] flex flex-col relative"
     >
 
       {/* Subtle background pattern */}
@@ -96,7 +96,7 @@ export default function LandingPage() {
       </div>
 
       {/* Hero — full-bleed, extends up behind the floating header */}
-      <div className="relative -mt-24 min-h-[600px] sm:min-h-[660px] flex items-center overflow-hidden">
+      <div className="relative w-full -mt-24 min-h-[600px] sm:min-h-[660px] flex items-center">
         <img
           src={heroImg}
           alt="Aerial view of stacked shipping containers at a busy port"
@@ -132,7 +132,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
 
         {/* See it in action */}
         <div className="mb-24">

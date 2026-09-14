@@ -3,6 +3,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearSca
 import { Pie, Line } from 'react-chartjs-2';
 import { Consignment, ConsignmentStatus } from './types';
 import Card from '../ui/Card';
+import { useTheme } from '../ThemeContext';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement);
 
@@ -17,6 +18,11 @@ const STATUS_COLORS: Record<ConsignmentStatus, { fill: string; border: string }>
 const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 const AnalyticsOverview: React.FC<{ consignments: Consignment[] }> = ({ consignments }) => {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
+  const tickColor = isDark ? '#9ca3af' : '#6b7280';
+  const gridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
+
   const chartData = useMemo(() => {
     const statuses = Object.values(ConsignmentStatus);
     const statusCounts = statuses.reduce((acc, status) => {
@@ -70,17 +76,32 @@ const AnalyticsOverview: React.FC<{ consignments: Consignment[] }> = ({ consignm
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <Card className="min-w-0">
-        <h3 className="text-lg font-semibold mb-4">Status Distribution</h3>
+        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Status Distribution</h3>
         <div className="h-64 w-full">
-          <Pie data={chartData} options={{ responsive: true, maintainAspectRatio: false }} />
+          <Pie
+            data={chartData}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { labels: { color: tickColor } } },
+            }}
+          />
         </div>
       </Card>
       <Card className="min-w-0">
-        <h3 className="text-lg font-semibold mb-4">Monthly Volume</h3>
+        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Monthly Volume</h3>
         <div className="h-64 w-full">
           <Line
             data={volumeData}
-            options={{ responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { labels: { color: tickColor } } },
+              scales: {
+                x: { ticks: { color: tickColor }, grid: { color: gridColor } },
+                y: { beginAtZero: true, ticks: { stepSize: 1, color: tickColor }, grid: { color: gridColor } },
+              },
+            }}
           />
         </div>
       </Card>

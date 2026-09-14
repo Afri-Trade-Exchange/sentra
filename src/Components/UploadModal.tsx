@@ -238,35 +238,35 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
       onClick={handleOutsideClick}  // Overlay click handler
     >
       <div
-        className="bg-white rounded-xl w-full max-w-4xl p-4 sm:p-8 max-h-[90vh] overflow-y-auto shadow-lg"
+        className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-4xl p-4 sm:p-8 max-h-[90vh] overflow-y-auto shadow-lg"
         onClick={(e) => e.stopPropagation()} // Add this to prevent clicks on modal from closing it
       >
         {/* Header Section */}
-        <div className="flex justify-between items-center mb-8 pb-4 border-b border-gray-100">
+        <div className="flex justify-between items-center mb-8 pb-4 border-b border-gray-100 dark:border-gray-700">
           <div>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">Upload Documents</h2>
-            <p className="text-sm text-gray-600">
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Upload Documents</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               Please upload all required documents in PDF or image format
             </p>
           </div>
-          <button 
+          <button
             onClick={handleClose}
             aria-label="Close upload modal"
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
           >
-            <FaTimes className="w-5 h-5 text-gray-500" />
+            <FaTimes className="w-5 h-5 text-gray-500 dark:text-gray-400" />
           </button>
         </div>
 
         {/* Progress Indicator */}
         <div className="mb-8">
           <div className="flex justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700">Upload Progress</span>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Upload Progress</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">
               {Object.values(documents).filter(doc => doc.file !== null).length} of {Object.values(documents).length} files
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
             <div
               className="bg-teal-600 h-2 rounded-full transition-all duration-300"
               style={{ width: `${(Object.values(documents).filter(doc => doc.file !== null).length / Object.values(documents).length) * 100}%` }}
@@ -281,7 +281,7 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
               key={key}
               className={`
                 relative p-6 rounded-xl transition-colors duration-200
-                ${doc.file ? 'bg-teal-50 border-teal-200' : 'bg-gray-50 border-gray-200'}
+                ${doc.file ? 'bg-teal-50 dark:bg-teal-900/20 border-teal-200 dark:border-teal-800' : 'bg-gray-50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600'}
                 ${doc.required ? 'border-2' : 'border'}
                 hover:shadow-sm cursor-pointer
               `}
@@ -289,29 +289,29 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
               onDrop={(e) => handleDrop(e, key)}
             >
               <div className="flex items-start space-x-4">
-                <div className={`p-3 rounded-lg ${doc.file ? 'bg-teal-100' : 'bg-gray-200'}`}>
-                  <FaFileAlt className={`w-6 h-6 ${doc.file ? 'text-teal-600' : 'text-gray-400'}`} />
+                <div className={`p-3 rounded-lg ${doc.file ? 'bg-teal-100 dark:bg-teal-900/40' : 'bg-gray-200 dark:bg-gray-600'}`}>
+                  <FaFileAlt className={`w-6 h-6 ${doc.file ? 'text-teal-600 dark:text-teal-400' : 'text-gray-400 dark:text-gray-400'}`} />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-medium text-gray-900">{doc.type}</h3>
+                    <h3 className="font-medium text-gray-900 dark:text-gray-100">{doc.type}</h3>
                     {doc.required ? (
-                      <span className="text-xs text-red-500 font-medium">Required</span>
+                      <span className="text-xs text-red-500 dark:text-red-400 font-medium">Required</span>
                     ) : (
-                      <span className="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded-full">
+                      <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded-full">
                         Optional
                       </span>
                     )}
                   </div>
                   {doc.file ? (
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-gray-600 dark:text-gray-400">
                       <p className="truncate max-w-xs">{doc.file.name}</p>
-                      <p className="text-gray-400 text-xs mt-1">
+                      <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">
                         {Math.round(doc.file.size / 1024)}KB • Uploaded
                       </p>
                     </div>
                   ) : (
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       Drag and drop or click to upload
                     </p>
                   )}
@@ -326,8 +326,8 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
                   <span className={`
                     inline-flex items-center px-3 py-1 rounded-lg text-sm font-medium
                     ${doc.file
-                      ? 'text-teal-700 bg-teal-100 hover:bg-teal-200'
-                      : 'text-gray-600 bg-gray-200 hover:bg-gray-300'}
+                      ? 'text-teal-700 dark:text-teal-300 bg-teal-100 dark:bg-teal-900/40 hover:bg-teal-200 dark:hover:bg-teal-900/60'
+                      : 'text-gray-600 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500'}
                     transition-colors
                   `}>
                     {doc.file ? 'Change' : 'Upload'}
@@ -340,12 +340,12 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
 
         {/* QR Code Section */}
         {isVerified && (
-          <div className="mb-8 rounded-xl bg-teal-50">
-            <div className="p-6 border border-teal-200 rounded-xl">
+          <div className="mb-8 rounded-xl bg-teal-50 dark:bg-teal-900/20">
+            <div className="p-6 border border-teal-200 dark:border-teal-800 rounded-xl">
               {/* Success Header */}
               <div className="flex items-center gap-2 mb-6">
-                <FaCheckCircle className="text-teal-600 w-6 h-6" />
-                <h3 className="text-xl font-medium text-gray-900">
+                <FaCheckCircle className="text-teal-600 dark:text-teal-400 w-6 h-6" />
+                <h3 className="text-xl font-medium text-gray-900 dark:text-gray-100">
                   Documents Verified Successfully!
                 </h3>
               </div>
@@ -353,7 +353,7 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
               {/* Content Grid */}
               <div className="grid md:grid-cols-2 gap-8">
                 {/* QR Code Side */}
-                <div className="bg-white p-6 rounded-lg shadow-sm">
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
                   <div className="flex justify-center mb-4">
                     <QRCodeSVG
                       id="qr-code"
@@ -366,7 +366,7 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
                     />
                   </div>
                   <div className="text-center">
-                    <p className="text-sm text-gray-600 mb-2">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                       Consignment ID: <span className="font-mono font-medium">{consignmentId}</span>
                     </p>
                     <button
@@ -381,52 +381,52 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
 
                 {/* Instructions Side */}
                 <div className="space-y-6">
-                  <h4 className="font-medium text-gray-900 flex items-center gap-2">
-                    <FaQrcode className="text-teal-600" />
+                  <h4 className="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                    <FaQrcode className="text-teal-600 dark:text-teal-400" />
                     Next Steps
                   </h4>
 
                   <div className="space-y-4">
                     <div className="flex gap-3">
-                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-sm font-medium">
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-400 flex items-center justify-center text-sm font-medium">
                         1
                       </div>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
                         Download and save the QR code to your device or print it out
                       </p>
                     </div>
 
                     <div className="flex gap-3">
-                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-sm font-medium">
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-400 flex items-center justify-center text-sm font-medium">
                         2
                       </div>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
                         Present this QR code to the customs officer at the border
                       </p>
                     </div>
 
                     <div className="flex gap-3">
-                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-sm font-medium">
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-400 flex items-center justify-center text-sm font-medium">
                         3
                       </div>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
                         The officer will scan the code to access your verified documents
                       </p>
                     </div>
 
                     <div className="flex gap-3">
-                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-sm font-medium">
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-400 flex items-center justify-center text-sm font-medium">
                         4
                       </div>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
                         Keep this QR code safe - you'll need it for customs clearance
                       </p>
                     </div>
                   </div>
 
-                  <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <p className="text-sm text-yellow-800">
-                      <strong>Important:</strong> This QR code is your digital key to access your uploaded documents. 
+                  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                    <p className="text-sm text-yellow-800 dark:text-yellow-400">
+                      <strong>Important:</strong> This QR code is your digital key to access your uploaded documents.
                       Make sure to keep it accessible during your customs clearance process.
                     </p>
                   </div>
@@ -437,22 +437,22 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
         )}
 
         {!consignmentId && (
-          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800">
+          <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg text-sm text-yellow-800 dark:text-yellow-400">
             No consignment is linked to this upload yet. Create a consignment first, then upload its documents.
           </div>
         )}
 
         {verifyError && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-700 dark:text-red-400">
             {verifyError}
           </div>
         )}
 
         {/* Action Buttons */}
-        <div className="flex justify-end items-center gap-4 pt-4 border-t border-gray-100">
+        <div className="flex justify-end items-center gap-4 pt-4 border-t border-gray-100 dark:border-gray-700">
           <button
             onClick={handleClose}  // Updated to use handleClose
-            className="px-6 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+            className="px-6 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 transition-colors"
           >
             Cancel
           </button>
@@ -464,7 +464,7 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
               transition-all duration-200
               ${areRequiredDocumentsUploaded() && consignmentId && !isVerifying
                 ? 'bg-teal-600 text-white hover:bg-teal-700'
-                : 'bg-gray-100 text-gray-400 cursor-not-allowed'}
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'}
             `}
           >
             <FaUpload />

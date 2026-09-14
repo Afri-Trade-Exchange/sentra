@@ -12,9 +12,9 @@ const NotificationCenter: React.FC<{ notifications: NotificationType[] }> = ({ n
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-3 bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors"
+        className="relative p-3 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
       >
-        <FaBell className="w-6 h-6 text-gray-600" />
+        <FaBell className="w-6 h-6 text-gray-600 dark:text-gray-300" />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
             {unreadCount}
@@ -28,23 +28,23 @@ const NotificationCenter: React.FC<{ notifications: NotificationType[] }> = ({ n
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
-            className="absolute bottom-full right-0 mb-2 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden"
+            className="absolute bottom-full right-0 mb-2 w-80 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden"
           >
-            <div className="p-4 border-b border-gray-100">
-              <h3 className="font-semibold">Notifications</h3>
+            <div className="p-4 border-b border-gray-100 dark:border-gray-700">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100">Notifications</h3>
             </div>
             <div className="max-h-96 overflow-y-auto">
               {notifications.map((notification) => (
                 <div
                   key={notification.id}
-                  className={`p-4 border-b border-gray-100 hover:bg-gray-50 ${
-                    !notification.read ? 'bg-teal-50' : ''
+                  className={`p-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 ${
+                    !notification.read ? 'bg-teal-50 dark:bg-teal-900/20' : ''
                   }`}
                 >
-                  <p className="text-sm text-gray-900">{notification.message}</p>
+                  <p className="text-sm text-gray-900 dark:text-gray-100">{notification.message}</p>
                   <div className="flex items-center gap-2 mt-2">
-                    <FaClock className="w-3 h-3 text-gray-400" />
-                    <span className="text-xs text-gray-500">
+                    <FaClock className="w-3 h-3 text-gray-400 dark:text-gray-500" />
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
                       {new Date(notification.timestamp).toLocaleDateString()}
                     </span>
                   </div>

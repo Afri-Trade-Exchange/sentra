@@ -9,16 +9,16 @@ const HelpButton: React.FC = () => {
       <button
         type="button"
         onClick={() => setShowHelp(!showHelp)}
-        className="p-3 bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors"
+        className="p-3 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
         aria-label="Help"
       >
-        <FaQuestion className="w-6 h-6 text-gray-600" />
+        <FaQuestion className="w-6 h-6 text-gray-600 dark:text-gray-300" />
       </button>
 
       {showHelp && (
-        <div className="absolute bottom-full left-0 mb-2 p-4 bg-white rounded-2xl shadow-xl border border-gray-100 w-64">
-          <h4 className="font-semibold mb-2">Quick Help</h4>
-          <ul className="space-y-2 text-sm">
+        <div className="absolute bottom-full left-0 mb-2 p-4 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 w-64">
+          <h4 className="font-semibold mb-2 text-gray-900 dark:text-gray-100">Quick Help</h4>
+          <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
             <li>• Click a card to select it, or "View Details" to inspect it</li>
             <li>• Use filters to narrow results</li>
             <li>• Create a New Consignment for a trader</li>

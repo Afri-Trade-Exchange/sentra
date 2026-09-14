@@ -14,7 +14,7 @@ const BulkActions: React.FC<{
   };
 
   return (
-    <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 flex items-center gap-4">
+    <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mb-6 flex items-center gap-4">
       <div className="flex items-center gap-2">
         <input
           type="checkbox"
@@ -23,7 +23,7 @@ const BulkActions: React.FC<{
           className="rounded text-teal-600 focus:ring-teal-500"
           aria-label="Select all items"
         />
-        <span className="text-sm text-gray-600">
+        <span className="text-sm text-gray-600 dark:text-gray-400">
           {selectedItems.length} selected
         </span>
       </div>
@@ -32,7 +32,7 @@ const BulkActions: React.FC<{
         aria-label="Select bulk action"
         value={pendingAction}
         onChange={(e) => setPendingAction(e.target.value)}
-        className="rounded-xl border-gray-300 text-sm focus:border-teal-500 focus:ring-teal-500"
+        className="rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 text-sm focus:border-teal-500 focus:ring-teal-500"
         disabled={selectedItems.length === 0}
       >
         <option value="">Bulk Actions</option>
@@ -45,7 +45,7 @@ const BulkActions: React.FC<{
         type="button"
         onClick={handleApply}
         disabled={selectedItems.length === 0 || !pendingAction}
-        className="px-4 py-2 bg-teal-600 text-white text-sm rounded-xl hover:bg-teal-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+        className="px-4 py-2 bg-teal-600 text-white text-sm rounded-xl hover:bg-teal-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
       >
         Apply
       </button>

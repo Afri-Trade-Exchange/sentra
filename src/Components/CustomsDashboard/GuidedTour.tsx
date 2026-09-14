@@ -48,7 +48,7 @@ const GuidedTour: React.FC = () => {
       <div
         className="
           absolute p-6
-          bg-white
+          bg-white dark:bg-gray-800
           rounded-2xl
           shadow-2xl
           w-[calc(100%-2rem)] max-w-md
@@ -63,16 +63,16 @@ const GuidedTour: React.FC = () => {
               className={`
                 h-1 flex-1 rounded-full
                 transition-colors duration-200
-                ${index <= currentStep ? 'bg-teal-600' : 'bg-gray-200'}
+                ${index <= currentStep ? 'bg-teal-600' : 'bg-gray-200 dark:bg-gray-600'}
               `}
             />
           ))}
         </div>
 
-        <h4 className="font-semibold text-xl mb-3">
+        <h4 className="font-semibold text-xl mb-3 text-gray-900 dark:text-gray-100">
           {steps[currentStep].title}
         </h4>
-        <p className="text-base leading-relaxed text-gray-600 mb-8">
+        <p className="text-base leading-relaxed text-gray-600 dark:text-gray-400 mb-8">
           {steps[currentStep].content}
         </p>
 
@@ -83,8 +83,8 @@ const GuidedTour: React.FC = () => {
               onClick={completeTour}
               className="
                 px-4 py-2
-                text-sm font-medium text-gray-600
-                hover:text-gray-900
+                text-sm font-medium text-gray-600 dark:text-gray-400
+                hover:text-gray-900 dark:hover:text-gray-100
                 transition-colors
               "
             >
@@ -96,8 +96,8 @@ const GuidedTour: React.FC = () => {
                 onClick={() => setCurrentStep(prev => prev - 1)}
                 className="
                   px-4 py-2
-                  text-sm font-medium text-gray-600
-                  hover:text-gray-900
+                  text-sm font-medium text-gray-600 dark:text-gray-400
+                  hover:text-gray-900 dark:hover:text-gray-100
                   transition-colors
                 "
               >

@@ -329,21 +329,21 @@ export default function InvoiceDetailModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none p-4 bg-black/50 backdrop-blur-sm">
       <div className="relative w-auto max-w-3xl mx-auto my-6">
-        <div className="relative flex flex-col w-full bg-white border-0 rounded-lg shadow-lg outline-none focus:outline-none">
-          <div className="flex items-start justify-between p-5 border-b border-solid rounded-t border-blueGray-200">
-            <h3 className="text-3xl font-semibold">Invoice Details</h3>
+        <div className="relative flex flex-col w-full bg-white dark:bg-gray-800 border-0 rounded-lg shadow-lg outline-none focus:outline-none">
+          <div className="flex items-start justify-between p-5 border-b border-solid rounded-t border-blueGray-200 dark:border-gray-700">
+            <h3 className="text-3xl font-semibold text-gray-900 dark:text-gray-100">Invoice Details</h3>
             <button
-              className="float-right p-1 ml-auto text-3xl font-semibold leading-none text-black bg-transparent border-0 outline-none opacity-5 focus:outline-none"
+              className="float-right p-1 ml-auto text-3xl font-semibold leading-none text-black dark:text-gray-100 bg-transparent border-0 outline-none opacity-5 focus:outline-none"
               onClick={onClose}
             >
               ×
             </button>
           </div>
-          
+
           {/* Invoice Content */}
-          <div className="relative flex-auto p-6">
+          <div className="relative flex-auto p-6 text-gray-900 dark:text-gray-100">
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div>
                 <p className="font-semibold">Invoice Number</p>
@@ -361,7 +361,7 @@ export default function InvoiceDetailModal({
               <h3 className="text-xl font-semibold mb-4">Invoice Items</h3>
               <table className="w-full">
                 <thead>
-                  <tr className="bg-gray-100">
+                  <tr className="bg-gray-100 dark:bg-gray-700">
                     <th className="p-2 text-left">Description</th>
                     <th className="p-2 text-right">Quantity</th>
                     <th className="p-2 text-right">Unit Price</th>
@@ -370,7 +370,7 @@ export default function InvoiceDetailModal({
                 </thead>
                 <tbody>
                   {invoice.items.map((item, index) => (
-                    <tr key={index}>
+                    <tr key={index} className="border-b border-gray-100 dark:border-gray-700 last:border-b-0">
                       <td className="p-2">{item.description}</td>
                       <td className="p-2 text-right">{item.quantity}</td>
                       <td className="p-2 text-right">${item.unitPrice.toFixed(2)}</td>
@@ -389,23 +389,23 @@ export default function InvoiceDetailModal({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-end p-6 border-t border-solid rounded-b border-blueGray-200">
+          <div className="flex items-center justify-end p-6 border-t border-solid rounded-b border-blueGray-200 dark:border-gray-700">
             <button
-              className="px-6 py-2 mb-1 mr-2 text-sm font-semibold text-teal-600 uppercase transition-colors duration-150 ease-linear outline-none background-transparent focus:outline-none flex items-center"
+              className="px-6 py-2 mb-1 mr-2 text-sm font-semibold text-teal-600 dark:text-teal-400 uppercase transition-colors duration-150 ease-linear outline-none background-transparent focus:outline-none flex items-center"
               type="button"
               onClick={downloadInvoice}
             >
               <FaDownload className="mr-2" /> Download PDF
             </button>
             <button
-              className="px-6 py-2 mb-1 mr-2 text-sm font-semibold text-green-600 uppercase transition-colors duration-150 ease-linear outline-none background-transparent focus:outline-none flex items-center"
+              className="px-6 py-2 mb-1 mr-2 text-sm font-semibold text-green-600 dark:text-green-400 uppercase transition-colors duration-150 ease-linear outline-none background-transparent focus:outline-none flex items-center"
               type="button"
               onClick={() => window.print()}
             >
               <FaPrint className="mr-2" /> Print
             </button>
             <button
-              className="px-6 py-2 mb-1 text-sm font-semibold text-red-500 uppercase transition-colors duration-150 ease-linear outline-none background-transparent focus:outline-none"
+              className="px-6 py-2 mb-1 text-sm font-semibold text-red-500 dark:text-red-400 uppercase transition-colors duration-150 ease-linear outline-none background-transparent focus:outline-none"
               type="button"
               onClick={onClose}
             >

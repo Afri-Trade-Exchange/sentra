@@ -66,14 +66,14 @@ const QrScannerModal: React.FC<{
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl p-6 max-w-md w-full">
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold">Scan QR Code</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Scan QR Code</h3>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close QR code scanner"
-            className="text-gray-500 hover:text-gray-700"
+            className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

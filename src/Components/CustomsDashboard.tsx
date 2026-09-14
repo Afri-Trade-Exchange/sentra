@@ -241,21 +241,21 @@ export const CustomsDashboard: React.FC = () => {
   if (isLoading) return <LoadingState />;
 
   return (
-    <div className="min-h-screen bg-stone-100">
+    <div className="min-h-screen bg-stone-100 dark:bg-gray-900">
       <GuidedTour />
       <div className="px-6 py-8 max-w-6xl mx-auto w-full space-y-16">
         <section id="overview" className="scroll-mt-20 space-y-8">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
               Welcome, {user?.displayName || user?.email?.split('@')[0] || 'Guest'}
             </h1>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               Manage and track your customs declarations and documents
             </p>
           </div>
 
           {loadError && (
-            <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-700">
+            <div className="rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4 text-sm text-red-700 dark:text-red-400">
               {loadError}
             </div>
           )}
@@ -293,11 +293,11 @@ export const CustomsDashboard: React.FC = () => {
 
           {paginatedConsignments.length === 0 ? (
             <Card padding="xl" className="text-center">
-              <div className="text-gray-400 mb-3">
+              <div className="text-gray-400 dark:text-gray-500 mb-3">
                 <FaClipboardList className="w-8 h-8 mx-auto" />
               </div>
-              <h3 className="text-gray-900 font-medium mb-1">No consignments found</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="text-gray-900 dark:text-gray-100 font-medium mb-1">No consignments found</h3>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">
                 {state.consignments.length === 0
                   ? 'Consignments submitted by traders will show up here.'
                   : "Try adjusting your search or filter to find what you're looking for"}
@@ -332,7 +332,7 @@ export const CustomsDashboard: React.FC = () => {
                       px-3 py-2 text-sm font-medium rounded-xl
                       ${state.currentPage === index + 1
                         ? 'bg-teal-600 text-white'
-                        : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                        : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
                       }
                       transition-colors duration-200
                     `}

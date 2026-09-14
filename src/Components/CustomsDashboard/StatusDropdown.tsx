@@ -45,8 +45,8 @@ const StatusDropdown: React.FC<{
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="absolute z-10 w-full mt-2 origin-top-right bg-white
-              rounded-xl shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+            className="absolute z-10 w-full mt-2 origin-top-right bg-white dark:bg-gray-800
+              rounded-xl shadow-lg ring-1 ring-black dark:ring-white/10 ring-opacity-5 focus:outline-none"
           >
             <div className="py-1">
               {statusOptions.map((status) => (
@@ -60,7 +60,7 @@ const StatusDropdown: React.FC<{
                   }}
                   className={`
                     group flex items-center w-full px-4 py-2 text-sm
-                    hover:bg-gray-100 transition-colors
+                    hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors
                     ${STATUS_CONFIG[status].color}
                   `}
                 >

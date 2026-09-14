@@ -16,6 +16,10 @@ interface NewConsignmentModalProps {
 
 import React, { useState } from 'react';
 
+const inputClass = `w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm transition-colors
+  focus:border-blue-500 focus:ring-blue-500 focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800`;
+const labelClass = 'block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1';
+
 const NewConsignmentModal: React.FC<NewConsignmentModalProps> = ({ isOpen, onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
     traderName: '',
@@ -40,19 +44,19 @@ const NewConsignmentModal: React.FC<NewConsignmentModalProps> = ({ isOpen, onClo
   };
 
   return (
-    <div 
+    <div
       className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
-      <div 
-        className="bg-white rounded-xl p-6 md:p-8 max-w-lg w-full shadow-2xl animate-[fadeIn_0.2s_ease-out]"
+      <div
+        className="bg-white dark:bg-gray-800 rounded-xl p-6 md:p-8 max-w-lg w-full shadow-2xl animate-[fadeIn_0.2s_ease-out]"
         onClick={e => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold text-gray-900">New Consignment</h2>
-          <button 
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">New Consignment</h2>
+          <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 transition-colors"
+            className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
             aria-label="Close modal"
           >
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -60,10 +64,10 @@ const NewConsignmentModal: React.FC<NewConsignmentModalProps> = ({ isOpen, onClo
             </svg>
           </button>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label htmlFor="traderName" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="traderName" className={labelClass}>
               Trader Name
             </label>
             <input
@@ -71,14 +75,13 @@ const NewConsignmentModal: React.FC<NewConsignmentModalProps> = ({ isOpen, onClo
               type="text"
               value={formData.traderName}
               onChange={(e) => setFormData({...formData, traderName: e.target.value})}
-              className="w-full rounded-lg border-gray-300 shadow-sm transition-colors
-                focus:border-blue-500 focus:ring-blue-500 focus:ring-2 focus:ring-offset-2"
+              className={inputClass}
               required
             />
           </div>
 
           <div>
-            <label htmlFor="traderEmail" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="traderEmail" className={labelClass}>
               Trader Email
             </label>
             <input
@@ -86,22 +89,20 @@ const NewConsignmentModal: React.FC<NewConsignmentModalProps> = ({ isOpen, onClo
               type="email"
               value={formData.traderEmail}
               onChange={(e) => setFormData({...formData, traderEmail: e.target.value})}
-              className="w-full rounded-lg border-gray-300 shadow-sm transition-colors
-                focus:border-blue-500 focus:ring-blue-500 focus:ring-2 focus:ring-offset-2"
+              className={inputClass}
               required
             />
           </div>
 
           <div>
-            <label htmlFor="documentType" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="documentType" className={labelClass}>
               Document Type
             </label>
             <select
               id="documentType"
               value={formData.documentType}
               onChange={(e) => setFormData({...formData, documentType: e.target.value})}
-              className="w-full rounded-lg border-gray-300 shadow-sm transition-colors
-                focus:border-blue-500 focus:ring-blue-500 focus:ring-2 focus:ring-offset-2"
+              className={inputClass}
               required
             >
               <option value="">Select type...</option>
@@ -112,22 +113,21 @@ const NewConsignmentModal: React.FC<NewConsignmentModalProps> = ({ isOpen, onClo
           </div>
 
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="description" className={labelClass}>
               Description
             </label>
             <textarea
               id="description"
               value={formData.description}
               onChange={(e) => setFormData({...formData, description: e.target.value})}
-              className="w-full rounded-lg border-gray-300 shadow-sm transition-colors
-                focus:border-blue-500 focus:ring-blue-500 focus:ring-2 focus:ring-offset-2"
+              className={inputClass}
               rows={3}
               required
             />
           </div>
 
           <div>
-            <label htmlFor="estimatedValue" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="estimatedValue" className={labelClass}>
               Estimated Value
             </label>
             <input
@@ -135,14 +135,13 @@ const NewConsignmentModal: React.FC<NewConsignmentModalProps> = ({ isOpen, onClo
               type="number"
               value={formData.estimatedValue}
               onChange={(e) => setFormData({...formData, estimatedValue: e.target.value})}
-              className="w-full rounded-lg border-gray-300 shadow-sm transition-colors
-                focus:border-blue-500 focus:ring-blue-500 focus:ring-2 focus:ring-offset-2"
+              className={inputClass}
               required
             />
           </div>
 
           <div>
-            <label htmlFor="goodsOrdered" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="goodsOrdered" className={labelClass}>
               Goods Ordered (comma-separated)
             </label>
             <input
@@ -150,23 +149,21 @@ const NewConsignmentModal: React.FC<NewConsignmentModalProps> = ({ isOpen, onClo
               type="text"
               value={formData.goodsOrdered}
               onChange={(e) => setFormData({...formData, goodsOrdered: e.target.value})}
-              className="w-full rounded-lg border-gray-300 shadow-sm transition-colors
-                focus:border-blue-500 focus:ring-blue-500 focus:ring-2 focus:ring-offset-2"
+              className={inputClass}
               placeholder="Item 1, Item 2, Item 3"
               required
             />
           </div>
 
           <div>
-            <label htmlFor="goodsStatus" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="goodsStatus" className={labelClass}>
               Goods Status
             </label>
             <select
               id="goodsStatus"
               value={formData.goodsStatus}
               onChange={(e) => setFormData({...formData, goodsStatus: e.target.value})}
-              className="w-full rounded-lg border-gray-300 shadow-sm transition-colors
-                focus:border-blue-500 focus:ring-blue-500 focus:ring-2 focus:ring-offset-2"
+              className={inputClass}
               required
             >
               <option value="">Select status...</option>
@@ -180,9 +177,9 @@ const NewConsignmentModal: React.FC<NewConsignmentModalProps> = ({ isOpen, onClo
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 
-                rounded-lg hover:bg-gray-200 transition-colors focus:outline-none 
-                focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+              className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700
+                rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors focus:outline-none
+                focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
             >
               Cancel
             </button>
@@ -190,7 +187,7 @@ const NewConsignmentModal: React.FC<NewConsignmentModalProps> = ({ isOpen, onClo
               type="submit"
               className="px-4 py-2.5 text-sm font-medium text-white bg-teal-600
                 rounded-lg hover:bg-teal-700 transition-colors focus:outline-none
-                focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+                focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
             >
               Create Consignment
             </button>

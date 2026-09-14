@@ -9,6 +9,7 @@ import { FaChartBar, FaFileExport, FaPlus, FaQrcode } from 'react-icons/fa';
 import NewConsignmentModal from '../NewConsignmentModal';
 import QrScannerModal from './QrScannerModal';
 import { Consignment, ConsignmentStatus, ExportSettings, NewConsignmentFormData, QrScannerData } from './types';
+import Card from '../ui/Card';
 
 declare module 'jspdf' {
   interface jsPDF {
@@ -237,7 +238,7 @@ const QuickActions: React.FC<{
         <button
           type="button"
           onClick={() => handleExportSettingsChange({ format: 'pdf' })}
-          className="flex items-center px-4 py-2 border border-teal-600 text-teal-600 bg-white rounded-xl hover:bg-teal-50 transition-colors"
+          className="flex items-center px-4 py-2 border border-teal-600 text-teal-600 dark:text-teal-400 bg-white dark:bg-gray-800 rounded-xl hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors"
         >
           Export Settings
         </button>
@@ -256,48 +257,48 @@ const QuickActions: React.FC<{
       />
 
       {scannedData && (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-          <h3 className="text-lg font-medium mb-4">Scanned Consignment Details</h3>
+        <Card className="mb-6">
+          <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-gray-100">Scanned Consignment Details</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <p className="text-sm font-medium text-gray-500">Trader Name</p>
-              <p className="mt-1">{scannedData.traderName}</p>
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Trader Name</p>
+              <p className="mt-1 text-gray-900 dark:text-gray-100">{scannedData.traderName}</p>
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-500">Trader Email</p>
-              <p className="mt-1">{scannedData.traderEmail}</p>
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Trader Email</p>
+              <p className="mt-1 text-gray-900 dark:text-gray-100">{scannedData.traderEmail}</p>
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-500">Document Type</p>
-              <p className="mt-1">{scannedData.documentType}</p>
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Document Type</p>
+              <p className="mt-1 text-gray-900 dark:text-gray-100">{scannedData.documentType}</p>
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-500">Status</p>
-              <p className="mt-1">{scannedData.goodsStatus}</p>
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Status</p>
+              <p className="mt-1 text-gray-900 dark:text-gray-100">{scannedData.goodsStatus}</p>
             </div>
             <div className="col-span-2">
-              <p className="text-sm font-medium text-gray-500">Goods Description</p>
-              <p className="mt-1">{scannedData.description}</p>
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Goods Description</p>
+              <p className="mt-1 text-gray-900 dark:text-gray-100">{scannedData.description}</p>
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-500">Estimated Value</p>
-              <p className="mt-1">{scannedData.estimatedValue}</p>
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Estimated Value</p>
+              <p className="mt-1 text-gray-900 dark:text-gray-100">{scannedData.estimatedValue}</p>
             </div>
           </div>
 
           {scannedData.documents && scannedData.documents.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-gray-100">
-              <p className="text-sm font-medium text-gray-500 mb-2">Submitted Documents</p>
+            <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Submitted Documents</p>
               <ul className="space-y-1">
                 {scannedData.documents.map((docItem, index) => (
-                  <li key={index} className="text-sm text-gray-700">
+                  <li key={index} className="text-sm text-gray-700 dark:text-gray-300">
                     • {docItem.type} — {docItem.fileName} ({docItem.sizeKb}KB)
                   </li>
                 ))}
               </ul>
             </div>
           )}
-        </div>
+        </Card>
       )}
     </>
   );

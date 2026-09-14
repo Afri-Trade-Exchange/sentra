@@ -15,7 +15,8 @@ const StatusFilterDropdown: React.FC<{
         name="status-filter"
         className="
           appearance-none w-full pl-4 pr-10 py-2.5
-          bg-white border border-gray-200
+          bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600
+          dark:text-gray-100
           rounded-lg shadow-sm text-sm
           focus:outline-none focus:ring-2
           focus:ring-teal-500 focus:border-teal-400
@@ -30,7 +31,7 @@ const StatusFilterDropdown: React.FC<{
         ))}
       </select>
       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3">
-        <FaChevronDown className="h-3 w-3 text-gray-500" />
+        <FaChevronDown className="h-3 w-3 text-gray-500 dark:text-gray-400" />
       </div>
     </div>
   );

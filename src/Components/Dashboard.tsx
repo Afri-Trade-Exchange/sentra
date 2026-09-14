@@ -1,36 +1,21 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FaUpload, FaDownload, FaBox } from 'react-icons/fa';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { AnimatePresence, motion } from 'framer-motion';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { db } from '../firebase/firebaseConfig';
 import UploadModal from './UploadModal';
 import InvoiceDetailModal from './InvoiceDetailModal';
 import { useAuth } from './AuthContext';
 import InvoiceViewButton from './Dashboard/InvoiceViewButton';
 import ContextualHelp from './Dashboard/ContextualHelp';
-import StatusBadge from './Dashboard/StatusBadge';
-import StatusNotification from './Dashboard/StatusNotification';
-import StatusTimeline from './Dashboard/StatusTimeline';
 import ConsignmentCreationModal from './Dashboard/ConsignmentCreationModal';
-import CreateRequestModal, { RequestFormData } from './Dashboard/CreateRequestModal';
 import Card from './ui/Card';
-import {
-  Activity,
-  ActivityStatus,
-  EnhancedInsights,
-  Invoice,
-  RiskAssessment,
-  StatusUpdate,
-} from '../types/dashboard';
-import {
-  calculateAverageProcessingTime,
-  calculateCustomerSatisfaction,
-  calculateProcessingEfficiency,
-  calculateRevenueGrowth,
-  calculateRiskLevel,
-  generateInvoice,
-} from './Dashboard/dashboardUtils';
+import { getStatusStyles, generateInvoice, calculateProcessingEfficiency, calculateValueGrowth, calculateRiskLevel } from './Dashboard/dashboardUtils';
+import { Activity, EnhancedInsights, Invoice } from '../types/dashboard';
+import { Consignment, ConsignmentStatus } from './CustomsDashboard/types';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 const EMPTY_INVOICE: Invoice = {
   id: '',
@@ -54,171 +39,132 @@ const EMPTY_INVOICE: Invoice = {
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const [activities, setActivities] = useState<Activity[]>([]);
+  const [consignments, setConsignments] = useState<Consignment[]>([]);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [showAllInvoices, setShowAllInvoices] = useState(false);
-  const [enhancedInsights, setEnhancedInsights] = useState<EnhancedInsights | null>(null);
-  const [riskAssessment, setRiskAssessment] = useState<RiskAssessment | null>(null);
+  const [showAllActivities, setShowAllActivities] = useState(false);
   const [isConsignmentModalOpen, setIsConsignmentModalOpen] = useState(false);
   const [activeConsignmentId, setActiveConsignmentId] = useState<string | null>(null);
-  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
-  const [statusHistory, setStatusHistory] = useState<StatusUpdate[]>([]);
-  const [statusUpdateNotification, setStatusUpdateNotification] = useState<string | null>(null);
-  const [showStatusHistory, setShowStatusHistory] = useState(false);
 
-  const calculateInsights = useCallback((activityList: Activity[]) => {
+  useEffect(() => {
+    if (!user?.email) return;
+
+    const consignmentsQuery = query(collection(db, 'consignments'), where('traderEmail', '==', user.email));
+    const unsubscribe = onSnapshot(
+      consignmentsQuery,
+      (snapshot) => {
+        setConsignments(
+          snapshot.docs.map((docSnap) => {
+            const data = docSnap.data();
+            return {
+              id: docSnap.id,
+              traderName: data.traderName ?? '',
+              traderEmail: data.traderEmail ?? '',
+              documentType: data.documentType ?? '',
+              status: (data.status as ConsignmentStatus) ?? ConsignmentStatus.Pending,
+              goodsStatus: data.goodsStatus ?? '',
+              description: data.description ?? '',
+              estimatedValue: data.estimatedValue ?? 0,
+              declarationNumber: data.declarationNumber ?? '',
+              goodsOrdered: data.goodsOrdered ?? [],
+              documents: data.documents ?? [],
+              createdAt: data.createdAt,
+            } as Consignment;
+          })
+        );
+      },
+      (error) => console.error('Failed to load consignments:', error)
+    );
+
+    return () => unsubscribe();
+  }, [user?.email]);
+
+  const sortedConsignments = useMemo(
+    () => [...consignments].sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis()),
+    [consignments]
+  );
+
+  const allActivities = useMemo<Activity[]>(
+    () =>
+      sortedConsignments.map((c) => ({
+        id: c.declarationNumber || c.id,
+        category: c.documentType,
+        date: c.createdAt.toDate().toISOString().split('T')[0],
+        status: c.status,
+        amount: c.estimatedValue,
+      })),
+    [sortedConsignments]
+  );
+
+  const visibleActivities = showAllActivities ? allActivities : allActivities.slice(0, 5);
+
+  const pendingCount = consignments.filter((c) => c.status === ConsignmentStatus.Pending).length;
+
+  const enhancedInsights: EnhancedInsights = useMemo(() => {
     const baseInsights = {
-      totalRevenue: activityList.reduce((sum, activity) => sum + activity.amount, 0),
-      pendingRequests: activityList.filter(a => a.status === 'Pending').length,
-      completedRequests: activityList.filter(a => a.status === 'Completed').length,
-      averageProcessingTime: calculateAverageProcessingTime(activityList)
+      totalDeclaredValue: consignments.reduce((sum, c) => sum + c.estimatedValue, 0),
+      pendingRequests: pendingCount,
+      completedRequests: consignments.filter((c) => c.status === ConsignmentStatus.Approved).length,
     };
-
-    const enhancedMetrics = {
-      ...baseInsights,
-      revenueGrowth: calculateRevenueGrowth(activityList),
-      processingEfficiency: calculateProcessingEfficiency(activityList),
-      customerSatisfaction: calculateCustomerSatisfaction(),
-    };
-
-    setEnhancedInsights(enhancedMetrics);
 
     return {
-      insightsData: enhancedMetrics,
-      riskLevel: calculateRiskLevel(enhancedMetrics),
+      ...baseInsights,
+      valueGrowth: calculateValueGrowth(
+        consignments.map((c) => ({ estimatedValue: c.estimatedValue, createdAt: c.createdAt.toDate() }))
+      ),
+      processingEfficiency: calculateProcessingEfficiency(consignments),
     };
-  }, []);
+  }, [consignments, pendingCount]);
 
-  useEffect(() => {
-    // Simulating fetching activities from an API
-    const initialActivities = [
-      { id: 'ORD-001', category: 'Order', date: '2023-05-01', status: 'Completed', amount: 5500 },
-      { id: 'ORD-002', category: 'Shipment', date: '2023-05-02', status: 'In Transit', amount: 750 },
-      { id: 'ORD-003', category: 'Payment', date: '2023-05-03', status: 'Pending', amount: 1000 },
-      { id: 'ORD-004', category: 'Order', date: '2023-05-04', status: 'Completed', amount: 500 },
-      { id: 'ORD-005', category: 'Shipment', date: '2023-05-05', status: 'In Transit', amount: 750 },
-      { id: 'ORD-006', category: 'Payment', date: '2023-05-06', status: 'Pending', amount: 1000 },
-      { id: 'ORD-007', category: 'Order', date: '2023-05-07', status: 'Completed', amount: 500 },
-      { id: 'ORD-008', category: 'Shipment', date: '2023-05-08', status: 'In Transit', amount: 750 },
-      { id: 'ORD-009', category: 'Payment', date: '2023-05-09', status: 'Pending', amount: 1000 },
-      { id: 'ORD-010', category: 'Order', date: '2023-05-10', status: 'Completed', amount: 500 },
-      { id: 'ORD-011', category: 'Shipment', date: '2023-05-11', status: 'In Transit', amount: 750 },
-      { id: 'ORD-012', category: 'Payment', date: '2023-05-12', status: 'Pending', amount: 1000 },
-      { id: 'ORD-013', category: 'Order', date: '2023-05-13', status: 'Completed', amount: 500 },
-      { id: 'ORD-014', category: 'Shipment', date: '2023-05-14', status: 'In Transit', amount: 750 },
-      { id: 'ORD-015', category: 'Payment', date: '2023-05-15', status: 'Pending', amount: 1300 },
-    ];
-    setActivities(initialActivities);
+  const riskAssessment = useMemo(() => calculateRiskLevel(enhancedInsights), [enhancedInsights]);
 
-    const { insightsData, riskLevel } = calculateInsights(initialActivities);
-    setEnhancedInsights(insightsData);
-    setRiskAssessment(riskLevel);
+  // Consignments received per month, for the last 6 months (including zero months).
+  const orderData = useMemo(() => {
+    const now = new Date();
+    const months = Array.from({ length: 6 }).map((_, i) => {
+      const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
+      return { key: `${d.getFullYear()}-${d.getMonth()}`, label: MONTH_LABELS[d.getMonth()] };
+    });
 
-    const generatedInvoices: Invoice[] = initialActivities.map(activity => generateInvoice(activity, user));
-    setInvoices(generatedInvoices);
-  }, [user, calculateInsights]);
+    return months.map(({ key, label }) => ({
+      month: label,
+      orders: consignments.filter((c) => {
+        const created = c.createdAt.toDate();
+        return `${created.getFullYear()}-${created.getMonth()}` === key;
+      }).length,
+    }));
+  }, [consignments]);
 
-  useEffect(() => {
-    const { insightsData, riskLevel } = calculateInsights(activities);
-    setEnhancedInsights(insightsData);
-    setRiskAssessment(riskLevel);
-  }, [activities, calculateInsights]);
+  // Breakdown of the trader's consignments by document type.
+  const categoryData = useMemo(() => {
+    const counts = consignments.reduce((acc, c) => {
+      const key = c.documentType || 'Other';
+      acc[key] = (acc[key] ?? 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
 
-  const orderData = [
-    { month: 'Jan', orders: 65 },
-    { month: 'Feb', orders: 85 },
-    { month: 'Mar', orders: 120 },
-    { month: 'Apr', orders: 90 },
-    { month: 'May', orders: 150 },
-    { month: 'Jun', orders: 110 },
-  ];
-
-  const categoryData = [
-    { name: 'Electronics', value: 400 },
-    { name: 'Clothing', value: 300 },
-    { name: 'Food', value: 200 },
-    { name: 'Others', value: 100 },
-  ];
+    return Object.entries(counts).map(([name, value]) => ({ name, value }));
+  }, [consignments]);
 
   const downloadActivitiesReport = () => {
-    const headers = ['Order ID,Category,Date,Status,Amount\n'];
-    const csvContent = activities.map(activity =>
-      `${activity.id},${activity.category},${activity.date},${activity.status},${activity.amount}`
-    ).join('\n');
+    const headers = ['Consignment,Category,Date,Status,Declared Value\n'];
+    const csvContent = allActivities
+      .map((activity) => `${activity.id},${activity.category},${activity.date},${activity.status},${activity.amount}`)
+      .join('\n');
 
     const blob = new Blob([headers + csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'activities-report.csv';
+    a.download = 'consignments-report.csv';
     a.click();
     window.URL.revokeObjectURL(url);
   };
 
-  const viewInvoiceDetails = (invoice: Invoice) => {
-    setSelectedInvoice(invoice);
+  const viewInvoiceDetails = (activity: Activity) => {
+    setSelectedInvoice(generateInvoice(activity, user));
     setIsInvoiceModalOpen(true);
-  };
-
-  const createNewRequest = (data: RequestFormData) => {
-    const newActivity: Activity = {
-      id: `ORD-${activities.length + 1}`,
-      category: data.category,
-      date: new Date().toISOString().split('T')[0],
-      status: 'Pending',
-      amount: data.amount
-    };
-
-    const newInvoice: Invoice = {
-      id: `INV-${newActivity.id}`,
-      invoiceNumber: `INV-${newActivity.id}`,
-      customerName: user?.displayName || 'Customer',
-      businessName: 'Afritrade',
-      activity: newActivity,
-      invoiceDate: newActivity.date,
-      dueDate: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString().split('T')[0],
-      totalAmount: newActivity.amount,
-      status: 'Pending',
-      items: [{
-        description: `${data.description}`,
-        quantity: 1,
-        unitPrice: newActivity.amount,
-        total: newActivity.amount
-      }],
-      taxRate: 0.16
-    };
-
-    setActivities(prev => [newActivity, ...prev]);
-    setInvoices(prev => [newInvoice, ...prev]);
-    setIsRequestModalOpen(false);
-  };
-
-  const updateActivityStatus = (
-    activityId: string,
-    newStatus: ActivityStatus
-  ) => {
-    const update: StatusUpdate = {
-      activityId,
-      status: newStatus,
-      updatedBy: user?.displayName || 'Unknown Officer',
-      timestamp: new Date()
-    };
-
-    setActivities(prevActivities =>
-      prevActivities.map(activity =>
-        activity.id === activityId
-          ? { ...activity, status: newStatus }
-          : activity
-      )
-    );
-
-    setStatusHistory(prev => [update, ...prev]);
-
-    setStatusUpdateNotification(`Status updated to ${newStatus} by ${update.updatedBy}`);
-    setTimeout(() => setStatusUpdateNotification(null), 3000);
   };
 
   return (
@@ -266,25 +212,21 @@ export default function Dashboard() {
             </section>
 
             <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {enhancedInsights && (
-                <>
-                  <Card padding="sm">
-                    <h3 className="text-lg font-medium">Revenue Growth</h3>
-                    <p className="text-2xl">{enhancedInsights.revenueGrowth}%</p>
-                  </Card>
-                  <Card padding="sm">
-                    <h3 className="text-lg font-medium">Processing Efficiency</h3>
-                    <p className="text-2xl">{enhancedInsights.processingEfficiency}%</p>
-                  </Card>
-                  <Card padding="sm">
-                    <h3 className="text-lg font-medium">Customer Satisfaction</h3>
-                    <p className="text-2xl">{enhancedInsights.customerSatisfaction}%</p>
-                  </Card>
-                </>
-              )}
+              <Card padding="sm">
+                <h3 className="text-lg font-medium">Total Declared Value</h3>
+                <p className="text-2xl">${enhancedInsights.totalDeclaredValue.toLocaleString()}</p>
+              </Card>
+              <Card padding="sm">
+                <h3 className="text-lg font-medium">Approval Rate</h3>
+                <p className="text-2xl">{enhancedInsights.processingEfficiency}%</p>
+              </Card>
+              <Card padding="sm">
+                <h3 className="text-lg font-medium">Value Growth (MoM)</h3>
+                <p className="text-2xl">{enhancedInsights.valueGrowth}%</p>
+              </Card>
             </section>
 
-            {riskAssessment && (
+            {consignments.length > 0 && (
               <Card padding="sm">
                 <h3 className="text-lg font-medium">Risk Assessment</h3>
                 <p className="text-2xl">{riskAssessment.level} Risk</p>
@@ -295,13 +237,13 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <Card padding="md">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-medium">Order Trends</h2>
-                  <span className="text-sm text-red-500">5 Pending</span>
+                  <h2 className="text-xl font-medium">Consignment Volume</h2>
+                  <span className="text-sm text-red-500">{pendingCount} Pending</span>
                 </div>
                 <ResponsiveContainer width="100%" height={250}>
                   <AreaChart data={orderData}>
                     <XAxis dataKey="month" axisLine={false} tickLine={false} />
-                    <YAxis axisLine={false} tickLine={false} />
+                    <YAxis axisLine={false} tickLine={false} allowDecimals={false} />
                     <Tooltip />
                     <Area
                       type="monotone"
@@ -315,28 +257,34 @@ export default function Dashboard() {
               </Card>
 
               <Card padding="md">
-                <h2 className="text-xl font-medium mb-4">Category Distribution</h2>
-                <ResponsiveContainer width="100%" height={250}>
-                  <PieChart>
-                    <Pie
-                      data={categoryData}
-                      innerRadius={60}
-                      outerRadius={90}
-                      fill="#8884d8"
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      {categoryData.map((_, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={COLORS[index % COLORS.length]}
-                          className="hover:opacity-80 transition-opacity"
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
+                <h2 className="text-xl font-medium mb-4">Document Type Breakdown</h2>
+                {categoryData.length === 0 ? (
+                  <div className="h-[250px] flex items-center justify-center text-sm text-gray-500">
+                    Your consignments will show up here once submitted.
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height={250}>
+                    <PieChart>
+                      <Pie
+                        data={categoryData}
+                        innerRadius={60}
+                        outerRadius={90}
+                        fill="#8884d8"
+                        paddingAngle={5}
+                        dataKey="value"
+                      >
+                        {categoryData.map((_, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={COLORS[index % COLORS.length]}
+                            className="hover:opacity-80 transition-opacity"
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                )}
               </Card>
             </div>
         </section>
@@ -345,40 +293,42 @@ export default function Dashboard() {
             <Card padding="md">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-medium flex items-center">
-                  Recent Activities
+                  Recent Consignments
                   <ContextualHelp
-                    content="This section shows your most recent business activities, including orders, shipments, and payments."
+                    content="This section shows the consignments you've submitted, most recent first."
                   />
                 </h2>
-                <button
-                  onClick={() => setShowAllInvoices(!showAllInvoices)}
-                  className="text-base text-teal-600 hover:text-teal-700 transition-colors"
-                >
-                  {showAllInvoices ? 'Show Recent' : 'View All'}
-                </button>
+                {allActivities.length > 5 && (
+                  <button
+                    onClick={() => setShowAllActivities(!showAllActivities)}
+                    className="text-base text-teal-600 hover:text-teal-700 transition-colors"
+                  >
+                    {showAllActivities ? 'Show Recent' : 'View All'}
+                  </button>
+                )}
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-base">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      {['Order ID', 'Category', 'Date', 'Status', 'Amount', 'Action'].map((header) => (
-                        <th
-                          key={header}
-                          className="px-4 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider"
-                        >
-                          {header}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {activities.map((activity) => {
-                      const correspondingInvoice = invoices.find(
-                        inv => inv.activity?.id === activity.id
-                      ) || generateInvoice(activity, user);
-
-                      return (
+              {visibleActivities.length === 0 ? (
+                <p className="text-sm text-gray-500 py-6 text-center">
+                  You haven't submitted any consignments yet.
+                </p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-base">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        {['Consignment', 'Type', 'Date', 'Status', 'Declared Value', 'Action'].map((header) => (
+                          <th
+                            key={header}
+                            className="px-4 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider"
+                          >
+                            {header}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {visibleActivities.map((activity) => (
                         <tr
                           key={activity.id}
                           className="hover:bg-gray-50 transition-colors border-b last:border-b-0"
@@ -387,24 +337,23 @@ export default function Dashboard() {
                           <td className="px-4 py-3 whitespace-nowrap text-base text-gray-500">{activity.category}</td>
                           <td className="px-4 py-3 whitespace-nowrap text-base text-gray-500">{activity.date}</td>
                           <td className="px-4 py-3 whitespace-nowrap text-base text-gray-500">
-                            <StatusBadge
-                              status={activity.status as ActivityStatus}
-                              onChange={(newStatus) => updateActivityStatus(activity.id, newStatus)}
-                            />
+                            <span className={`inline-block px-3 py-1 rounded-md border text-sm font-medium ${getStatusStyles(activity.status)}`}>
+                              {activity.status}
+                            </span>
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-base text-gray-500">${activity.amount}</td>
+                          <td className="px-4 py-3 whitespace-nowrap text-base text-gray-500">${activity.amount.toLocaleString()}</td>
                           <td className="px-4 py-3 whitespace-nowrap text-base text-gray-500 space-x-2">
                             <InvoiceViewButton
-                              onClick={() => viewInvoiceDetails(correspondingInvoice)}
+                              onClick={() => viewInvoiceDetails(activity)}
                               hasInvoice={true}
                             />
                           </td>
                         </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </Card>
         </section>
       </div>
@@ -431,36 +380,6 @@ export default function Dashboard() {
           setIsUploadModalOpen(true);
         }}
       />
-      <CreateRequestModal
-        isOpen={isRequestModalOpen}
-        onClose={() => setIsRequestModalOpen(false)}
-        onCreate={createNewRequest}
-      />
-
-      <AnimatePresence>
-        <StatusNotification message={statusUpdateNotification} />
-      </AnimatePresence>
-
-      <motion.div
-        initial={false}
-        animate={{ height: showStatusHistory ? 'auto' : 0 }}
-        className="fixed bottom-0 right-0 w-80 bg-white shadow-lg rounded-t-lg overflow-hidden"
-      >
-        <button
-          onClick={() => setShowStatusHistory(!showStatusHistory)}
-          className="w-full px-4 py-2 flex items-center justify-between bg-gray-100"
-        >
-          <span className="font-medium">Status History</span>
-          <motion.span
-            animate={{ rotate: showStatusHistory ? 180 : 0 }}
-          >
-            ↑
-          </motion.span>
-        </button>
-        <div className="p-4">
-          <StatusTimeline updates={statusHistory} />
-        </div>
-      </motion.div>
     </div>
   );
 }

@@ -1,10 +1,10 @@
 import {
   Activity,
-  ActivityStatus,
   EnhancedInsights,
   Invoice,
   RiskAssessment,
 } from '../../types/dashboard';
+import { ConsignmentStatus } from '../CustomsDashboard/types';
 import type { User } from 'firebase/auth';
 
 export const generateInvoice = (activity: Activity, user?: User | null): Invoice => ({
@@ -21,69 +21,59 @@ export const generateInvoice = (activity: Activity, user?: User | null): Invoice
   status: 'Pending',
   items: [
     {
-      description: `${activity.category} Service`,
+      description: `${activity.category} declaration`,
       quantity: 1,
       unitPrice: activity.amount,
       total: activity.amount,
     },
   ],
   taxRate: 0.16,
-  notes: `Invoice for ${activity.category} - ${activity.id}`,
+  notes: `Declared value summary for ${activity.category} - ${activity.id}`,
 });
 
-export const getStatusStyles = (status: ActivityStatus) => {
+export const getStatusStyles = (status: string) => {
   switch (status) {
-    case ActivityStatus.Completed:
+    case ConsignmentStatus.Approved:
       return 'bg-green-100 text-green-800 border-green-200';
-    case ActivityStatus.InTransit:
+    case ConsignmentStatus.Rejected:
+      return 'bg-red-100 text-red-800 border-red-200';
+    case ConsignmentStatus.Pending:
       return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-    case ActivityStatus.Pending:
-      return 'bg-gray-100 text-gray-800 border-gray-200';
     default:
       return 'bg-gray-100 text-gray-800 border-gray-200';
   }
 };
 
-export const getStatusColor = (status: ActivityStatus) => {
-  switch (status) {
-    case ActivityStatus.Completed:
-      return 'bg-green-500';
-    case ActivityStatus.InTransit:
-      return 'bg-yellow-500';
-    case ActivityStatus.Pending:
-      return 'bg-gray-500';
-    default:
-      return 'bg-gray-500';
-  }
+export const calculateProcessingEfficiency = (consignments: { status: ConsignmentStatus }[]): number => {
+  if (consignments.length === 0) return 0;
+  const approved = consignments.filter((c) => c.status === ConsignmentStatus.Approved).length;
+  return Number(((approved / consignments.length) * 100).toFixed(1));
 };
 
-export const calculateAverageProcessingTime = (activities: Activity[]): number => {
-  // Placeholder until real processing-time tracking exists.
-  return activities.length * 0.5;
-};
+export const calculateValueGrowth = (consignments: { estimatedValue: number; createdAt: Date }[]): number => {
+  const now = new Date();
+  const thisMonthKey = `${now.getFullYear()}-${now.getMonth()}`;
+  const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const lastMonthKey = `${lastMonthDate.getFullYear()}-${lastMonthDate.getMonth()}`;
 
-export const calculateRevenueGrowth = (activities: Activity[]): number => {
-  const currentRevenue = activities.reduce((sum, act) => sum + act.amount, 0);
-  const previousRevenue = currentRevenue * 0.9; // Placeholder calculation
-  return Number((((currentRevenue - previousRevenue) / previousRevenue) * 100).toFixed(1));
-};
+  const sumFor = (key: string) =>
+    consignments
+      .filter((c) => `${c.createdAt.getFullYear()}-${c.createdAt.getMonth()}` === key)
+      .reduce((sum, c) => sum + c.estimatedValue, 0);
 
-export const calculateProcessingEfficiency = (activities: Activity[]): number => {
-  const completedActivities = activities.filter((act) => act.status === ActivityStatus.Completed);
-  return Number(((completedActivities.length / activities.length) * 100).toFixed(1));
-};
+  const current = sumFor(thisMonthKey);
+  const previous = sumFor(lastMonthKey);
 
-export const calculateCustomerSatisfaction = (): number => {
-  // Placeholder implementation
-  return 85;
+  if (previous === 0) return current > 0 ? 100 : 0;
+  return Number((((current - previous) / previous) * 100).toFixed(1));
 };
 
 export const calculateRiskLevel = (insights: EnhancedInsights): RiskAssessment => {
-  const score = insights.processingEfficiency + insights.revenueGrowth * 0.5;
+  const score = insights.processingEfficiency + insights.valueGrowth * 0.5;
 
   return {
     level: score > 80 ? 'Low' : score > 50 ? 'Medium' : 'High',
-    description: 'Risk assessment based on processing efficiency and revenue growth',
+    description: 'Risk assessment based on approval rate and month-over-month declared value growth',
     impactScore: score,
   };
 };

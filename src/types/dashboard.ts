@@ -28,38 +28,19 @@ export interface Invoice {
   notes?: string;
 }
 
-export enum ActivityStatus {
-  Pending = 'Pending',
-  InTransit = 'In Transit',
-  Completed = 'Completed',
-}
-
-export function isValidStatus(status: string): status is ActivityStatus {
-  return Object.values(ActivityStatus).includes(status as ActivityStatus);
-}
-
 export interface DashboardInsights {
-  totalRevenue: number;
+  totalDeclaredValue: number;
   pendingRequests: number;
   completedRequests: number;
-  averageProcessingTime: number;
 }
 
 export interface EnhancedInsights extends DashboardInsights {
-  revenueGrowth: number;
+  valueGrowth: number;
   processingEfficiency: number;
-  customerSatisfaction: number;
 }
 
 export interface RiskAssessment {
   level: 'Low' | 'Medium' | 'High';
   description: string;
   impactScore: number;
-}
-
-export interface StatusUpdate {
-  activityId: string;
-  status: ActivityStatus;
-  updatedBy: string;
-  timestamp: Date;
 }

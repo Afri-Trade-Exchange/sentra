@@ -20,7 +20,7 @@ interface CardProps {
 // `className` to avoid Tailwind class-order conflicts.
 export default function Card({ children, className = '', padding = 'lg' }: CardProps) {
   return (
-    <div className={`bg-white rounded-2xl shadow-sm border border-gray-100 ${PADDING[padding]} ${className}`}>
+    <div className={`bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 ${PADDING[padding]} ${className}`}>
       {children}
     </div>
   );

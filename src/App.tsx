@@ -13,6 +13,7 @@ import ErrorBoundary from './Components/ErrorBoundary'
 import Dashboard from './Components/Dashboard'
 import CustomsDashboard from './Components/CustomsDashboard'
 import { AuthProvider } from './Components/AuthContext'
+import { ThemeProvider } from './Components/ThemeContext'
 import ProtectedRoute from './Components/ProtectedRoute'
 import LoginPage from './Components/LoginPage'
 import ForgotPassword from './Components/ForgotPassword'
@@ -75,16 +76,18 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <ErrorBoundary>
-        <Router>
-          <Suspense fallback={<div>Loading...</div>}>
-            <div className="App">
-              <AppRoutes />
-            </div>
-          </Suspense>
-        </Router>
-      </ErrorBoundary>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <ErrorBoundary>
+          <Router>
+            <Suspense fallback={<div>Loading...</div>}>
+              <div className="App">
+                <AppRoutes />
+              </div>
+            </Suspense>
+          </Router>
+        </ErrorBoundary>
+      </AuthProvider>
+    </ThemeProvider>
   )
 }

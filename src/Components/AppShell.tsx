@@ -80,10 +80,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen flex bg-stone-100">
-      <div className="md:hidden fixed top-0 inset-x-0 h-14 bg-white border-b border-gray-100 flex items-center justify-between px-4 z-40">
-        <img src={sentraLogo} alt="Sentra" className="h-6 w-auto cursor-pointer" onClick={() => navigate('/')} />
-        <button type="button" onClick={() => setMobileOpen(true)} aria-label="Open menu" className="p-2 -mr-2 text-gray-700">
+    <div className="min-h-screen flex bg-stone-100 dark:bg-gray-900">
+      <div className="md:hidden fixed top-0 inset-x-0 h-14 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between px-4 z-40">
+        <img src={sentraLogo} alt="Sentra" className="h-6 w-auto cursor-pointer dark:brightness-0 dark:invert" onClick={() => navigate('/')} />
+        <button type="button" onClick={() => setMobileOpen(true)} aria-label="Open menu" className="p-2 -mr-2 text-gray-700 dark:text-gray-300">
           <FaBars className="w-5 h-5" />
         </button>
       </div>
@@ -93,13 +93,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       )}
 
       <aside
-        className={`fixed md:sticky top-0 left-0 h-screen w-64 shrink-0 bg-white border-r border-gray-100 flex flex-col z-50 transition-transform duration-200 md:translate-x-0 ${
+        className={`fixed md:sticky top-0 left-0 h-screen w-64 shrink-0 bg-white dark:bg-gray-800 border-r border-gray-100 dark:border-gray-700 flex flex-col z-50 transition-transform duration-200 md:translate-x-0 ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="h-16 flex items-center justify-between px-5 border-b border-gray-100 shrink-0">
-          <img src={sentraLogo} alt="Sentra" className="h-6 w-auto cursor-pointer" onClick={() => navigate('/')} />
-          <button type="button" className="md:hidden text-gray-500" onClick={() => setMobileOpen(false)} aria-label="Close menu">
+        <div className="h-16 flex items-center justify-between px-5 border-b border-gray-100 dark:border-gray-700 shrink-0">
+          <img src={sentraLogo} alt="Sentra" className="h-6 w-auto cursor-pointer dark:brightness-0 dark:invert" onClick={() => navigate('/')} />
+          <button type="button" className="md:hidden text-gray-500 dark:text-gray-400" onClick={() => setMobileOpen(false)} aria-label="Close menu">
             <FaTimes className="w-5 h-5" />
           </button>
         </div>
@@ -113,48 +113,52 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 key={item.label}
                 onClick={() => handleNavClick(item)}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                  isActive ? 'bg-teal-50 text-teal-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  isActive
+                    ? 'bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100'
                 }`}
               >
-                <item.icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-teal-600' : 'text-gray-400'}`} />
+                <item.icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-teal-600 dark:text-teal-400' : 'text-gray-400 dark:text-gray-500'}`} />
                 {item.label}
               </button>
             );
           })}
         </nav>
 
-        <div className="shrink-0 border-t border-gray-100 p-3 space-y-1">
+        <div className="shrink-0 border-t border-gray-100 dark:border-gray-700 p-3 space-y-1">
           <button
             type="button"
             onClick={() => handleNavClick({ label: 'Settings', icon: FaCog, path: '/settings' })}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-              location.pathname === '/settings' ? 'bg-teal-50 text-teal-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              location.pathname === '/settings'
+                ? 'bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400'
+                : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100'
             }`}
           >
-            <FaCog className={`w-4 h-4 shrink-0 ${location.pathname === '/settings' ? 'text-teal-600' : 'text-gray-400'}`} />
+            <FaCog className={`w-4 h-4 shrink-0 ${location.pathname === '/settings' ? 'text-teal-600 dark:text-teal-400' : 'text-gray-400 dark:text-gray-500'}`} />
             Settings
           </button>
           <button
             type="button"
             onClick={handleSignOut}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
           >
             <FaSignOutAlt className="w-4 h-4 shrink-0" />
             Log Out
           </button>
         </div>
 
-        <div className="shrink-0 border-t border-gray-100 p-4 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-teal-100 flex items-center justify-center shrink-0">
-            <span className="text-sm font-medium text-teal-700">
+        <div className="shrink-0 border-t border-gray-100 dark:border-gray-700 p-4 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-teal-100 dark:bg-teal-900/40 flex items-center justify-center shrink-0">
+            <span className="text-sm font-medium text-teal-700 dark:text-teal-400">
               {(user?.displayName || user?.email || 'G').charAt(0).toUpperCase()}
             </span>
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-medium text-gray-900 truncate">
+            <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
               {user?.displayName || user?.email?.split('@')[0] || 'Guest'}
             </p>
-            <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
           </div>
         </div>
       </aside>

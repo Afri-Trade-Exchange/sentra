@@ -13,7 +13,9 @@ const InvoiceViewButton: React.FC<{
         text-sm
         font-medium
         text-teal-600
+        dark:text-teal-400
         hover:text-teal-700
+        dark:hover:text-teal-300
         transition-colors
         flex
         items-center

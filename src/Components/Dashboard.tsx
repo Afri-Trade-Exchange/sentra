@@ -10,6 +10,7 @@ import InvoiceViewButton from './Dashboard/InvoiceViewButton';
 import ContextualHelp from './Dashboard/ContextualHelp';
 import ConsignmentCreationModal from './Dashboard/ConsignmentCreationModal';
 import Card from './ui/Card';
+import { useTheme } from './ThemeContext';
 import { getStatusStyles, generateInvoice, calculateProcessingEfficiency, calculateValueGrowth, calculateRejectionRate, calculateRiskLevel } from './Dashboard/dashboardUtils';
 import { Activity, EnhancedInsights, Invoice } from '../types/dashboard';
 import { Consignment, ConsignmentStatus } from './CustomsDashboard/types';
@@ -39,6 +40,11 @@ const EMPTY_INVOICE: Invoice = {
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const { resolvedTheme } = useTheme();
+  const axisColor = resolvedTheme === 'dark' ? '#9ca3af' : '#6b7280';
+  const tooltipStyle = resolvedTheme === 'dark'
+    ? { backgroundColor: '#1f2937', border: '1px solid #374151', color: '#f3f4f6' }
+    : undefined;
   const [consignments, setConsignments] = useState<Consignment[]>([]);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
@@ -172,14 +178,14 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 pt-8 space-y-6">
         <div className="mb-8 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
               Welcome {user?.displayName || user?.email?.split('@')[0] || ''}
             </h1>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               {user?.email || 'Manage and track your customs declarations and documents'}
             </p>
           </div>
@@ -217,38 +223,38 @@ export default function Dashboard() {
 
             <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <Card padding="sm">
-                <h3 className="text-lg font-medium">Total Declared Value</h3>
-                <p className="text-2xl">${enhancedInsights.totalDeclaredValue.toLocaleString()}</p>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Total Declared Value</h3>
+                <p className="text-2xl text-gray-900 dark:text-gray-100">${enhancedInsights.totalDeclaredValue.toLocaleString()}</p>
               </Card>
               <Card padding="sm">
-                <h3 className="text-lg font-medium">Approval Rate</h3>
-                <p className="text-2xl">{enhancedInsights.processingEfficiency}%</p>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Approval Rate</h3>
+                <p className="text-2xl text-gray-900 dark:text-gray-100">{enhancedInsights.processingEfficiency}%</p>
               </Card>
               <Card padding="sm">
-                <h3 className="text-lg font-medium">Value Growth (MoM)</h3>
-                <p className="text-2xl">{enhancedInsights.valueGrowth}%</p>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Value Growth (MoM)</h3>
+                <p className="text-2xl text-gray-900 dark:text-gray-100">{enhancedInsights.valueGrowth}%</p>
               </Card>
             </section>
 
             {decidedCount > 0 && (
               <Card padding="sm">
-                <h3 className="text-lg font-medium">Risk Assessment</h3>
-                <p className="text-2xl">{riskAssessment.level} Risk</p>
-                <p className="text-sm text-gray-600">{riskAssessment.description}</p>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Risk Assessment</h3>
+                <p className="text-2xl text-gray-900 dark:text-gray-100">{riskAssessment.level} Risk</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{riskAssessment.description}</p>
               </Card>
             )}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <Card padding="md">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-medium">Consignment Volume</h2>
-                  <span className="text-sm text-red-500">{pendingCount} Pending</span>
+                  <h2 className="text-xl font-medium text-gray-900 dark:text-gray-100">Consignment Volume</h2>
+                  <span className="text-sm text-red-500 dark:text-red-400">{pendingCount} Pending</span>
                 </div>
                 <ResponsiveContainer width="100%" height={250}>
                   <AreaChart data={orderData}>
-                    <XAxis dataKey="month" axisLine={false} tickLine={false} />
-                    <YAxis axisLine={false} tickLine={false} allowDecimals={false} />
-                    <Tooltip />
+                    <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: axisColor }} />
+                    <YAxis axisLine={false} tickLine={false} allowDecimals={false} tick={{ fill: axisColor }} />
+                    <Tooltip contentStyle={tooltipStyle} />
                     <Area
                       type="monotone"
                       dataKey="orders"
@@ -261,9 +267,9 @@ export default function Dashboard() {
               </Card>
 
               <Card padding="md">
-                <h2 className="text-xl font-medium mb-4">Document Type Breakdown</h2>
+                <h2 className="text-xl font-medium mb-4 text-gray-900 dark:text-gray-100">Document Type Breakdown</h2>
                 {categoryData.length === 0 ? (
-                  <div className="h-[250px] flex items-center justify-center text-sm text-gray-500">
+                  <div className="h-[250px] flex items-center justify-center text-sm text-gray-500 dark:text-gray-400">
                     Your consignments will show up here once submitted.
                   </div>
                 ) : (
@@ -285,7 +291,7 @@ export default function Dashboard() {
                           />
                         ))}
                       </Pie>
-                      <Tooltip />
+                      <Tooltip contentStyle={tooltipStyle} />
                     </PieChart>
                   </ResponsiveContainer>
                 )}
@@ -296,7 +302,7 @@ export default function Dashboard() {
         <section id="activity" className="scroll-mt-20 space-y-6">
             <Card padding="md">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-medium flex items-center">
+                <h2 className="text-xl font-medium flex items-center text-gray-900 dark:text-gray-100">
                   Recent Consignments
                   <ContextualHelp
                     content="This section shows the consignments you've submitted, most recent first."
@@ -305,7 +311,7 @@ export default function Dashboard() {
                 {allActivities.length > 5 && (
                   <button
                     onClick={() => setShowAllActivities(!showAllActivities)}
-                    className="text-base text-teal-600 hover:text-teal-700 transition-colors"
+                    className="text-base text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition-colors"
                   >
                     {showAllActivities ? 'Show Recent' : 'View All'}
                   </button>
@@ -313,18 +319,18 @@ export default function Dashboard() {
               </div>
 
               {visibleActivities.length === 0 ? (
-                <p className="text-sm text-gray-500 py-6 text-center">
+                <p className="text-sm text-gray-500 dark:text-gray-400 py-6 text-center">
                   You haven't submitted any consignments yet.
                 </p>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-base">
-                    <thead className="bg-gray-50">
+                    <thead className="bg-gray-50 dark:bg-gray-700/50">
                       <tr>
                         {['Consignment', 'Type', 'Date', 'Status', 'Declared Value', 'Action'].map((header) => (
                           <th
                             key={header}
-                            className="px-4 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider"
+                            className="px-4 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                           >
                             {header}
                           </th>
@@ -335,17 +341,17 @@ export default function Dashboard() {
                       {visibleActivities.map((activity) => (
                         <tr
                           key={activity.id}
-                          className="hover:bg-gray-50 transition-colors border-b last:border-b-0"
+                          className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors border-b border-gray-100 dark:border-gray-700 last:border-b-0"
                         >
-                          <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{activity.id}</td>
-                          <td className="px-4 py-3 whitespace-nowrap text-base text-gray-500">{activity.category}</td>
-                          <td className="px-4 py-3 whitespace-nowrap text-base text-gray-500">{activity.date}</td>
+                          <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">{activity.id}</td>
+                          <td className="px-4 py-3 whitespace-nowrap text-base text-gray-500 dark:text-gray-400">{activity.category}</td>
+                          <td className="px-4 py-3 whitespace-nowrap text-base text-gray-500 dark:text-gray-400">{activity.date}</td>
                           <td className="px-4 py-3 whitespace-nowrap text-base text-gray-500">
                             <span className={`inline-block px-3 py-1 rounded-md border text-sm font-medium ${getStatusStyles(activity.status)}`}>
                               {activity.status}
                             </span>
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-base text-gray-500">${activity.amount.toLocaleString()}</td>
+                          <td className="px-4 py-3 whitespace-nowrap text-base text-gray-500 dark:text-gray-400">${activity.amount.toLocaleString()}</td>
                           <td className="px-4 py-3 whitespace-nowrap text-base text-gray-500 space-x-2">
                             <InvoiceViewButton
                               onClick={() => viewInvoiceDetails(activity)}

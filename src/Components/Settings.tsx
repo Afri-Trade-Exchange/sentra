@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import { useAuth } from './AuthContext';
 import { updateUserName } from '../firebase/authService';
+import { useTheme } from './ThemeContext';
 
 interface UserSettings {
   name: string;
@@ -10,11 +11,11 @@ interface UserSettings {
     push: boolean;
     marketing: boolean;
   };
-  theme: 'light' | 'dark' | 'system';
 }
 
 const Settings: React.FC = () => {
   const { user } = useAuth();
+  const { theme, setTheme } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
   const [settings, setSettings] = useState<UserSettings>({
     name: '',
@@ -23,7 +24,6 @@ const Settings: React.FC = () => {
       push: true,
       marketing: false,
     },
-    theme: 'system',
   });
 
   useEffect(() => {
@@ -51,13 +51,6 @@ const Settings: React.FC = () => {
     }
   };
 
-  const handleThemeChange = (theme: UserSettings['theme']) => {
-    setSettings(prev => ({
-      ...prev,
-      theme,
-    }));
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -65,8 +58,9 @@ const Settings: React.FC = () => {
     setIsLoading(true);
     try {
       await updateUserName(user, settings.name);
-      // Notification and theme preferences aren't persisted anywhere yet —
-      // there's no backend field for them, so only the name change is real for now.
+      // Notification preferences aren't persisted anywhere yet - there's no
+      // backend field for them. Theme is applied and persisted immediately
+      // when picked below, independent of this form.
       toast.success('Settings updated successfully');
     } catch (error) {
       toast.error('Failed to update settings');
@@ -79,17 +73,17 @@ const Settings: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-sm text-gray-600">Manage your account preferences</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Settings</h1>
+        <p className="text-sm text-gray-600 dark:text-gray-400">Manage your account preferences</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Profile Section */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Profile</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Profile</h2>
           <div className="space-y-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Name
               </label>
               <input
@@ -98,11 +92,11 @@ const Settings: React.FC = () => {
                 name="name"
                 value={settings.name}
                 onChange={handleInputChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Email
               </label>
               <input
@@ -110,24 +104,24 @@ const Settings: React.FC = () => {
                 id="email"
                 value={user?.email || ''}
                 disabled
-                className="mt-1 block w-full rounded-md border-gray-300 bg-gray-50 text-gray-500 shadow-sm cursor-not-allowed"
+                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 shadow-sm cursor-not-allowed"
               />
-              <p className="mt-1 text-xs text-gray-500">Your email can't be changed here yet.</p>
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Your email can't be changed here yet.</p>
             </div>
           </div>
         </div>
 
         {/* Notifications Section */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Notifications</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Notifications</h2>
           <div className="space-y-4">
             {Object.entries(settings.notifications).map(([key, value]) => (
               <div key={key} className="flex items-center justify-between">
                 <div>
-                  <label htmlFor={`notification-${key}`} className="font-medium text-gray-700 capitalize">
+                  <label htmlFor={`notification-${key}`} className="font-medium text-gray-700 dark:text-gray-300 capitalize">
                     {key} Notifications
                   </label>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
                     Receive {key} notifications about your account activity
                   </p>
                 </div>
@@ -140,7 +134,7 @@ const Settings: React.FC = () => {
                     onChange={handleInputChange}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-teal-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-600"></div>
+                  <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-teal-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-600"></div>
                 </label>
               </div>
             ))}
@@ -148,21 +142,21 @@ const Settings: React.FC = () => {
         </div>
 
         {/* Theme Section */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Theme</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Theme</h2>
           <div className="grid grid-cols-3 gap-4">
-            {(['light', 'dark', 'system'] as const).map((theme) => (
+            {(['light', 'dark', 'system'] as const).map((option) => (
               <button
-                key={theme}
+                key={option}
                 type="button"
-                onClick={() => handleThemeChange(theme)}
-                className={`p-4 rounded-lg border-2 ${
-                  settings.theme === theme
-                    ? 'border-teal-500 bg-teal-50'
-                    : 'border-gray-200 hover:border-gray-300'
+                onClick={() => setTheme(option)}
+                className={`p-4 rounded-lg border-2 transition-colors ${
+                  theme === option
+                    ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/30'
+                    : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
                 }`}
               >
-                <span className="block text-sm font-medium capitalize">{theme}</span>
+                <span className="block text-sm font-medium capitalize text-gray-900 dark:text-gray-100">{option}</span>
               </button>
             ))}
           </div>

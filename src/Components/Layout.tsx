@@ -36,7 +36,7 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <div className="flex flex-col min-h-screen">
       <header className="fixed top-4 inset-x-4 sm:inset-x-6 lg:inset-x-10 z-50">
-        <nav className={`mx-auto max-w-6xl flex items-center justify-between gap-4 rounded-full px-5 sm:px-6 py-2.5 transition-colors duration-300 ${
+        <nav className={`relative z-50 mx-auto max-w-6xl grid grid-cols-[1fr_auto_1fr] items-center gap-4 rounded-full px-5 sm:px-6 py-2.5 transition-colors duration-300 ${
           overHero
             ? 'bg-transparent backdrop-blur-[2px]'
             : 'border border-white/40 bg-white/55 backdrop-blur-lg shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.08)]'
@@ -44,47 +44,51 @@ export default function Layout({ children }: LayoutProps) {
           <img
             src={sentraLogo}
             alt="Sentra"
-            className={`h-6 sm:h-7 w-auto cursor-pointer transition-all ${overHero ? 'brightness-0 invert' : ''}`}
+            className={`col-start-1 justify-self-start h-6 sm:h-7 w-auto cursor-pointer transition-all ${overHero ? 'brightness-0 invert' : ''}`}
             onClick={() => navigate('/')}
           />
 
-          {/* Hamburger Menu */}
-          <button
-            type="button"
-            className={`md:hidden relative -mr-1 w-9 h-9 rounded-full flex items-center justify-center transition-colors ${overHero ? 'text-white hover:bg-white/10' : 'text-gray-900 hover:bg-gray-100'}`}
-            onClick={() => setIsOpen(!isOpen)}
-            aria-label="Toggle menu"
-            aria-expanded={isOpen}
-          >
-            <motion.span
-              className="absolute w-4 h-0.5 rounded-full bg-current"
-              animate={{ rotate: isOpen ? 45 : 0, y: isOpen ? 0 : -3 }}
-              transition={{ duration: 0.2, ease: 'easeInOut' }}
-            />
-            <motion.span
-              className="absolute w-4 h-0.5 rounded-full bg-current"
-              animate={{ rotate: isOpen ? -45 : 0, y: isOpen ? 0 : 3 }}
-              transition={{ duration: 0.2, ease: 'easeInOut' }}
-            />
-          </button>
-
-          {/* Desktop Navigation */}
-          <div className={`hidden md:flex items-center gap-7 text-sm transition-colors duration-300 ${overHero ? 'text-white' : 'text-gray-600'}`}>
-            <a href="/trader-signup" className={`font-medium transition-colors ${overHero ? 'hover:text-teal-200' : 'hover:text-teal-600'}`}>I'm a Trader</a>
-            <button type="button" onClick={() => navigate('/customs-login')} className={`font-medium transition-colors ${overHero ? 'hover:text-teal-200' : 'hover:text-teal-600'}`}>
-              I'm a Customs Officer
+          {/* Desktop Navigation — centered between logo and actions */}
+          <div className={`col-start-2 hidden md:flex items-center justify-center gap-5 lg:gap-6 text-sm transition-colors duration-300 ${overHero ? 'text-white' : 'text-gray-600'}`}>
+            <a href="/trader-signup" className={`font-medium whitespace-nowrap transition-colors ${overHero ? 'hover:text-teal-200' : 'hover:text-teal-600'}`}>Trader</a>
+            <button type="button" onClick={() => navigate('/customs-login')} className={`font-medium whitespace-nowrap transition-colors ${overHero ? 'hover:text-teal-200' : 'hover:text-teal-600'}`}>
+              Customs
             </button>
-            <a href="/contact" className={`font-medium transition-colors ${overHero ? 'hover:text-teal-200' : 'hover:text-teal-600'}`}>Company</a>
-            <a href="/contact" className={`font-medium transition-colors ${overHero ? 'hover:text-teal-200' : 'hover:text-teal-600'}`}>Tracking</a>
+            <a href="/pricing" className={`font-medium whitespace-nowrap transition-colors ${overHero ? 'hover:text-teal-200' : 'hover:text-teal-600'}`}>Pricing</a>
+            <a href="/blog" className={`font-medium whitespace-nowrap transition-colors ${overHero ? 'hover:text-teal-200' : 'hover:text-teal-600'}`}>Blog</a>
+            <a href="/about" className={`font-medium whitespace-nowrap transition-colors ${overHero ? 'hover:text-teal-200' : 'hover:text-teal-600'}`}>Company</a>
+            <a href="/contact" className={`font-medium whitespace-nowrap transition-colors ${overHero ? 'hover:text-teal-200' : 'hover:text-teal-600'}`}>Tracking</a>
           </div>
 
-          <div className="hidden md:flex items-center gap-2">
-            <button type="button" onClick={() => navigate('/login')} className={`px-4 py-2 text-sm font-medium transition-colors ${overHero ? 'text-white hover:text-teal-200' : 'text-gray-600 hover:text-teal-600'}`}>
-              Sign in
+          {/* Right side: hamburger on mobile, sign-in/demo on desktop — same grid cell */}
+          <div className="col-start-3 justify-self-end flex items-center">
+            <button
+              type="button"
+              className={`md:hidden relative -mr-1 w-9 h-9 rounded-full flex items-center justify-center transition-colors ${overHero ? 'text-white hover:bg-white/10' : 'text-gray-900 hover:bg-gray-100'}`}
+              onClick={() => setIsOpen(!isOpen)}
+              aria-label="Toggle menu"
+              aria-expanded={isOpen}
+            >
+              <motion.span
+                className="absolute w-4 h-0.5 rounded-full bg-current"
+                animate={{ rotate: isOpen ? 45 : 0, y: isOpen ? 0 : -3 }}
+                transition={{ duration: 0.2, ease: 'easeInOut' }}
+              />
+              <motion.span
+                className="absolute w-4 h-0.5 rounded-full bg-current"
+                animate={{ rotate: isOpen ? -45 : 0, y: isOpen ? 0 : 3 }}
+                transition={{ duration: 0.2, ease: 'easeInOut' }}
+              />
             </button>
-            <button type="button" onClick={() => navigate('/contact')} className="px-5 py-2 text-sm text-white bg-teal-600 hover:bg-teal-700 rounded-full font-medium transition-colors">
-              Book a Demo
-            </button>
+
+            <div className="hidden md:flex items-center gap-2">
+              <button type="button" onClick={() => navigate('/login')} className={`px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors ${overHero ? 'text-white hover:text-teal-200' : 'text-gray-600 hover:text-teal-600'}`}>
+                Sign in
+              </button>
+              <button type="button" onClick={() => navigate('/contact')} className="px-5 py-2 text-sm text-white bg-teal-600 hover:bg-teal-700 rounded-full font-medium whitespace-nowrap transition-colors">
+                Book a Demo
+              </button>
+            </div>
           </div>
         </nav>
 
@@ -117,7 +121,13 @@ export default function Layout({ children }: LayoutProps) {
                     <a href="/customs-login" className="block py-2.5 px-3 hover:bg-teal-50 rounded-xl transition-colors" onClick={() => setIsOpen(false)}>
                       <span className="text-gray-700 hover:text-teal-600">I'm a Customs Officer</span>
                     </a>
-                    <a href="/contact" className="block py-2.5 px-3 hover:bg-teal-50 rounded-xl transition-colors" onClick={() => setIsOpen(false)}>
+                    <a href="/pricing" className="block py-2.5 px-3 hover:bg-teal-50 rounded-xl transition-colors" onClick={() => setIsOpen(false)}>
+                      <span className="text-gray-700 hover:text-teal-600">Pricing</span>
+                    </a>
+                    <a href="/blog" className="block py-2.5 px-3 hover:bg-teal-50 rounded-xl transition-colors" onClick={() => setIsOpen(false)}>
+                      <span className="text-gray-700 hover:text-teal-600">Blog</span>
+                    </a>
+                    <a href="/about" className="block py-2.5 px-3 hover:bg-teal-50 rounded-xl transition-colors" onClick={() => setIsOpen(false)}>
                       <span className="text-gray-700 hover:text-teal-600">Company</span>
                     </a>
                     <a href="/contact" className="block py-2.5 px-3 hover:bg-teal-50 rounded-xl transition-colors" onClick={() => setIsOpen(false)}>

@@ -96,38 +96,52 @@ export default function LandingPage() {
       </div>
 
       {/* Hero — full-bleed, extends up behind the floating header */}
-      <div className="relative w-full -mt-24 min-h-[600px] sm:min-h-[660px] flex items-center">
+      <div className="relative w-full -mt-24 min-h-[640px] sm:min-h-[700px] flex items-center bg-[#07211d]">
         <img
           src={heroImg}
           alt="Aerial view of stacked shipping containers at a busy port"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover opacity-[0.14] mix-blend-luminosity"
         />
-        <div className="absolute inset-0 bg-black/50" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#07211d] via-[#07211d]/95 to-[#07211d]" />
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              'radial-gradient(at 80% 20%, rgba(45,212,191,0.28), transparent 55%), radial-gradient(at 10% 75%, rgba(94,234,212,0.14), transparent 50%)',
+          }}
+        />
         <div className="relative z-10 max-w-6xl mx-auto px-4 pt-24 w-full">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-light mb-6 leading-tight text-white">
-              Clear Customs <span className="font-semibold text-teal-300">40% Faster</span><br />
-              and Keep Your Business Moving.
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-teal-200 text-xs font-semibold tracking-wide uppercase mb-7 font-['Manrope']">
+              <span className="w-1.5 h-1.5 rounded-full bg-teal-300" />
+              Cross-border trade platform
+            </span>
+            <h1 className="font-['Manrope'] text-4xl sm:text-5xl md:text-6xl font-semibold mb-6 leading-[1.1] text-white">
+              Clear customs 40% faster.<br />
+              <span className="font-['Instrument_Serif'] italic font-normal text-teal-300">and keep your business moving.</span>
             </h1>
-            <p className="text-base sm:text-lg text-gray-200 mb-8 px-2 sm:px-0">
+            <p className="text-base sm:text-lg text-gray-300 mb-8 px-2 sm:px-0 max-w-2xl mx-auto">
               One platform for traders and customs officers across Africa — upload your documents, get a QR code, and clear the border without the paperwork chase.
             </p>
-            <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4 px-4 sm:px-0">
+            <div className="flex flex-col sm:flex-row flex-wrap justify-center items-center gap-4 sm:gap-6 px-4 sm:px-0">
               <button
                 type="button"
                 onClick={() => navigate('/trader-signup')}
-                className="px-6 sm:px-8 md:px-12 py-3 text-white bg-white/10 border border-white/40 backdrop-blur-sm rounded-xl hover:bg-white/20 transition-colors font-medium"
-              >
-                How others use it
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate('/trader-signup')}
-                className="px-6 sm:px-8 md:px-12 py-3 text-white bg-teal-600 rounded-xl hover:bg-teal-700 transition-colors font-medium"
+                className="px-8 py-3 text-[#07211d] bg-teal-300 rounded-lg hover:bg-teal-200 transition-colors font-['Manrope'] font-semibold"
               >
                 Try for free
               </button>
+              <button
+                type="button"
+                onClick={() => navigate('/trader-signup')}
+                className="inline-flex items-center gap-2 text-white hover:text-teal-200 transition-colors font-medium"
+              >
+                How others use it <FaArrowRight className="text-sm" />
+              </button>
             </div>
+            <p className="mt-10 text-xs text-gray-500 tracking-wide">
+              Document verification · QR-based clearance · Built for African trade corridors
+            </p>
           </div>
         </div>
       </div>
@@ -151,9 +165,9 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.6 }}
               transition={{ duration: 0.5, ease: 'easeOut', delay: 0.1 }}
-              className="text-2xl sm:text-3xl font-medium mb-2"
+              className="font-['Manrope'] text-2xl sm:text-3xl font-semibold mb-2"
             >
-              From upload to cleared, in one flow
+              From upload to <span className="font-['Instrument_Serif'] italic font-normal text-teal-600">cleared</span>, in one flow
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 16 }}
@@ -183,7 +197,7 @@ export default function LandingPage() {
             transition={{ duration: 0.5, ease: 'easeOut' }}
             className="text-center mb-10"
           >
-            <h3 className="text-xl sm:text-2xl font-medium mb-2">Wherever you're joining us from, you're in the right place</h3>
+            <h3 className="font-['Manrope'] text-xl sm:text-2xl font-semibold mb-2">Wherever you're joining us from, you're in the right place</h3>
             <p className="text-gray-600 text-base sm:text-lg">Pick the side you're on and we'll get you set up.</p>
           </motion.div>
 
@@ -193,12 +207,12 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.5 }}
               transition={{ duration: 0.5, ease: 'easeOut' }}
-              className="bg-stone-50 p-6 sm:p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex flex-col items-center text-center"
+              className="p-6 sm:p-8 border-b-2 border-transparent hover:border-teal-500 transition-colors flex flex-col items-center text-center"
             >
-              <div className="w-12 h-12 rounded-full bg-teal-50 flex items-center justify-center mb-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-100 to-teal-50 flex items-center justify-center mb-5">
                 <FaBriefcase className="text-teal-600 text-lg" />
               </div>
-              <h3 className="text-lg font-medium mb-2">I'm a Trader</h3>
+              <h3 className="font-['Manrope'] font-semibold text-lg mb-2">I'm a Trader</h3>
               <p className="text-gray-600 mb-5">Upload your documents once, get a QR code, and clear customs without the paperwork chase.</p>
               <button
                 type="button"
@@ -213,12 +227,12 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.5 }}
               transition={{ duration: 0.5, ease: 'easeOut', delay: 0.1 }}
-              className="bg-stone-50 p-6 sm:p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex flex-col items-center text-center"
+              className="p-6 sm:p-8 border-b-2 border-transparent hover:border-teal-500 transition-colors flex flex-col items-center text-center"
             >
-              <div className="w-12 h-12 rounded-full bg-teal-50 flex items-center justify-center mb-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-100 to-teal-50 flex items-center justify-center mb-5">
                 <FaUserShield className="text-teal-600 text-lg" />
               </div>
-              <h3 className="text-lg font-medium mb-2">I'm a Customs Officer</h3>
+              <h3 className="font-['Manrope'] font-semibold text-lg mb-2">I'm a Customs Officer</h3>
               <p className="text-gray-600 mb-5">Scan a trader's QR code at the border to instantly verify their documents and clear the consignment.</p>
               <button
                 type="button"
@@ -238,7 +252,7 @@ export default function LandingPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.6 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="text-center text-2xl sm:text-3xl font-medium mb-12"
+            className="font-['Manrope'] text-center text-2xl sm:text-3xl font-semibold mb-12"
           >
             How it works
           </motion.h2>
@@ -285,10 +299,15 @@ export default function LandingPage() {
               transition={{ duration: 0.5, ease: 'easeOut' }}
               className="lg:col-span-5 text-center lg:text-left"
             >
-              <span className="inline-block text-teal-600 text-xs font-semibold uppercase tracking-wide mb-3">
-                Why Sentra
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-medium mb-4">Why traders choose Sentra</h2>
+              <div className="flex items-center justify-center lg:justify-start gap-3 mb-4">
+                <span className="text-teal-600 text-xs font-semibold uppercase tracking-wide whitespace-nowrap">
+                  Why Sentra
+                </span>
+                <span className="hidden sm:block h-px flex-1 bg-gradient-to-r from-teal-200 to-transparent" aria-hidden="true" />
+              </div>
+              <h2 className="font-['Manrope'] text-2xl sm:text-3xl font-semibold mb-4">
+                Why traders choose <span className="font-['Instrument_Serif'] italic font-normal text-teal-600">Sentra</span>
+              </h2>
               <p className="text-gray-600 mb-8">
                 Built with traders and customs officers on both sides of the border, so every document, status update, and QR scan stays in sync — no more chasing paperwork by phone or email.
               </p>
@@ -318,11 +337,11 @@ export default function LandingPage() {
                   transition={{ duration: 0.5, ease: 'easeOut', delay: index * 0.1 }}
                   className="group flex items-start gap-4 p-5 rounded-2xl border border-transparent hover:border-teal-100 hover:bg-teal-50/40 transition-colors"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-teal-50 group-hover:bg-teal-600 flex items-center justify-center shrink-0 transition-colors">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-100 to-teal-50 group-hover:from-teal-600 group-hover:to-teal-600 flex items-center justify-center shrink-0 transition-colors">
                     <feature.icon className="text-teal-600 group-hover:text-white text-lg transition-colors" />
                   </div>
                   <div>
-                    <h3 className="font-medium mb-1">{feature.title}</h3>
+                    <h3 className="font-['Manrope'] font-semibold mb-1">{feature.title}</h3>
                     <p className="text-gray-600 text-sm">{feature.body}</p>
                   </div>
                 </motion.div>
@@ -342,7 +361,7 @@ export default function LandingPage() {
           <div className="w-12 h-12 rounded-full bg-teal-50 flex items-center justify-center mx-auto mb-4">
             <FaQrcode className="text-teal-600 text-lg" />
           </div>
-          <h2 className="text-xl font-medium mb-1">Already shipping with us?</h2>
+          <h2 className="font-['Manrope'] text-xl font-semibold mb-1">Already shipping with us?</h2>
           <p className="text-gray-600 mb-8 text-sm">Track your order below.</p>
           <div className="flex flex-col gap-4">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-3 border-b-2 border-gray-300 focus-within:border-teal-600 transition-colors pb-2">

@@ -1,8 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
-import { FaUpload, FaDownload, FaBox, FaSignOutAlt, FaCog } from 'react-icons/fa';
+import { FaUpload, FaDownload, FaBox } from 'react-icons/fa';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useLocation, useNavigate } from 'react-router-dom';
 import UploadModal from './UploadModal';
 import InvoiceDetailModal from './InvoiceDetailModal';
 import { useAuth } from './AuthContext';
@@ -13,6 +12,7 @@ import StatusNotification from './Dashboard/StatusNotification';
 import StatusTimeline from './Dashboard/StatusTimeline';
 import ConsignmentCreationModal from './Dashboard/ConsignmentCreationModal';
 import CreateRequestModal, { RequestFormData } from './Dashboard/CreateRequestModal';
+import Card from './ui/Card';
 import {
   Activity,
   ActivityStatus,
@@ -53,9 +53,7 @@ const EMPTY_INVOICE: Invoice = {
 };
 
 export default function Dashboard() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
@@ -128,16 +126,6 @@ export default function Dashboard() {
     setEnhancedInsights(insightsData);
     setRiskAssessment(riskLevel);
   }, [activities, calculateInsights]);
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
-  };
-
-  const navItems = [
-    { label: 'Settings', icon: FaCog, path: '/settings' },
-    { label: 'Log Out', icon: FaSignOutAlt, action: handleSignOut },
-  ];
 
   const orderData = [
     { month: 'Jan', orders: 65 },
@@ -247,77 +235,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-          {/* Sidebar */}
-          <aside className="lg:col-span-2 bg-white/80 backdrop-blur-md rounded-2xl shadow-sm overflow-hidden">
-            <div className="p-4 border-b border-gray-100">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center">
-                  <span className="text-xl font-medium text-teal-600">
-                    {(user?.displayName || user?.email || 'G').charAt(0).toUpperCase()}
-                  </span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h2 className="text-sm font-semibold text-gray-900 truncate">
-                    {user?.displayName || user?.email?.split('@')[0] || 'Guest'}
-                  </h2>
-                  <p className="text-xs text-gray-500 truncate">
-                    {user?.email || 'guest@example.com'}
-                  </p>
-                </div>
-                <button
-                  onClick={handleSignOut}
-                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
-                  title="Sign Out"
-                >
-                  <FaSignOutAlt className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            <div className="p-4">
-              <div className="mb-6">
-                <h2 className="text-lg font-semibold text-gray-800">Dashboard</h2>
-                <p className="text-sm text-gray-500">Manage your account</p>
-              </div>
-
-              <nav className="space-y-1">
-                {navItems.map((item) => {
-                  const isActive = 'path' in item && location.pathname === item.path;
-                  return (
-                    <button
-                      key={item.label}
-                      onClick={item.action || (() => navigate(item.path))}
-                      className={`
-                        w-full flex items-center px-4 py-3 rounded-lg
-                        transition-all duration-200 ease-in-out
-                        ${isActive
-                          ? 'bg-teal-50 text-teal-600'
-                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                        }
-                        group
-                      `}
-                    >
-                      <item.icon className={`
-                        w-5 h-5 mr-3
-                        transition-colors
-                        ${isActive ? 'text-teal-600' : 'text-gray-400 group-hover:text-gray-600'}
-                      `} />
-                      <span className="font-medium">{item.label}</span>
-                      {item.path && (
-                        <span className="ml-auto transform group-hover:translate-x-1 transition-transform">
-                          →
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </nav>
-            </div>
-          </aside>
-
-          {/* Main Content */}
-          <main className="lg:col-span-10 space-y-6">
+        <section id="overview" className="scroll-mt-20 space-y-6">
             <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
                 {
@@ -350,32 +268,32 @@ export default function Dashboard() {
             <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {enhancedInsights && (
                 <>
-                  <div className="bg-white/80 backdrop-blur-md rounded-xl p-4">
+                  <Card padding="sm">
                     <h3 className="text-lg font-medium">Revenue Growth</h3>
                     <p className="text-2xl">{enhancedInsights.revenueGrowth}%</p>
-                  </div>
-                  <div className="bg-white/80 backdrop-blur-md rounded-xl p-4">
+                  </Card>
+                  <Card padding="sm">
                     <h3 className="text-lg font-medium">Processing Efficiency</h3>
                     <p className="text-2xl">{enhancedInsights.processingEfficiency}%</p>
-                  </div>
-                  <div className="bg-white/80 backdrop-blur-md rounded-xl p-4">
+                  </Card>
+                  <Card padding="sm">
                     <h3 className="text-lg font-medium">Customer Satisfaction</h3>
                     <p className="text-2xl">{enhancedInsights.customerSatisfaction}%</p>
-                  </div>
+                  </Card>
                 </>
               )}
             </section>
 
             {riskAssessment && (
-              <div className="bg-white/80 backdrop-blur-md rounded-xl p-4">
+              <Card padding="sm">
                 <h3 className="text-lg font-medium">Risk Assessment</h3>
                 <p className="text-2xl">{riskAssessment.level} Risk</p>
                 <p className="text-sm text-gray-600">{riskAssessment.description}</p>
-              </div>
+              </Card>
             )}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-sm p-5">
+              <Card padding="md">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl font-medium">Order Trends</h2>
                   <span className="text-sm text-red-500">5 Pending</span>
@@ -394,9 +312,9 @@ export default function Dashboard() {
                     />
                   </AreaChart>
                 </ResponsiveContainer>
-              </div>
+              </Card>
 
-              <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-sm p-5">
+              <Card padding="md">
                 <h2 className="text-xl font-medium mb-4">Category Distribution</h2>
                 <ResponsiveContainer width="100%" height={250}>
                   <PieChart>
@@ -419,10 +337,12 @@ export default function Dashboard() {
                     <Tooltip />
                   </PieChart>
                 </ResponsiveContainer>
-              </div>
+              </Card>
             </div>
+        </section>
 
-            <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-sm p-5">
+        <section id="activity" className="scroll-mt-20 space-y-6">
+            <Card padding="md">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-medium flex items-center">
                   Recent Activities
@@ -485,9 +405,8 @@ export default function Dashboard() {
                   </tbody>
                 </table>
               </div>
-            </div>
-          </main>
-        </div>
+            </Card>
+        </section>
       </div>
 
       {/* Modals */}

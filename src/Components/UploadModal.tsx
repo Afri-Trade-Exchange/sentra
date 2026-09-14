@@ -234,7 +234,7 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
 
   return (
     <div 
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
       onClick={handleOutsideClick}  // Overlay click handler
     >
       <div
@@ -268,7 +268,8 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div
-              className={`bg-teal-600 h-2 rounded-full transition-all duration-300 w-[${(Object.values(documents).filter(doc => doc.file !== null).length / Object.values(documents).length) * 100}%]`}
+              className="bg-teal-600 h-2 rounded-full transition-all duration-300"
+              style={{ width: `${(Object.values(documents).filter(doc => doc.file !== null).length / Object.values(documents).length) * 100}%` }}
             />
           </div>
         </div>

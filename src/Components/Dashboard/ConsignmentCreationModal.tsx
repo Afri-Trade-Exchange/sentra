@@ -88,9 +88,9 @@ const ConsignmentCreationModal: React.FC<ConsignmentCreationModalProps> = ({ isO
         initial={{ opacity: 0, scale: 0.5 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
       >
-        <div className="bg-white rounded-2xl p-8 text-center">
+        <div className="bg-white rounded-2xl p-8 text-center max-w-sm w-full">
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
@@ -109,7 +109,7 @@ const ConsignmentCreationModal: React.FC<ConsignmentCreationModalProps> = ({ isO
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}

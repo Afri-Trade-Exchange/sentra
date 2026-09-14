@@ -26,7 +26,7 @@ const TraderDetailsModal: React.FC<TraderDetailsModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70">
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 p-4">
       <div className={`bg-white rounded-lg p-8 shadow-lg max-w-lg w-full transition-transform transform ${isOpen ? 'scale-100' : 'scale-95'}`}>
         <h2 className="text-2xl font-bold mb-4 text-gray-800">{traderName}</h2>
         <p className="text-gray-700 mb-2"><strong>Email:</strong> {traderEmail}</p>

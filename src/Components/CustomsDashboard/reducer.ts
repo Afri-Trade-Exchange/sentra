@@ -14,9 +14,9 @@ export const filterConsignments = (
       consignment.traderName,
       consignment.documentType,
       consignment.status,
-      consignment.details?.declarationNumber,
-      consignment.details?.description,
-      consignment.details?.estimatedValue?.toString()
+      consignment.declarationNumber,
+      consignment.description,
+      consignment.estimatedValue?.toString()
     ];
 
     const matchesSearch = searchableFields.some(field =>
@@ -33,6 +33,16 @@ export const filterConsignments = (
 
 export const dashboardReducer = (state: DashboardState, action: DashboardAction): DashboardState => {
   switch (action.type) {
+    case 'SET_CONSIGNMENTS':
+      return {
+        ...state,
+        consignments: action.payload,
+        filteredConsignments: filterConsignments(
+          action.payload,
+          state.searchTerm,
+          state.statusFilter
+        )
+      };
     case 'UPDATE_CONSIGNMENT_STATUS':
       return {
         ...state,

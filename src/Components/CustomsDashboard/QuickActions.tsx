@@ -53,7 +53,7 @@ const QuickActions: React.FC<{
   const [scannedData, setScannedData] = useState<QrScannerData | null>(null);
   const [exportSettings, setExportSettings] = useState<ExportSettings>({
     format: 'pdf',
-    includeFields: ['traderName', 'documentType', 'status', 'uploadDate'],
+    includeFields: ['Trader Name', 'Document Type', 'Status', 'Upload Date'],
     orientation: 'portrait'
   });
 
@@ -67,11 +67,11 @@ const QuickActions: React.FC<{
       'Email': c.traderEmail,
       'Document Type': c.documentType,
       'Status': c.status,
-      'Upload Date': format(c.uploadDate.toDate(), 'dd/MM/yyyy'),
-      'Declaration Number': c.details?.declarationNumber || '',
-      'Description': c.details?.description || '',
-      'Estimated Value': c.details?.estimatedValue?.toLocaleString() || '',
-      'Goods Status': c.details?.goodsStatus || ''
+      'Upload Date': format(c.createdAt.toDate(), 'dd/MM/yyyy'),
+      'Declaration Number': c.declarationNumber || '',
+      'Description': c.description || '',
+      'Estimated Value': c.estimatedValue?.toLocaleString() || '',
+      'Goods Status': c.goodsStatus || ''
     }));
   };
 
@@ -95,9 +95,7 @@ const QuickActions: React.FC<{
     );
 
     doc.autoTable({
-      head: [exportSettings.includeFields.map(field =>
-        field.replace(/([A-Z])/g, ' $1').trim()
-      )],
+      head: [exportSettings.includeFields],
       body: tableData,
       startY: 35,
       styles: {
@@ -174,7 +172,7 @@ const QuickActions: React.FC<{
 
     if (exportSettings.dateRange) {
       dataToExport = dataToExport.filter(c => {
-        const date = c.uploadDate.toDate();
+        const date = c.createdAt.toDate();
         return date >= exportSettings.dateRange!.start &&
                date <= exportSettings.dateRange!.end;
       });

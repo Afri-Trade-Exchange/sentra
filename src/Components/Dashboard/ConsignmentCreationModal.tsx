@@ -8,6 +8,7 @@ import { FaClipboardCheck } from 'react-icons/fa';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
 import { useAuth } from '../AuthContext';
+import { ConsignmentStatus } from '../CustomsDashboard/types';
 
 const ConsignmentSchema = z.object({
   traderName: z.string().min(2, 'Trader name is required'),
@@ -61,6 +62,7 @@ const ConsignmentCreationModal: React.FC<ConsignmentCreationModalProps> = ({ isO
         goodsStatus: 'Pending',
         goodsOrdered: [] as string[],
         documents: [] as { type: string; fileName: string; sizeKb: number }[],
+        status: ConsignmentStatus.Pending,
         createdAt: Timestamp.now(),
       });
 

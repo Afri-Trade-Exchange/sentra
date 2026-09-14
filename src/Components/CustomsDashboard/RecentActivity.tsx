@@ -1,17 +1,21 @@
 import React from 'react';
 import { FaClipboardList, FaClock, FaEye, FaHistory, FaUserCircle } from 'react-icons/fa';
 import { Activity } from './types';
+import Card from '../ui/Card';
+import SectionHeader from '../ui/SectionHeader';
 
 const RecentActivity: React.FC<{ activities: Activity[] }> = ({ activities }) => {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">Recent Activity</h3>
-        <button type="button" className="text-sm text-teal-600 hover:text-teal-700">
-          View All
-        </button>
-      </div>
-      <div className="space-y-4">
+    <Card>
+      <SectionHeader
+        title="Recent Activity"
+        action={(
+          <button type="button" className="text-sm text-teal-600 hover:text-teal-700">
+            View All
+          </button>
+        )}
+      />
+      <div className="mt-4 space-y-4">
         {activities.map((activity) => (
           <div
             key={activity.id}
@@ -43,7 +47,7 @@ const RecentActivity: React.FC<{ activities: Activity[] }> = ({ activities }) =>
           </div>
         ))}
       </div>
-    </div>
+    </Card>
   );
 };
 

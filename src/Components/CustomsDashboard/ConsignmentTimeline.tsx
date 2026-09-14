@@ -1,11 +1,13 @@
 import React from 'react';
 import { ConsignmentStatus, TimelineEvent } from './types';
+import Card from '../ui/Card';
+import SectionHeader from '../ui/SectionHeader';
 
 const ConsignmentTimeline: React.FC<{ timelineEvents: TimelineEvent[] }> = ({ timelineEvents }) => {
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
-      <h3 className="text-lg font-semibold mb-4">Consignment Timeline</h3>
-      <div className="relative">
+    <Card>
+      <SectionHeader title="Consignment Timeline" />
+      <div className="relative mt-4">
         <div className="border-l-2 border-gray-200 ml-4 space-y-6">
           {timelineEvents.map((event) => (
             <div key={event.id} className="relative">
@@ -30,7 +32,7 @@ const ConsignmentTimeline: React.FC<{ timelineEvents: TimelineEvent[] }> = ({ ti
           ))}
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
 

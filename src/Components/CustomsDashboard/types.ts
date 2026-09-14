@@ -12,14 +12,13 @@ export interface Consignment {
   traderEmail: string;
   documentType: string;
   status: ConsignmentStatus;
-  uploadDate: Timestamp;
-  details?: {
-    declarationNumber?: string;
-    description?: string;
-    estimatedValue?: number;
-    goodsOrdered?: string[];
-    goodsStatus?: string;
-  };
+  goodsStatus: string;
+  description: string;
+  estimatedValue: number;
+  declarationNumber: string;
+  goodsOrdered: string[];
+  documents: { type: string; fileName: string; sizeKb: number }[];
+  createdAt: Timestamp;
 }
 
 export interface Activity {
@@ -64,13 +63,11 @@ export interface DashboardState {
     min: number | null;
     max: number | null;
   };
-  notifications: NotificationType[];
-  activities: Activity[];
   showAdvancedFilters: boolean;
-  timelineEvents: TimelineEvent[];
 }
 
 export type DashboardAction =
+  | { type: 'SET_CONSIGNMENTS'; payload: Consignment[] }
   | { type: 'SET_SEARCH_TERM'; payload: string }
   | { type: 'SET_STATUS_FILTER'; payload: ConsignmentStatus | null }
   | { type: 'SET_PAGE'; payload: number }

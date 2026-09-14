@@ -41,7 +41,7 @@ const ConsignmentCard: React.FC<{
 
       <div className="flex justify-between items-center">
         <span className="text-sm text-gray-500">
-          {consignment.uploadDate.toDate().toLocaleDateString()}
+          {consignment.createdAt.toDate().toLocaleDateString()}
         </span>
         <button
           type="button"

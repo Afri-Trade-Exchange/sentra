@@ -10,7 +10,7 @@ import InvoiceViewButton from './Dashboard/InvoiceViewButton';
 import ContextualHelp from './Dashboard/ContextualHelp';
 import ConsignmentCreationModal from './Dashboard/ConsignmentCreationModal';
 import Card from './ui/Card';
-import { getStatusStyles, generateInvoice, calculateProcessingEfficiency, calculateValueGrowth, calculateRiskLevel } from './Dashboard/dashboardUtils';
+import { getStatusStyles, generateInvoice, calculateProcessingEfficiency, calculateValueGrowth, calculateRejectionRate, calculateRiskLevel } from './Dashboard/dashboardUtils';
 import { Activity, EnhancedInsights, Invoice } from '../types/dashboard';
 import { Consignment, ConsignmentStatus } from './CustomsDashboard/types';
 
@@ -117,7 +117,11 @@ export default function Dashboard() {
     };
   }, [consignments, pendingCount]);
 
-  const riskAssessment = useMemo(() => calculateRiskLevel(enhancedInsights), [enhancedInsights]);
+  const decidedCount = consignments.filter((c) => c.status !== ConsignmentStatus.Pending).length;
+  const riskAssessment = useMemo(
+    () => calculateRiskLevel(calculateRejectionRate(consignments)),
+    [consignments]
+  );
 
   // Consignments received per month, for the last 6 months (including zero months).
   const orderData = useMemo(() => {
@@ -226,7 +230,7 @@ export default function Dashboard() {
               </Card>
             </section>
 
-            {consignments.length > 0 && (
+            {decidedCount > 0 && (
               <Card padding="sm">
                 <h3 className="text-lg font-medium">Risk Assessment</h3>
                 <p className="text-2xl">{riskAssessment.level} Risk</p>

@@ -1,6 +1,5 @@
 import {
   Activity,
-  EnhancedInsights,
   Invoice,
   RiskAssessment,
 } from '../../types/dashboard';
@@ -68,12 +67,21 @@ export const calculateValueGrowth = (consignments: { estimatedValue: number; cre
   return Number((((current - previous) / previous) * 100).toFixed(1));
 };
 
-export const calculateRiskLevel = (insights: EnhancedInsights): RiskAssessment => {
-  const score = insights.processingEfficiency + insights.valueGrowth * 0.5;
+// Only meaningful once some consignments have actually been decided - a
+// trader whose submissions are all still Pending isn't "risky", they just
+// haven't been reviewed yet. Callers should check decided.length > 0 before
+// showing this (there's no honest risk level to report otherwise).
+export const calculateRejectionRate = (consignments: { status: ConsignmentStatus }[]): number => {
+  const decided = consignments.filter((c) => c.status !== ConsignmentStatus.Pending);
+  if (decided.length === 0) return 0;
+  const rejected = decided.filter((c) => c.status === ConsignmentStatus.Rejected).length;
+  return Number(((rejected / decided.length) * 100).toFixed(1));
+};
 
+export const calculateRiskLevel = (rejectionRate: number): RiskAssessment => {
   return {
-    level: score > 80 ? 'Low' : score > 50 ? 'Medium' : 'High',
-    description: 'Risk assessment based on approval rate and month-over-month declared value growth',
-    impactScore: score,
+    level: rejectionRate >= 40 ? 'High' : rejectionRate >= 15 ? 'Medium' : 'Low',
+    description: 'Based on the share of your reviewed consignments that customs has rejected',
+    impactScore: rejectionRate,
   };
 };

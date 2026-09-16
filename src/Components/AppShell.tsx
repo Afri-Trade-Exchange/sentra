@@ -21,6 +21,7 @@ const CUSTOMS_NAV: NavItem[] = [
 
 const TRADER_NAV: NavItem[] = [
   { label: 'Overview', icon: FaHome, href: '#overview' },
+  { label: 'Analytics', icon: FaChartPie, href: '#analytics' },
   { label: 'Activity', icon: FaHistory, href: '#activity' },
 ];
 

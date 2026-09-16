@@ -1,9 +1,16 @@
-import React from 'react';
-import { MdEmail, MdPhone, MdLocationOn } from 'react-icons/md';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaFacebookF, FaInstagram, FaTwitter } from 'react-icons/fa';
-import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { db } from '../firebase/firebaseConfig';
+
+// TODO: swap in the real social URLs once available (matches Footer's convention)
+const socialLinks = [
+  { icon: FaFacebookF, label: 'Facebook', href: '#' },
+  { icon: FaInstagram, label: 'Instagram', href: '#' },
+  { icon: FaTwitter, label: 'Twitter', href: '#' },
+];
 
 const faqs = [
   {
@@ -28,7 +35,6 @@ const faqs = [
   }
 ];
 
-// Add interface above FAQItem component
 interface FAQItemProps {
   question: string;
   answer: string;
@@ -36,39 +42,24 @@ interface FAQItemProps {
 
 const FAQItem: React.FC<FAQItemProps> = ({ question, answer }) => {
   const [isOpen, setIsOpen] = useState(false);
-  
+
   return (
-    <motion.div 
-      className="bg-white rounded-2xl p-6 mb-4 shadow-sm hover:shadow-md transition-shadow"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
+    <div className="bg-white rounded-2xl border border-gray-100 p-6 mb-4 shadow-sm hover:shadow-md transition-shadow">
       <button
         className="flex justify-between items-center w-full text-left group"
         onClick={() => setIsOpen(!isOpen)}
         type="button"
       >
-        <span className="text-lg font-medium text-gray-900 group-hover:text-teal-600 transition-colors">
+        <span className="font-['Manrope'] font-medium text-gray-900 group-hover:text-teal-600 transition-colors">
           {question}
         </span>
         <motion.span
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2 }}
-          className="text-teal-600"
+          className="text-teal-600 shrink-0 ml-4"
         >
-          <svg 
-            className="w-5 h-5" 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
-              d="M19 9l-7 7-7-7"
-            />
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
         </motion.span>
       </button>
@@ -76,22 +67,19 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer }) => {
         {isOpen && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
+            animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <p className="mt-4 text-gray-600 leading-relaxed">
-              {answer}
-            </p>
+            <p className="mt-4 text-gray-600 leading-relaxed">{answer}</p>
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </div>
   );
 };
 
-// Add form state management
 interface FormData {
   name: string;
   email: string;
@@ -99,23 +87,26 @@ interface FormData {
 }
 
 const ContactPage: React.FC = () => {
-  const [formData, setFormData] = useState<FormData>({
-    name: '',
-    email: '',
-    message: ''
-  });
+  const [formData, setFormData] = useState<FormData>({ name: '', email: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+    setSubmitStatus('idle');
+
     try {
-      // will API call here
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      await addDoc(collection(db, 'contactMessages'), {
+        name: formData.name,
+        email: formData.email,
+        message: formData.message,
+        createdAt: Timestamp.now(),
+      });
       setSubmitStatus('success');
-    } catch {
+      setFormData({ name: '', email: '', message: '' });
+    } catch (error) {
+      console.error('Failed to send message:', error);
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
@@ -123,159 +114,115 @@ const ContactPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-teal-50 text-gray-800">
-      <div className="container mx-auto px-4 py-16">
-        <h1 className="text-5xl font-light text-center mb-12 text-teal-600">Contact Us</h1>
+    <div className="min-h-screen bg-stone-100 text-gray-800">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center">
+        <span className="inline-block text-teal-600 text-xs font-semibold uppercase tracking-wide mb-4">
+          Contact
+        </span>
+        <h1 className="font-['Manrope'] text-3xl sm:text-4xl font-semibold mb-4 leading-tight">
+          We'd like to hear from you.
+        </h1>
+        <p className="text-gray-600 text-lg">
+          Questions, feedback, or issues with a consignment — send us a message and we'll get back to you.
+        </p>
+      </div>
 
-        {/* Existing contact form and info sections */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
-          <div className="bg-white rounded-xl shadow-sm p-8">
-            <h2 className="text-2xl font-medium mb-6 text-teal-600">Get in Touch</h2>
-            <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <label htmlFor="name" className="block text-gray-700 mb-2">Name *</label>
-                <input 
-                  type="text" 
-                  id="name" 
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 pb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          <div className="lg:col-span-3 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
+            <h2 className="font-['Manrope'] text-xl font-semibold mb-6 text-gray-900">Send us a message</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                <input
+                  type="text"
+                  id="name"
                   required
                   value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500" 
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                 />
               </div>
-              <div className="mb-4">
-                <label htmlFor="email" className="block text-gray-700 mb-2">Email</label>
-                <input type="email" id="email" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500" />
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                <input
+                  type="email"
+                  id="email"
+                  required
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                />
               </div>
-              <div className="mb-4">
-                <label htmlFor="message" className="block text-gray-700 mb-2">Message</label>
-                <textarea id="message" rows={4} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"></textarea>
+              <div>
+                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">Message *</label>
+                <textarea
+                  id="message"
+                  rows={4}
+                  required
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                />
               </div>
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={isSubmitting}
-                className={`w-full py-3 px-4 rounded-lg text-lg font-semibold shadow-md 
-                  ${isSubmitting 
-                    ? 'bg-gray-400 cursor-not-allowed' 
-                    : 'bg-teal-600 hover:bg-teal-700 text-white hover:shadow-lg'
-                  } transition-all`}
+                className="w-full py-3 px-4 rounded-lg font-['Manrope'] font-semibold text-white bg-teal-600 hover:bg-teal-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
               >
                 {isSubmitting ? 'Sending...' : 'Send Message'}
               </button>
 
               {submitStatus === 'success' && (
-                <motion.p 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="mt-4 text-green-600 text-center"
-                >
-                  Message sent successfully!
+                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-teal-700 text-center">
+                  Message sent — we'll get back to you soon.
                 </motion.p>
               )}
-
               {submitStatus === 'error' && (
-                <motion.p 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="mt-4 text-red-600 text-center"
-                >
-                  Failed to send message. Please try again.
+                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-red-600 text-center">
+                  Something went wrong. Please try again.
                 </motion.p>
               )}
             </form>
           </div>
-          <div className="bg-white rounded-xl shadow-sm p-8">
-            <h2 className="text-2xl font-medium mb-6 text-teal-600">Contact Information</h2>
-            <div className="space-y-6">
-              <div className="flex items-center">
-                <MdLocationOn className="text-teal-600 text-3xl mr-4" />
-                <p className="text-lg">123 Trade Street, Nairobi, Kenya</p>
-              </div>
-              <div className="flex items-center">
-                <MdPhone className="text-teal-600 text-3xl mr-4" />
-                <p className="text-lg">+254 123 456 789</p>
-              </div>
-              <div className="flex items-center">
-                <MdEmail className="text-teal-600 text-3xl mr-4" />
-                <p className="text-lg">info@sentra.com</p>
-              </div>
-            </div>
-            <div className="mt-12">
-              <h3 className="text-2xl font-medium mb-4 text-teal-600">Follow Us</h3>
-              <div className="flex space-x-6">
-                <a href="#" className="text-gray-600 hover:text-teal-600 transition-colors">
-                  <FaFacebookF className="w-8 h-8" />
+
+          <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
+            <h2 className="font-['Manrope'] text-xl font-semibold mb-4 text-gray-900">Follow us</h2>
+            <p className="text-sm text-gray-600 mb-4">
+              We typically respond within 1-2 business days.
+            </p>
+            <div className="flex gap-3">
+              {socialLinks.map(({ icon: Icon, label, href }) => (
+                <a
+                  key={label}
+                  href={href}
+                  aria-label={label}
+                  className="w-10 h-10 flex items-center justify-center rounded-full bg-stone-100 text-gray-600 hover:bg-teal-50 hover:text-teal-600 transition-colors"
+                >
+                  <Icon />
                 </a>
-                <a href="#" className="text-gray-600 hover:text-teal-600 transition-colors">
-                  <FaInstagram className="w-8 h-8" />
-                </a>
-                <a href="#" className="text-gray-600 hover:text-teal-600 transition-colors">
-                  <FaTwitter className="w-8 h-8" />
-                </a>
-              </div>
-            </div>
-            {/* Add business hours */}
-            <div className="mt-8">
-              <h3 className="text-2xl font-medium mb-4 text-teal-600">Business Hours</h3>
-              <div className="space-y-2">
-                <p className="flex justify-between">
-                  <span>Monday - Friday:</span>
-                  <span>9:00 AM - 6:00 PM</span>
-                </p>
-                <p className="flex justify-between">
-                  <span>Saturday:</span>
-                  <span>10:00 AM - 4:00 PM</span>
-                </p>
-                <p className="flex justify-between">
-                  <span>Sunday:</span>
-                  <span>Closed</span>
-                </p>
-              </div>
+              ))}
             </div>
           </div>
         </div>
+      </div>
 
-        {/* FAQ Section */}
-        <div className="max-w-3xl mx-auto mb-20">
-          <h2 className="text-3xl font-medium mb-8 text-teal-600 text-center">
-            Frequently Asked Questions
-          </h2>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            {faqs.map((faq, index) => (
-              <FAQItem 
-                key={index} 
-                question={faq.question} 
-                answer={faq.answer} 
-              />
-            ))}
-          </motion.div>
-        </div>
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 pb-24">
+        <h2 className="font-['Manrope'] text-2xl font-semibold mb-8 text-center text-gray-900">
+          Frequently Asked Questions
+        </h2>
+        {faqs.map((faq) => (
+          <FAQItem key={faq.question} question={faq.question} answer={faq.answer} />
+        ))}
+      </div>
 
-        <div className="text-center mb-12">
-          <Link 
-            to="/" 
-            className="inline-flex items-center text-teal-600 hover:text-teal-700 transition-colors text-lg font-medium"
-          >
-            <svg 
-              className="w-5 h-5 mr-2" 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              />
-            </svg>
-            Back to Home
-          </Link>
-        </div>
+      <div className="text-center pb-16">
+        <Link to="/" className="inline-flex items-center text-teal-600 hover:text-teal-700 transition-colors font-medium">
+          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Home
+        </Link>
       </div>
     </div>
   );

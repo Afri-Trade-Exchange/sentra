@@ -11,5 +11,16 @@ service cloud.firestore {
     match /consignments/{consignmentId} {
       allow read, write: if request.auth != null;
     }
+
+    // The public Contact page must work for signed-out visitors, so writes
+    // are open but validated; there's no admin UI to read these yet, so
+    // reads/updates/deletes are locked down to the Firebase Console.
+    match /contactMessages/{messageId} {
+      allow create: if request.resource.data.keys().hasAll(['name', 'email', 'message', 'createdAt'])
+        && request.resource.data.name is string && request.resource.data.name.size() > 0
+        && request.resource.data.email is string && request.resource.data.email.size() > 0
+        && request.resource.data.message is string && request.resource.data.message.size() > 0;
+      allow read, update, delete: if false;
+    }
   }
 }

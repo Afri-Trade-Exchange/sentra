@@ -98,9 +98,9 @@ export default function TermsPage() {
       </div>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 pb-24">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-10 space-y-8">
+        <div className="divide-y divide-gray-200">
           {SECTIONS.map((section) => (
-            <div key={section.title}>
+            <div key={section.title} className="py-8 first:pt-0">
               <h2 className="font-['Manrope'] text-lg font-semibold mb-3 text-gray-900">
                 {section.title}
               </h2>

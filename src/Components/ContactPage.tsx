@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FaFacebookF, FaInstagram, FaTwitter } from 'react-icons/fa';
+import { FaFacebookF, FaInstagram, FaTwitter, FaArrowRight, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
@@ -36,31 +36,34 @@ const faqs = [
 ];
 
 interface FAQItemProps {
+  index: number;
   question: string;
   answer: string;
 }
 
-const FAQItem: React.FC<FAQItemProps> = ({ question, answer }) => {
+const FAQItem: React.FC<FAQItemProps> = ({ index, question, answer }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-6 mb-4 shadow-sm hover:shadow-md transition-shadow">
+    <div className="py-6">
       <button
-        className="flex justify-between items-center w-full text-left group"
+        className="flex items-center gap-4 w-full text-left group"
         onClick={() => setIsOpen(!isOpen)}
         type="button"
       >
-        <span className="font-['Manrope'] font-medium text-gray-900 group-hover:text-teal-600 transition-colors">
+        <span className="text-sm font-medium text-teal-600 tabular-nums w-6 shrink-0">
+          {String(index + 1).padStart(2, '0')}
+        </span>
+        <span className="flex-1 font-['Manrope'] text-lg font-semibold text-gray-900 group-hover:text-teal-600 transition-colors">
           {question}
         </span>
         <motion.span
-          animate={{ rotate: isOpen ? 180 : 0 }}
+          animate={{ rotate: isOpen ? 45 : 0 }}
           transition={{ duration: 0.2 }}
-          className="text-teal-600 shrink-0 ml-4"
+          className="relative w-5 h-5 shrink-0 text-teal-600"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
+          <span className="absolute left-1/2 top-0 -translate-x-1/2 w-0.5 h-full bg-current rounded-full" />
+          <span className="absolute top-1/2 left-0 -translate-y-1/2 h-0.5 w-full bg-current rounded-full" />
         </motion.span>
       </button>
       <AnimatePresence>
@@ -72,7 +75,7 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer }) => {
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <p className="mt-4 text-gray-600 leading-relaxed">{answer}</p>
+            <p className="mt-3 pl-10 text-gray-600 leading-relaxed">{answer}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -128,65 +131,68 @@ const ContactPage: React.FC = () => {
       </div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 pb-20">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-          <div className="lg:col-span-3 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 divide-y divide-gray-200 lg:divide-y-0 lg:divide-x">
+          <div className="lg:col-span-3 lg:pr-8">
             <h2 className="font-['Manrope'] text-xl font-semibold mb-6 text-gray-900">Send us a message</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                <label htmlFor="name" className="block text-xs font-medium uppercase tracking-wide text-gray-500 mb-2">Name *</label>
                 <input
                   type="text"
                   id="name"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                  className="w-full px-0 py-2.5 bg-transparent border-0 border-b-2 border-gray-200 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0 focus:border-teal-600 transition-colors"
                 />
               </div>
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                <label htmlFor="email" className="block text-xs font-medium uppercase tracking-wide text-gray-500 mb-2">Email *</label>
                 <input
                   type="email"
                   id="email"
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                  className="w-full px-0 py-2.5 bg-transparent border-0 border-b-2 border-gray-200 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0 focus:border-teal-600 transition-colors"
                 />
               </div>
               <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">Message *</label>
+                <label htmlFor="message" className="block text-xs font-medium uppercase tracking-wide text-gray-500 mb-2">Message *</label>
                 <textarea
                   id="message"
                   rows={4}
                   required
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                  className="w-full px-0 py-2.5 bg-transparent border-0 border-b-2 border-gray-200 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0 focus:border-teal-600 transition-colors resize-none"
                 />
               </div>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3 px-4 rounded-lg font-['Manrope'] font-semibold text-white bg-teal-600 hover:bg-teal-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                className="group inline-flex items-center gap-2 py-3 px-6 rounded-full font-['Manrope'] font-semibold text-white bg-teal-600 hover:bg-teal-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
               >
                 {isSubmitting ? 'Sending...' : 'Send Message'}
+                <FaArrowRight className="transition-transform group-hover:translate-x-1" />
               </button>
 
               {submitStatus === 'success' && (
-                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-teal-700 text-center">
+                <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-2 text-sm text-teal-700">
+                  <FaCheckCircle className="shrink-0" />
                   Message sent — we'll get back to you soon.
                 </motion.p>
               )}
               {submitStatus === 'error' && (
-                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-red-600 text-center">
+                <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-2 text-sm text-red-600">
+                  <FaExclamationCircle className="shrink-0" />
                   Something went wrong. Please try again.
                 </motion.p>
               )}
             </form>
           </div>
 
-          <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
+          <div className="lg:col-span-2 pt-8 lg:pt-0 lg:pl-8">
             <h2 className="font-['Manrope'] text-xl font-semibold mb-4 text-gray-900">Follow us</h2>
             <p className="text-sm text-gray-600 mb-4">
               We typically respond within 1-2 business days.
@@ -211,9 +217,11 @@ const ContactPage: React.FC = () => {
         <h2 className="font-['Manrope'] text-2xl font-semibold mb-8 text-center text-gray-900">
           Frequently Asked Questions
         </h2>
-        {faqs.map((faq) => (
-          <FAQItem key={faq.question} question={faq.question} answer={faq.answer} />
-        ))}
+        <div className="divide-y divide-gray-200">
+          {faqs.map((faq, index) => (
+            <FAQItem key={faq.question} index={index} question={faq.question} answer={faq.answer} />
+          ))}
+        </div>
       </div>
 
       <div className="text-center pb-16">

@@ -7,6 +7,8 @@ import ContactPage from './Components/ContactPage'
 import AboutPage from './Components/AboutPage'
 import PricingPage from './Components/PricingPage'
 import BlogPage from './Components/BlogPage'
+import TermsPage from './Components/TermsPage'
+import PrivacyPage from './Components/PrivacyPage'
 import Layout from './Components/Layout'
 import AppShell from './Components/AppShell'
 import ErrorBoundary from './Components/ErrorBoundary'
@@ -41,6 +43,8 @@ function AppRoutes() {
       <Route path="/about" element={<AboutPage />} />
       <Route path="/pricing" element={<PricingPage />} />
       <Route path="/blog" element={<BlogPage />} />
+      <Route path="/terms" element={<TermsPage />} />
+      <Route path="/privacy" element={<PrivacyPage />} />
       <Route
         path="/dashboard"
         element={

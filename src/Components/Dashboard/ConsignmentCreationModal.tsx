@@ -3,12 +3,14 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as HeroIcons from '@heroicons/react/24/outline';
-import { FaClipboardCheck } from 'react-icons/fa';
+import { FaClipboardCheck, FaBox, FaTimes } from 'react-icons/fa';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
 import { useAuth } from '../AuthContext';
 import { ConsignmentStatus } from '../CustomsDashboard/types';
+
+const inputClass = 'mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-teal-500 focus:ring focus:ring-teal-200 dark:focus:ring-teal-900/40';
+const labelClass = 'block text-sm font-medium text-gray-700 dark:text-gray-300';
 
 const ConsignmentSchema = z.object({
   traderName: z.string().min(2, 'Trader name is required'),
@@ -124,22 +126,22 @@ const ConsignmentCreationModal: React.FC<ConsignmentCreationModalProps> = ({ isO
               aria-label="Close Consignment Modal"
               className="absolute top-4 right-4 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
             >
-              <HeroIcons.XMarkIcon className="h-6 w-6" />
+              <FaTimes className="h-5 w-5" />
             </button>
 
             <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100 flex items-center">
-              <HeroIcons.DocumentIcon className="h-8 w-8 mr-3 text-teal-600 dark:text-teal-400" />
+              <FaBox className="h-7 w-7 mr-3 text-teal-600 dark:text-teal-400" />
               Create New Consignment
             </h2>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               {submitError && (
-                <div className="rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-3 text-sm text-red-700 dark:text-red-400">
+                <div className="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-3 text-sm text-red-700 dark:text-red-400">
                   {submitError}
                 </div>
               )}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className={labelClass}>
                   Trader Name
                 </label>
                 <Controller
@@ -148,7 +150,7 @@ const ConsignmentCreationModal: React.FC<ConsignmentCreationModalProps> = ({ isO
                   render={({ field }) => (
                     <input
                       {...field}
-                      className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                      className={inputClass}
                       placeholder="Enter trader name"
                     />
                   )}
@@ -161,7 +163,7 @@ const ConsignmentCreationModal: React.FC<ConsignmentCreationModalProps> = ({ isO
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className={labelClass}>
                   Document Type
                 </label>
                 <Controller
@@ -170,7 +172,7 @@ const ConsignmentCreationModal: React.FC<ConsignmentCreationModalProps> = ({ isO
                   render={({ field }) => (
                     <select
                       {...field}
-                      className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                      className={inputClass}
                     >
                       <option value="Import">Import</option>
                       <option value="Export">Export</option>
@@ -183,7 +185,7 @@ const ConsignmentCreationModal: React.FC<ConsignmentCreationModalProps> = ({ isO
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className={labelClass}>
                   Goods Description
                 </label>
                 <Controller
@@ -193,7 +195,7 @@ const ConsignmentCreationModal: React.FC<ConsignmentCreationModalProps> = ({ isO
                     <textarea
                       {...field}
                       rows={3}
-                      className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                      className={inputClass}
                       placeholder="Describe the goods in detail"
                     />
                   )}
@@ -206,7 +208,7 @@ const ConsignmentCreationModal: React.FC<ConsignmentCreationModalProps> = ({ isO
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className={labelClass}>
                   Estimated Value
                 </label>
                 <Controller
@@ -217,7 +219,7 @@ const ConsignmentCreationModal: React.FC<ConsignmentCreationModalProps> = ({ isO
                       {...field}
                       type="number"
                       onChange={(e) => onChange(Number(e.target.value))}
-                      className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                      className={inputClass}
                       placeholder="Enter estimated value"
                     />
                   )}
@@ -233,14 +235,14 @@ const ConsignmentCreationModal: React.FC<ConsignmentCreationModalProps> = ({ isO
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                  className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <FaClipboardCheck className="h-5 w-5 mr-2" />
                   {isSubmitting ? 'Creating...' : 'Create Consignment'}

@@ -204,10 +204,6 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
   const qrCodeData = { consignmentId };
 
   const handleClose = () => {
-    // Add console.log to debug
-    console.log('handleClose called');
-    
-    // If documents are uploaded but not verified, show confirmation
     const hasUploadedDocuments = Object.values(documents).some(doc => doc.file !== null);
     if (hasUploadedDocuments && !isVerified) {
       const confirmClose = window.confirm(
@@ -217,29 +213,26 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
         return;
       }
     }
-    
-    onClose(); // Make sure this is being called
+
+    onClose();
   };
 
-  // Add handleOutsideClick function
   const handleOutsideClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Check if the click is on the overlay (outside the modal)
     if (e.target === e.currentTarget) {
       handleClose();
     }
   };
 
-  // If modal isn't open, don't render anything
   if (!isOpen) return null;
 
   return (
-    <div 
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-      onClick={handleOutsideClick}  // Overlay click handler
+    <div
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      onClick={handleOutsideClick}
     >
       <div
         className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-4xl p-4 sm:p-8 max-h-[90vh] overflow-y-auto shadow-lg"
-        onClick={(e) => e.stopPropagation()} // Add this to prevent clicks on modal from closing it
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Header Section */}
         <div className="flex justify-between items-center mb-8 pb-4 border-b border-gray-100 dark:border-gray-700">
@@ -277,10 +270,10 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
         {/* Documents Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           {Object.entries(documents).map(([key, doc]) => (
-            <div
+            <label
               key={key}
               className={`
-                relative p-6 rounded-xl transition-colors duration-200
+                relative p-6 rounded-xl transition-colors duration-200 block
                 ${doc.file ? 'bg-teal-50 dark:bg-teal-900/20 border-teal-200 dark:border-teal-800' : 'bg-gray-50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600'}
                 ${doc.required ? 'border-2' : 'border'}
                 hover:shadow-sm cursor-pointer
@@ -288,6 +281,12 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => handleDrop(e, key)}
             >
+              <input
+                type="file"
+                className="hidden"
+                accept=".pdf,.jpg,.jpeg,.png"
+                onChange={(e) => e.target.files?.[0] && handleFileChange(key, e.target.files[0])}
+              />
               <div className="flex items-start space-x-4">
                 <div className={`p-3 rounded-lg ${doc.file ? 'bg-teal-100 dark:bg-teal-900/40' : 'bg-gray-200 dark:bg-gray-600'}`}>
                   <FaFileAlt className={`w-6 h-6 ${doc.file ? 'text-teal-600 dark:text-teal-400' : 'text-gray-400 dark:text-gray-400'}`} />
@@ -316,25 +315,16 @@ export default function UploadModal({ isOpen, onClose, consignmentId }: UploadMo
                     </p>
                   )}
                 </div>
-                <label className="cursor-pointer">
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept=".pdf,.jpg,.jpeg,.png"
-                    onChange={(e) => e.target.files?.[0] && handleFileChange(key, e.target.files[0])}
-                  />
-                  <span className={`
-                    inline-flex items-center px-3 py-1 rounded-lg text-sm font-medium
-                    ${doc.file
-                      ? 'text-teal-700 dark:text-teal-300 bg-teal-100 dark:bg-teal-900/40 hover:bg-teal-200 dark:hover:bg-teal-900/60'
-                      : 'text-gray-600 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500'}
-                    transition-colors
-                  `}>
-                    {doc.file ? 'Change' : 'Upload'}
-                  </span>
-                </label>
+                <span className={`
+                  inline-flex items-center px-3 py-1 rounded-lg text-sm font-medium shrink-0
+                  ${doc.file
+                    ? 'text-teal-700 dark:text-teal-300 bg-teal-100 dark:bg-teal-900/40'
+                    : 'text-gray-600 dark:text-gray-300 bg-gray-200 dark:bg-gray-600'}
+                `}>
+                  {doc.file ? 'Change' : 'Upload'}
+                </span>
               </div>
-            </div>
+            </label>
           ))}
         </div>
 

@@ -50,9 +50,7 @@ const QrScannerModal: React.FC<{
           setError(err instanceof Error ? err.message : 'Invalid QR code');
         }
       },
-      (error) => {
-        console.log(error);
-      }
+      () => {}
     );
 
     return () => {

@@ -50,7 +50,7 @@ export default function Layout({ children }: LayoutProps) {
 
           {/* Desktop Navigation — centered between logo and actions */}
           <div className={`col-start-2 hidden md:flex items-center justify-center gap-5 lg:gap-6 text-sm transition-colors duration-300 ${overHero ? 'text-white' : 'text-gray-600'}`}>
-            <a href="/trader-signup" className={`font-medium whitespace-nowrap transition-colors ${overHero ? 'hover:text-teal-200' : 'hover:text-teal-600'}`}>Trader</a>
+            <a href="/login" className={`font-medium whitespace-nowrap transition-colors ${overHero ? 'hover:text-teal-200' : 'hover:text-teal-600'}`}>Trader</a>
             <button type="button" onClick={() => navigate('/customs-login')} className={`font-medium whitespace-nowrap transition-colors ${overHero ? 'hover:text-teal-200' : 'hover:text-teal-600'}`}>
               Customs
             </button>
@@ -115,7 +115,7 @@ export default function Layout({ children }: LayoutProps) {
               >
                 <div className="px-5 py-5 space-y-5">
                   <div className="space-y-1">
-                    <a href="/trader-signup" className="block py-2.5 px-3 hover:bg-teal-50 rounded-xl transition-colors" onClick={() => setIsOpen(false)}>
+                    <a href="/login" className="block py-2.5 px-3 hover:bg-teal-50 rounded-xl transition-colors" onClick={() => setIsOpen(false)}>
                       <span className="text-gray-700 hover:text-teal-600">I'm a Trader</span>
                     </a>
                     <a href="/customs-login" className="block py-2.5 px-3 hover:bg-teal-50 rounded-xl transition-colors" onClick={() => setIsOpen(false)}>

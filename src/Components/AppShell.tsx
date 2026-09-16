@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { IconType } from 'react-icons';
-import { FaBars, FaBoxOpen, FaChartPie, FaCog, FaHistory, FaHome, FaSignOutAlt, FaTimes } from 'react-icons/fa';
+import { FaArrowLeft, FaBars, FaBoxOpen, FaChartPie, FaCog, FaHistory, FaHome, FaSignOutAlt, FaTimes } from 'react-icons/fa';
 import sentraLogo from '../assets/images/Sentralogo.png';
 import { useAuth } from './AuthContext';
 
@@ -25,6 +25,20 @@ const TRADER_NAV: NavItem[] = [
   { label: 'Activity', icon: FaHistory, href: '#activity' },
 ];
 
+// Settings has no dashboard of its own to navigate within, so instead of a
+// section nav it just needs one way back to whichever dashboard the user
+// came from. Remembered across a refresh since Settings can be reached
+// directly (bookmark, reload) with no router state to fall back on.
+const LAST_DASHBOARD_KEY = 'sentra-last-dashboard';
+
+function getLastDashboardPath(): string {
+  try {
+    return sessionStorage.getItem(LAST_DASHBOARD_KEY) || '/dashboard';
+  } catch {
+    return '/dashboard';
+  }
+}
+
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -34,9 +48,23 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   const isCustoms = location.pathname.startsWith('/customs-dashboard');
   const isSettings = location.pathname === '/settings';
+
+  useEffect(() => {
+    if (location.pathname === '/dashboard' || location.pathname.startsWith('/customs-dashboard')) {
+      try {
+        sessionStorage.setItem(LAST_DASHBOARD_KEY, location.pathname);
+      } catch {
+        // sessionStorage unavailable - the Settings back-link just falls back to /dashboard
+      }
+    }
+  }, [location.pathname]);
+
   // Settings is a standalone page with no #overview/#activity sections to
-  // jump to, so it gets no section nav rather than dead links that no-op.
-  const primaryNav = isSettings ? [] : isCustoms ? CUSTOMS_NAV : TRADER_NAV;
+  // jump to, so instead of the section nav it gets a single link back to
+  // whichever dashboard the user came from, rather than dead links that no-op.
+  const primaryNav: NavItem[] = isSettings
+    ? [{ label: 'Back to Dashboard', icon: FaArrowLeft, path: getLastDashboardPath() }]
+    : isCustoms ? CUSTOMS_NAV : TRADER_NAV;
 
   useEffect(() => {
     setMobileOpen(false);

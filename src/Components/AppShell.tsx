@@ -32,7 +32,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const [activeSection, setActiveSection] = useState<string>('overview');
 
   const isCustoms = location.pathname.startsWith('/customs-dashboard');
-  const primaryNav = isCustoms ? CUSTOMS_NAV : TRADER_NAV;
+  const isSettings = location.pathname === '/settings';
+  // Settings is a standalone page with no #overview/#activity sections to
+  // jump to, so it gets no section nav rather than dead links that no-op.
+  const primaryNav = isSettings ? [] : isCustoms ? CUSTOMS_NAV : TRADER_NAV;
 
   useEffect(() => {
     setMobileOpen(false);

@@ -55,6 +55,7 @@ const ConsignmentCreationModal: React.FC<ConsignmentCreationModalProps> = ({ isO
 
     try {
       const docRef = await addDoc(collection(db, 'consignments'), {
+        traderId: authUser?.uid ?? '',
         traderName: data.traderName,
         traderEmail: authUser?.email ?? '',
         documentType: data.documentType,

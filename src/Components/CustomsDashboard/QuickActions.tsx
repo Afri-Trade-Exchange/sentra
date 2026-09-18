@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import Papa from 'papaparse';
 import { format } from 'date-fns';
 import { FaChartBar, FaFileExport, FaPlus, FaQrcode } from 'react-icons/fa';
@@ -10,39 +10,6 @@ import NewConsignmentModal from '../NewConsignmentModal';
 import QrScannerModal from './QrScannerModal';
 import { Consignment, ConsignmentStatus, ExportSettings, NewConsignmentFormData, QrScannerData } from './types';
 import Card from '../ui/Card';
-
-declare module 'jspdf' {
-  interface jsPDF {
-    autoTable: (options: {
-      head?: string[][];
-      body: (string | number)[][];
-      startY?: number;
-      styles?: {
-        fontSize?: number;
-        cellPadding?: number;
-      };
-      headStyles?: {
-        fillColor?: number[];
-        textColor?: number;
-      };
-      alternateRowStyles?: {
-        fillColor?: number[];
-      };
-    }) => jsPDF;
-    internal: {
-      events: PubSub;
-      scaleFactor: number;
-      pageSize: {
-        width: number;
-        getWidth: () => number;
-        height: number;
-        getHeight: () => number;
-      };
-      pages: number[];
-      getEncryptor(objectId: number): (data: string) => string;
-    };
-  }
-}
 
 const QuickActions: React.FC<{
   consignments: Consignment[];
@@ -95,7 +62,7 @@ const QuickActions: React.FC<{
       exportSettings.includeFields.map(field => item[field as keyof typeof item])
     );
 
-    doc.autoTable({
+    autoTable(doc, {
       head: [exportSettings.includeFields],
       body: tableData,
       startY: 35,

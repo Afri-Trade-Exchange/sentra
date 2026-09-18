@@ -48,7 +48,7 @@ function AppRoutes() {
       <Route
         path="/dashboard"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole="trader">
             <Dashboard />
           </ProtectedRoute>
         }
@@ -56,12 +56,19 @@ function AppRoutes() {
       <Route
         path="/customs-dashboard"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole="customs">
             <CustomsDashboard />
           </ProtectedRoute>
         }
       />
-      <Route path="/settings" element={<Settings />} />
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute>
+            <Settings />
+          </ProtectedRoute>
+        }
+      />
       {/* Add other routes as needed */}
     </Routes>
   );

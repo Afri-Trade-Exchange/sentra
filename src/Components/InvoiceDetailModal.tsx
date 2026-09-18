@@ -2,6 +2,21 @@ import { FaDownload, FaPrint } from 'react-icons/fa';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
+// Invoice fields (trader name, item descriptions, notes, ...) ultimately
+// trace back to Firestore consignment data, which isn't guaranteed to be
+// free of markup. This HTML is built as a raw template string and inserted
+// into the live DOM below (for html2canvas to rasterize), so every
+// interpolated string must be escaped or a crafted consignment field
+// becomes stored XSS against whoever opens this invoice.
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 interface Invoice {
   invoiceNumber: string;
   invoiceDate: string;
@@ -55,6 +70,20 @@ export default function InvoiceDetailModal({
       fontLink.rel = 'stylesheet';
       container.appendChild(fontLink);
 
+      // Escape every user-influenced string once, up front, so the
+      // template below can interpolate freely without re-deriving which
+      // fields need it.
+      const safe = {
+        invoiceNumber: escapeHtml(invoice.invoiceNumber),
+        businessName: escapeHtml(invoice.businessName || 'Afritrade'),
+        customerName: escapeHtml(invoice.customerName || 'Customer'),
+        notes: escapeHtml(invoice.notes || 'No additional notes'),
+        items: invoice.items.map((item) => ({
+          ...item,
+          description: escapeHtml(item.description),
+        })),
+      };
+
       // Detailed invoice HTML
       invoiceWrapper.innerHTML = `
         <div style="
@@ -81,7 +110,7 @@ export default function InvoiceDetailModal({
                 Invoice
               </h1>
               <p style="margin: 10px 0 5px; font-weight: 600; color: #7f8c8d;">
-                Invoice #: ${invoice.invoiceNumber}
+                Invoice #: ${safe.invoiceNumber}
               </p>
               <p style="margin: 0; font-weight: 500; color: #7f8c8d;">
                 Date: ${new Date().toLocaleDateString()}
@@ -102,7 +131,7 @@ export default function InvoiceDetailModal({
                 From:
               </h3>
               <p style="margin: 0; font-weight: 500; color: #34495e;">
-                ${invoice.businessName || 'Afritrade'}
+                ${safe.businessName}
               </p>
             </div>
             <div style="text-align: right;">
@@ -110,7 +139,7 @@ export default function InvoiceDetailModal({
                 Bill To:
               </h3>
               <p style="margin: 0; font-weight: 500; color: #34495e;">
-                ${invoice.customerName || 'Customer'}
+                ${safe.customerName}
               </p>
             </div>
           </div>
@@ -157,7 +186,7 @@ export default function InvoiceDetailModal({
               </tr>
             </thead>
             <tbody>
-              ${invoice.items.map((item, index) => `
+              ${safe.items.map((item, index) => `
                 <tr style="
                   background-color: ${index % 2 === 0 ? '#f9f9f9' : 'white'};
                   transition: background-color 0.3s ease;
@@ -220,7 +249,7 @@ export default function InvoiceDetailModal({
                 font-weight: 500; 
                 color: #34495e;
               ">
-                ${invoice.notes || 'No additional notes'}
+                ${safe.notes}
               </p>
             </div>
             <div style="
@@ -262,7 +291,7 @@ export default function InvoiceDetailModal({
               Generated on: ${new Date().toLocaleString()}
             </p>
             <p style="margin: 5px 0;">
-              © ${new Date().getFullYear()} ${invoice.businessName}. All rights reserved.
+              © ${new Date().getFullYear()} ${safe.businessName}. All rights reserved.
             </p>
           </div>
         </div>

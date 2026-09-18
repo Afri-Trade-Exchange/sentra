@@ -1,22 +1,39 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { auth } from '../firebase/firebaseConfig'; // Adjust this import based on your firebase setup
+import { auth, firestore } from '../firebase/firebaseConfig';
+import { doc, getDoc } from 'firebase/firestore';
 import { User } from 'firebase/auth';
+import type { UserRole } from '../firebase/authService';
 
 interface AuthContextType {
   user: User | null;
+  role: UserRole | null;
   signOut: () => Promise<void>;
   loading: boolean;
 }
 
-const AuthContext = createContext<AuthContextType>({ user: null, signOut: async () => {}, loading: true });
+const AuthContext = createContext<AuthContextType>({ user: null, role: null, signOut: async () => {}, loading: true });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [role, setRole] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setUser(user);
+    const unsubscribe = auth.onAuthStateChanged(async (nextUser) => {
+      setUser(nextUser);
+
+      if (nextUser) {
+        try {
+          const userDoc = await getDoc(doc(firestore, 'users', nextUser.uid));
+          setRole(userDoc.exists() ? (userDoc.data().role as UserRole) : null);
+        } catch (error) {
+          console.error('Failed to load user role:', error);
+          setRole(null);
+        }
+      } else {
+        setRole(null);
+      }
+
       setLoading(false);
     });
 
@@ -28,10 +45,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, signOut, loading }}>
+    <AuthContext.Provider value={{ user, role, signOut, loading }}>
       {!loading && children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext); 
+export const useAuth = () => useContext(AuthContext);

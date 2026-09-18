@@ -2,14 +2,66 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+    function isSignedIn() {
+      return request.auth != null;
     }
 
-    // Consignments are shared between traders (who create/update them) and
-    // customs officers (who look them up via QR scan) — both must be signed in.
+    function userRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isCustoms() {
+      return isSignedIn() && userRole() == 'customs';
+    }
+
+    match /users/{userId} {
+      allow read: if isSignedIn() && request.auth.uid == userId;
+
+      // Self-service signup only ever creates a trader account; customs
+      // officer accounts are provisioned directly in the Firebase Console,
+      // never through this rule, so client code can never grant itself
+      // customs access by writing its own user document.
+      allow create: if isSignedIn() && request.auth.uid == userId
+        && request.resource.data.role == 'trader';
+
+      // A user can update their own profile, but role is immutable once
+      // set — otherwise a trader could self-escalate to customs by
+      // writing their own user document directly via the SDK.
+      allow update: if isSignedIn() && request.auth.uid == userId
+        && request.resource.data.role == resource.data.role;
+
+      allow delete: if false;
+    }
+
+    // Consignments are created by traders and reviewed by customs
+    // officers. A trader may only read/update their own; customs officers
+    // (role looked up from their own user document) can act on all of
+    // them, since reviewing consignments they don't own is the point of
+    // the role.
     match /consignments/{consignmentId} {
-      allow read, write: if request.auth != null;
+      function isOwnTrader() {
+        return resource.data.traderId == request.auth.uid
+          // Consignments created before `traderId` was recorded fall back
+          // to matching the trader's verified auth email.
+          || (!('traderId' in resource.data) && resource.data.traderEmail == request.auth.token.email);
+      }
+
+      allow read: if isSignedIn() && (isOwnTrader() || isCustoms());
+
+      allow create: if isSignedIn()
+        && request.resource.data.traderId == request.auth.uid
+        && request.resource.data.status == 'Pending';
+
+      // Traders can update their own consignment (e.g. uploading documents)
+      // but can never change its review status themselves — only customs
+      // officers can approve/reject.
+      allow update: if isSignedIn() && (
+        (isOwnTrader() && request.resource.data.status == resource.data.status)
+        || isCustoms()
+      );
+
+      allow delete: if false;
     }
 
     // The public Contact page must work for signed-out visitors, so writes

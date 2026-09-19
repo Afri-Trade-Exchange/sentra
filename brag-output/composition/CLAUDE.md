@@ -69,13 +69,6 @@ Topics: `data-attributes`, `gsap`, `compositions`, `rendering`, `examples`, `tro
 https://hyperframes.heygen.com/llms.txt
 ```
 
-## Project Structure
-
-- `index.html` — main composition (root timeline)
-- `compositions/` — sub-compositions referenced via `data-composition-src`
-- `meta.json` — project metadata (id, name)
-- `transcript.json` — whisper word-level transcript (if generated)
-
 ## Linting — ALWAYS RUN AFTER CHANGES
 
 After creating or editing any `.html` composition, **always** run the full check before considering the task complete:

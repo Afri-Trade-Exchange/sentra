@@ -127,14 +127,14 @@ export default function LandingPage() {
               <button
                 type="button"
                 onClick={() => navigate('/trader-signup')}
-                className="px-8 py-3 text-[#07211d] bg-teal-300 rounded-lg hover:bg-teal-200 transition-colors font-['Manrope'] font-semibold"
+                className="px-8 py-3 text-[#07211d] bg-teal-300 rounded-lg hover:bg-teal-200 active:scale-[0.98] transition-all font-['Manrope'] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#07211d]"
               >
                 Try for free
               </button>
               <button
                 type="button"
                 onClick={() => navigate('/trader-signup')}
-                className="inline-flex items-center gap-2 text-white hover:text-teal-200 transition-colors font-medium"
+                className="inline-flex items-center gap-2 text-white hover:text-teal-200 active:scale-[0.98] transition-all font-medium rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#07211d]"
               >
                 How others use it <FaArrowRight className="text-sm" />
               </button>
@@ -217,7 +217,7 @@ export default function LandingPage() {
               <button
                 type="button"
                 onClick={() => navigate('/trader-signup')}
-                className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-medium"
+                className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 active:scale-[0.98] transition-transform font-medium rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
               >
                 Get started as a trader <FaArrowRight className="text-sm" />
               </button>
@@ -237,7 +237,7 @@ export default function LandingPage() {
               <button
                 type="button"
                 onClick={() => navigate('/customs-login')}
-                className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-medium"
+                className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 active:scale-[0.98] transition-transform font-medium rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
               >
                 Sign in as an officer <FaArrowRight className="text-sm" />
               </button>
@@ -374,12 +374,12 @@ export default function LandingPage() {
                   placeholder="Search order, e.g. ORD-001"
                   value={orderNumber}
                   onChange={(e) => setOrderNumber(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 />
               </div>
               <button
                 type="button"
-                className="shrink-0 inline-flex items-center justify-center gap-2 text-teal-600 hover:text-teal-700 font-medium pb-1 sm:pb-2"
+                className="shrink-0 inline-flex items-center justify-center gap-2 text-teal-600 hover:text-teal-700 active:scale-[0.98] transition-transform font-medium pb-1 sm:pb-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
                 onClick={handleSearch}
               >
                 Track Shipment <FiSearch />
@@ -408,8 +408,9 @@ export default function LandingPage() {
                     </div>
                   )}
                   <button
+                    type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="mt-4 px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600"
+                    className="mt-4 px-4 py-2 bg-teal-600 text-white rounded-xl hover:bg-teal-700 active:scale-[0.98] transition-all font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
                   >
                     Close
                   </button>

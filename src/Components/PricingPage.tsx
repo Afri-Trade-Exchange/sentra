@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { FaCheck } from 'react-icons/fa';
+import { motion, useReducedMotion } from 'framer-motion';
 
 const plans = [
   {
@@ -47,6 +48,7 @@ const plans = [
 
 export default function PricingPage() {
   const navigate = useNavigate();
+  const prefersReducedMotion = useReducedMotion();
 
   return (
     <div className="min-h-screen bg-stone-100 text-gray-800">
@@ -58,15 +60,19 @@ export default function PricingPage() {
           Pricing that fits how you trade.
         </h1>
         <p className="text-gray-600 text-lg">
-          From a single trader to a national customs authority — talk to us and we'll match a plan to your volume.
+          From a single trader to a national customs authority, talk to us and we'll match a plan to your volume.
         </p>
       </div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 pb-24">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-          {plans.map((plan) => (
-            <div
+          {plans.map((plan, index) => (
+            <motion.div
               key={plan.name}
+              initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.4 }}
+              transition={{ duration: 0.5, ease: 'easeOut', delay: index * 0.1 }}
               className={`rounded-2xl p-8 flex flex-col h-full ${
                 plan.highlighted
                   ? 'bg-teal-600 text-white shadow-lg md:-translate-y-2'
@@ -88,15 +94,15 @@ export default function PricingPage() {
               <button
                 type="button"
                 onClick={() => navigate(plan.action)}
-                className={`w-full py-3 rounded-lg font-['Manrope'] font-semibold transition-colors ${
+                className={`w-full py-3 rounded-lg font-['Manrope'] font-semibold transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
                   plan.highlighted
-                    ? 'bg-white text-teal-700 hover:bg-teal-50'
-                    : 'bg-teal-600 text-white hover:bg-teal-700'
+                    ? 'bg-white text-teal-700 hover:bg-teal-50 focus-visible:ring-white focus-visible:ring-offset-teal-600'
+                    : 'bg-teal-600 text-white hover:bg-teal-700 focus-visible:ring-teal-500'
                 }`}
               >
                 {plan.cta}
               </button>
-            </div>
+            </motion.div>
           ))}
         </div>
 

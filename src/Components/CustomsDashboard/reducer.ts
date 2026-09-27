@@ -8,8 +8,6 @@ export const filterConsignments = (
   const normalizedSearchTerm = searchTerm.trim().toLowerCase();
 
   return consignments.filter(consignment => {
-    if (!normalizedSearchTerm) return true;
-
     const searchableFields = [
       consignment.traderName,
       consignment.documentType,
@@ -19,7 +17,7 @@ export const filterConsignments = (
       consignment.estimatedValue?.toString()
     ];
 
-    const matchesSearch = searchableFields.some(field =>
+    const matchesSearch = !normalizedSearchTerm || searchableFields.some(field =>
       field && String(field).toLowerCase().includes(normalizedSearchTerm)
     );
 

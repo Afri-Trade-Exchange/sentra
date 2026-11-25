@@ -41,7 +41,7 @@ service cloud.firestore {
     // the role.
     match /consignments/{consignmentId} {
       function isOwnTrader() {
-        return resource.data.traderId == request.auth.uid
+        return resource.data.get('traderId', null) == request.auth.uid
           // Consignments created before `traderId` was recorded fall back
           // to matching the trader's verified auth email.
           || (!('traderId' in resource.data) && resource.data.traderEmail == request.auth.token.email);
@@ -56,12 +56,95 @@ service cloud.firestore {
       // Traders can update their own consignment (e.g. uploading documents)
       // but can never change its review status themselves — only customs
       // officers can approve/reject.
-      allow update: if isSignedIn() && (
+      allow update: if isSignedIn()
+        && request.resource.data.get('traderId', null) == resource.data.get('traderId', null)
+        && (
         (isOwnTrader() && request.resource.data.status == resource.data.status)
         || isCustoms()
       );
 
       allow delete: if false;
+    }
+
+    match /consignments/{consignmentId}/packet/{packetId} {
+      function packetPath() {
+        return /databases/$(database)/documents/consignments/$(consignmentId)/packet/current;
+      }
+
+      function revisionPath(revisionId) {
+        return /databases/$(database)/documents/consignments/$(consignmentId)/packet/current/revisions/$(revisionId);
+      }
+
+      function ownsConsignment() {
+        return isSignedIn() && get(/databases/$(database)/documents/consignments/$(consignmentId)).data.traderId == request.auth.uid;
+      }
+
+      function assignedReviewer(packet) {
+        return isCustoms() && packet.reviewerId == request.auth.uid;
+      }
+
+      function validSubmission(version) {
+        let data = request.resource.data;
+        return data.keys().hasOnly(['ownerId', 'reviewerId', 'revisionId', 'version', 'status'])
+          && data.ownerId == request.auth.uid
+          && data.reviewerId is string && data.reviewerId.size() > 0 && data.reviewerId.size() <= 128
+          && data.reviewerId != data.ownerId
+          && data.revisionId is string && data.revisionId.matches('[A-Za-z0-9]{20}')
+          && data.version == version && data.status == 'submitted'
+          && !exists(revisionPath(data.revisionId))
+          && getAfter(revisionPath(data.revisionId)).data.version == version;
+      }
+
+      function validReview() {
+        let data = request.resource.data;
+        return assignedReviewer(resource.data) && resource.data.status == 'submitted'
+          && data.diff(resource.data).affectedKeys().hasOnly(['status'])
+          && data.status in ['correction_requested', 'ready_to_file']
+          && getAfter(revisionPath(data.revisionId)).data.decision.status == data.status;
+      }
+
+      allow get: if packetId == 'current'
+        && (ownsConsignment() || assignedReviewer(resource.data));
+      allow create: if packetId == 'current' && ownsConsignment() && validSubmission(1)
+        && get(/databases/$(database)/documents/users/$(request.resource.data.reviewerId)).data.role == 'customs';
+      allow update: if packetId == 'current' && (
+        (ownsConsignment() && resource.data.status == 'correction_requested'
+          && request.resource.data.reviewerId == resource.data.reviewerId
+          && validSubmission(resource.data.version + 1))
+        || validReview()
+      );
+
+      match /revisions/{revisionId} {
+        function validNewRevision() {
+          let data = request.resource.data;
+          let packet = getAfter(packetPath()).data;
+          return data.keys().hasOnly(['ownerId', 'reviewerId', 'version', 'fileNames', 'submittedAt'])
+            && packet.revisionId == revisionId && packet.status == 'submitted'
+            && packet.ownerId == data.ownerId && packet.reviewerId == data.reviewerId
+            && packet.version == data.version && data.submittedAt == request.time
+            && data.fileNames is list && data.fileNames.size() > 0 && data.fileNames.size() <= 10
+            && data.fileNames.join('').size() <= 2000;
+        }
+
+        function validDecision() {
+          let before = get(packetPath()).data;
+          let after = getAfter(packetPath()).data;
+          let decision = request.resource.data.decision;
+          return assignedReviewer(before) && before.revisionId == revisionId
+            && before.status == 'submitted' && !('decision' in resource.data)
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['decision'])
+            && decision.keys().hasOnly(['status', 'reason', 'at'])
+            && decision.status == after.status && decision.status in ['correction_requested', 'ready_to_file']
+            && decision.reason is string && decision.reason.size() <= 1000
+            && (decision.status != 'correction_requested' || decision.reason.size() > 0)
+            && decision.at == request.time;
+        }
+
+        allow read: if packetId == 'current'
+          && (ownsConsignment() || assignedReviewer(get(packetPath()).data));
+        allow create: if packetId == 'current' && ownsConsignment() && validNewRevision();
+        allow update: if packetId == 'current' && validDecision();
+      }
     }
 
     // The public Contact page must work for signed-out visitors, so writes

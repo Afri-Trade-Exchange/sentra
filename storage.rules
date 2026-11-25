@@ -1,0 +1,32 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /packetFiles/{ownerId}/{consignmentId}/{revisionId}/{fileIndex} {
+      function revisionPath() {
+        return /databases/(default)/documents/consignments/$(consignmentId)/packet/current/revisions/$(revisionId);
+      }
+
+      function owner() {
+        return request.auth != null && request.auth.uid == ownerId;
+      }
+
+      function canReadPublishedFile() {
+        let revision = firestore.get(revisionPath()).data;
+        return revision.ownerId == ownerId && (owner() || (
+          revision.reviewerId == request.auth.uid
+          && firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'customs'
+        ));
+      }
+
+      allow get: if request.auth != null && canReadPublishedFile();
+      allow create: if owner() && revisionId.matches('[A-Za-z0-9]{20}') && fileIndex.matches('[0-9]')
+        && firestore.get(/databases/(default)/documents/consignments/$(consignmentId)).data.traderId == ownerId
+        && !firestore.exists(revisionPath())
+        && request.resource.size > 0 && request.resource.size <= 10 * 1024 * 1024
+        && request.resource.contentType in ['application/pdf', 'image/jpeg', 'image/png']
+        && request.resource.contentDisposition == 'attachment';
+      allow delete: if owner() && !firestore.exists(revisionPath());
+    }
+  }
+}

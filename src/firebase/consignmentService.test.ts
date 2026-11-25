@@ -7,7 +7,7 @@ vi.mock('./firebaseConfig', () => ({ db: {} }));
 vi.mock('firebase/firestore', async (importOriginal) => ({
   ...await importOriginal<typeof import('firebase/firestore')>(),
   collection: vi.fn(() => 'collection'),
-  where: vi.fn(() => 'email-filter'),
+  where: vi.fn(() => 'owner-filter'),
   query: vi.fn(() => 'trader-query'),
   onSnapshot: vi.fn(),
 }));
@@ -37,14 +37,14 @@ describe('consignment data service', () => {
     expect(Number.isFinite(result.createdAt.toMillis())).toBe(true);
   });
 
-  it('restricts trader subscriptions by email and returns the cleanup function', () => {
+  it('restricts trader subscriptions by owner UID and returns the cleanup function', () => {
     const cleanup = vi.fn();
     vi.mocked(onSnapshot).mockReturnValue(cleanup);
     const receive = vi.fn();
     const onError = vi.fn();
-    expect(subscribeToConsignments({ traderEmail: 'trader@example.com' }, receive, onError)).toBe(cleanup);
-    expect(where).toHaveBeenCalledWith('traderEmail', '==', 'trader@example.com');
-    expect(query).toHaveBeenCalledWith('collection', 'email-filter');
+    expect(subscribeToConsignments({ traderId: 'trader-uid' }, receive, onError)).toBe(cleanup);
+    expect(where).toHaveBeenCalledWith('traderId', '==', 'trader-uid');
+    expect(query).toHaveBeenCalledWith('collection', 'owner-filter');
     expect(onSnapshot).toHaveBeenCalledWith('trader-query', expect.any(Function), onError);
   });
 

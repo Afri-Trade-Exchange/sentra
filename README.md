@@ -76,6 +76,14 @@ npm run lint      # run ESLint
 
 > There's no automated test suite yet — no `npm test` script, no CI. That's a known gap, not an oversight.
 
+### Document packet pilot
+
+- Provision clearing reviewers with the existing `customs` role. The reviewer shares the ID shown in the clearing dashboard. A trader assigns one reviewer when they submit a consignment's first packet.
+- Apply the Firestore and Storage rules in the same release. Enable Storage rules to read Firestore, and configure the bucket's CORS policy to allow `GET` from your frontend origins for authenticated SDK downloads. Use a separate Firebase project for staging.
+- Trader dashboard queries use `traderId`. Backfill this field using verified account ownership before relying on the dashboard for legacy consignments that only have an email. Historical filename-only submissions contain no files to migrate.
+- Corrections require a complete new packet. Each version keeps its original files and review note. “Ready to file” is a packet decision, separate from the consignment's official status.
+- For local rules verification, run `firebase emulators:exec --only auth,firestore,storage --project demo-sentra "node scripts/test-document-packet.mjs"` with the Firebase CLI and Java installed.
+
 ## 🗺️ Routes
 
 | Path | Description |

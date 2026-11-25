@@ -15,7 +15,8 @@ const QuickActions: React.FC<{
   consignments: Consignment[];
   selectedItems: string[];
   onSubmitNewConsignment: (formData: NewConsignmentFormData) => void;
-}> = ({ consignments, selectedItems, onSubmitNewConsignment }) => {
+  onReviewPacket: (id: string) => void;
+}> = ({ consignments, selectedItems, onSubmitNewConsignment, onReviewPacket }) => {
   const [showNewConsignmentModal, setShowNewConsignmentModal] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const [scannedData, setScannedData] = useState<QrScannerData | null>(null);
@@ -252,6 +253,11 @@ const QuickActions: React.FC<{
               <p className="mt-1 text-gray-900 dark:text-gray-100">{scannedData.estimatedValue}</p>
             </div>
           </div>
+
+          <button type="button" className="mt-4 text-teal-700 underline dark:text-teal-300"
+            onClick={() => onReviewPacket(scannedData.consignmentId)}>
+            Review document packet
+          </button>
 
           {scannedData.documents && scannedData.documents.length > 0 && (
             <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">

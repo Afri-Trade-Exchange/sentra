@@ -1,104 +1,66 @@
-import { Suspense, lazy } from 'react'
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom'
-import './index.css'
-import LandingPage from './Components/Landing/LandingPage'
-import TraderSignup from './Components/TraderSignup'
-import ContactPage from './Components/ContactPage'
-import AboutPage from './Components/AboutPage'
-import PricingPage from './Components/PricingPage'
-import BlogPage from './Components/BlogPage'
-import TermsPage from './Components/TermsPage'
-import PrivacyPage from './Components/PrivacyPage'
-import Layout from './Components/Layout'
-import AppShell from './Components/AppShell'
-import ErrorBoundary from './Components/ErrorBoundary'
-import Dashboard from './Components/Dashboard'
-import CustomsDashboard from './Components/CustomsDashboard'
-import { AuthProvider } from './Components/AuthContext'
-import { ThemeProvider } from './Components/ThemeContext'
-import ProtectedRoute from './Components/ProtectedRoute'
-import LoginPage from './Components/LoginPage'
-import ForgotPassword from './Components/ForgotPassword'
-import Settings from './Components/Settings'
+import { Suspense, lazy } from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import LandingPage from './Components/Landing/LandingPage';
+import ContactPage from './Components/ContactPage';
+import AboutPage from './Components/AboutPage';
+import PricingPage from './Components/PricingPage';
+import BlogPage from './Components/BlogPage';
+import TermsPage from './Components/TermsPage';
+import PrivacyPage from './Components/PrivacyPage';
+import ErrorBoundary from './Components/ErrorBoundary';
+import { ThemeProvider } from './Components/ThemeContext';
+import PublicLayout from './routes/PublicLayout';
 
-const Footer = lazy(() => import('./Components/Footer'));
-
-// Logged-in app pages get a left-sidebar shell instead of the marketing
-// top nav, since a persistent top nav for signed-out visitors doesn't
-// belong on an authenticated dashboard.
-const APP_SHELL_PREFIXES = ['/dashboard', '/customs-dashboard', '/settings'];
-
-function AppRoutes() {
-  const location = useLocation();
-  const useAppShell = APP_SHELL_PREFIXES.some((prefix) => location.pathname.startsWith(prefix));
-
-  const routes = (
-    <Routes>
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/trader-signup" element={<TraderSignup />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/customs-login" element={<LoginPage />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/contact" element={<ContactPage />} />
-      <Route path="/about" element={<AboutPage />} />
-      <Route path="/pricing" element={<PricingPage />} />
-      <Route path="/blog" element={<BlogPage />} />
-      <Route path="/terms" element={<TermsPage />} />
-      <Route path="/privacy" element={<PrivacyPage />} />
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute requiredRole="trader">
-            <Dashboard />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/customs-dashboard"
-        element={
-          <ProtectedRoute requiredRole="customs">
-            <CustomsDashboard />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/settings"
-        element={
-          <ProtectedRoute>
-            <Settings />
-          </ProtectedRoute>
-        }
-      />
-      {/* Add other routes as needed */}
-    </Routes>
-  );
-
-  if (useAppShell) {
-    return <AppShell>{routes}</AppShell>;
-  }
-
-  return (
-    <Layout>
-      {routes}
-      <Footer />
-    </Layout>
-  );
-}
+const AccountLayout = lazy(() => import('./routes/AccountLayout'));
+const WorkspaceLayout = lazy(() => import('./routes/WorkspaceLayout'));
+const TraderSignup = lazy(() => import('./Components/TraderSignup'));
+const LoginPage = lazy(() => import('./Components/LoginPage'));
+const ForgotPassword = lazy(() => import('./Components/ForgotPassword'));
+const Dashboard = lazy(() => import('./Components/Dashboard'));
+const CustomsDashboard = lazy(() => import('./Components/CustomsDashboard'));
+const Settings = lazy(() => import('./Components/Settings'));
 
 export default function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <ErrorBoundary>
-          <Router>
-            <Suspense fallback={<div>Loading...</div>}>
-              <div className="App">
-                <AppRoutes />
-              </div>
+      <ErrorBoundary>
+        <BrowserRouter>
+          <div className="App">
+            <Suspense fallback={<div role="status">Loading…</div>}>
+              <Routes>
+                <Route element={<PublicLayout />}>
+                  <Route index element={<LandingPage />} />
+                  <Route path="contact" element={<ContactPage />} />
+                  <Route path="about" element={<AboutPage />} />
+                  <Route path="pricing" element={<PricingPage />} />
+                  <Route path="blog" element={<BlogPage />} />
+                  <Route path="terms" element={<TermsPage />} />
+                  <Route path="privacy" element={<PrivacyPage />} />
+                  <Route path="*" element={null} />
+                </Route>
+
+                <Route element={<AccountLayout />}>
+                  <Route element={<PublicLayout />}>
+                    <Route path="trader-signup" element={<TraderSignup />} />
+                    <Route path="login" element={<LoginPage />} />
+                    <Route path="customs-login" element={<LoginPage />} />
+                    <Route path="forgot-password" element={<ForgotPassword />} />
+                  </Route>
+                  <Route element={<WorkspaceLayout requiredRole="trader" />}>
+                    <Route path="dashboard" element={<Dashboard />} />
+                  </Route>
+                  <Route element={<WorkspaceLayout requiredRole="customs" />}>
+                    <Route path="customs-dashboard" element={<CustomsDashboard />} />
+                  </Route>
+                  <Route element={<WorkspaceLayout />}>
+                    <Route path="settings" element={<Settings />} />
+                  </Route>
+                </Route>
+              </Routes>
             </Suspense>
-          </Router>
-        </ErrorBoundary>
-      </AuthProvider>
+          </div>
+        </BrowserRouter>
+      </ErrorBoundary>
     </ThemeProvider>
-  )
+  );
 }

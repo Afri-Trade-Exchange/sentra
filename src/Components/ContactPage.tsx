@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaFacebookF, FaInstagram, FaTwitter, FaArrowRight, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
-import { collection, addDoc, Timestamp } from 'firebase/firestore';
-import { db } from '../firebase/firebaseConfig';
 
 // TODO: swap in the real social URLs once available (matches Footer's convention)
 const socialLinks = [
@@ -100,12 +98,8 @@ const ContactPage: React.FC = () => {
     setSubmitStatus('idle');
 
     try {
-      await addDoc(collection(db, 'contactMessages'), {
-        name: formData.name,
-        email: formData.email,
-        message: formData.message,
-        createdAt: Timestamp.now(),
-      });
+      const { sendContactMessage } = await import('../firebase/contactMessages');
+      await sendContactMessage(formData);
       setSubmitStatus('success');
       setFormData({ name: '', email: '', message: '' });
     } catch (error) {

@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { FaClipboardList } from 'react-icons/fa';
-import { collection, addDoc, doc, updateDoc, onSnapshot, writeBatch, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, doc, updateDoc, writeBatch, Timestamp } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
+import { subscribeToConsignments } from '../firebase/consignmentService';
 import { useAuth } from './AuthContext';
 import TraderDetailsModal from './TraderDetailsModal';
 import { Activity, Consignment, ConsignmentStatus, DashboardState, NewConsignmentFormData, NotificationType, TimelineEvent } from './CustomsDashboard/types';
@@ -51,26 +52,9 @@ export const CustomsDashboard: React.FC = () => {
   const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(
-      collection(db, 'consignments'),
-      (snapshot) => {
-        const consignments: Consignment[] = snapshot.docs.map((docSnap) => {
-          const data = docSnap.data();
-          return {
-            id: docSnap.id,
-            traderName: data.traderName ?? '',
-            traderEmail: data.traderEmail ?? '',
-            documentType: data.documentType ?? '',
-            status: (data.status as ConsignmentStatus) ?? ConsignmentStatus.Pending,
-            goodsStatus: data.goodsStatus ?? '',
-            description: data.description ?? '',
-            estimatedValue: data.estimatedValue ?? 0,
-            declarationNumber: data.declarationNumber ?? '',
-            goodsOrdered: data.goodsOrdered ?? [],
-            documents: data.documents ?? [],
-            createdAt: data.createdAt ?? Timestamp.now(),
-          };
-        });
+    return subscribeToConsignments(
+      { all: true },
+      (consignments) => {
         dispatch({ type: 'SET_CONSIGNMENTS', payload: consignments });
         setIsLoading(false);
       },
@@ -80,8 +64,6 @@ export const CustomsDashboard: React.FC = () => {
         setIsLoading(false);
       }
     );
-
-    return () => unsubscribe();
   }, []);
 
   const paginatedConsignments = useMemo(() => {

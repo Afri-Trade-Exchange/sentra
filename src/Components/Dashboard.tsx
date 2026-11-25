@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { FaUpload, FaDownload, FaBox, FaWallet, FaCheckCircle, FaChartLine, FaShieldAlt, FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
-import { db } from '../firebase/firebaseConfig';
+import { subscribeToConsignments } from '../firebase/consignmentService';
 import UploadModal from './UploadModal';
 import InvoiceDetailModal from './InvoiceDetailModal';
 import { useAuth } from './AuthContext';
@@ -63,34 +62,11 @@ export default function Dashboard() {
   useEffect(() => {
     if (!user?.email) return;
 
-    const consignmentsQuery = query(collection(db, 'consignments'), where('traderEmail', '==', user.email));
-    const unsubscribe = onSnapshot(
-      consignmentsQuery,
-      (snapshot) => {
-        setConsignments(
-          snapshot.docs.map((docSnap) => {
-            const data = docSnap.data();
-            return {
-              id: docSnap.id,
-              traderName: data.traderName ?? '',
-              traderEmail: data.traderEmail ?? '',
-              documentType: data.documentType ?? '',
-              status: (data.status as ConsignmentStatus) ?? ConsignmentStatus.Pending,
-              goodsStatus: data.goodsStatus ?? '',
-              description: data.description ?? '',
-              estimatedValue: data.estimatedValue ?? 0,
-              declarationNumber: data.declarationNumber ?? '',
-              goodsOrdered: data.goodsOrdered ?? [],
-              documents: data.documents ?? [],
-              createdAt: data.createdAt,
-            } as Consignment;
-          })
-        );
-      },
+    return subscribeToConsignments(
+      { traderEmail: user.email },
+      setConsignments,
       (error) => console.error('Failed to load consignments:', error)
     );
-
-    return () => unsubscribe();
   }, [user?.email]);
 
   const sortedConsignments = useMemo(

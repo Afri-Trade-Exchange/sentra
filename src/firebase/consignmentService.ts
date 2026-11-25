@@ -4,7 +4,7 @@ import { db } from './firebaseConfig';
 import { ConsignmentStatus } from '../types/consignment';
 import type { Consignment } from '../types/consignment';
 
-type ConsignmentScope = { all: true; traderEmail?: never } | { traderEmail: string; all?: never };
+type ConsignmentScope = { all: true; traderId?: never } | { traderId: string; all?: never };
 
 export function mapConsignment(snapshot: Pick<QueryDocumentSnapshot, 'id' | 'data'>): Consignment {
   const data = snapshot.data();
@@ -33,7 +33,7 @@ export function subscribeToConsignments(
   const consignments = collection(db, 'consignments');
   const source = scope.all
     ? consignments
-    : query(consignments, where('traderEmail', '==', scope.traderEmail));
+    : query(consignments, where('traderId', '==', scope.traderId));
 
   return onSnapshot(source, (snapshot) => onData(snapshot.docs.map(mapConsignment)), onError);
 }

@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FaUpload, FaDownload, FaBox, FaWallet, FaCheckCircle, FaChartLine, FaShieldAlt, FaArrowUp, FaArrowDown } from 'react-icons/fa';
+import { FaDownload, FaBox, FaWallet, FaCheckCircle, FaChartLine, FaShieldAlt, FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { subscribeToConsignments } from '../firebase/consignmentService';
-import UploadModal from './UploadModal';
+import PacketDialog from './DocumentPacket/PacketDialog';
 import InvoiceDetailModal from './InvoiceDetailModal';
 import { useAuth } from './AuthContext';
 import InvoiceViewButton from './Dashboard/InvoiceViewButton';
@@ -52,7 +52,7 @@ export default function Dashboard() {
     ? { backgroundColor: '#1f2937', border: '1px solid #374151', color: '#f3f4f6' }
     : undefined;
   const [consignments, setConsignments] = useState<Consignment[]>([]);
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [consignmentLoadError, setConsignmentLoadError] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
   const [showAllActivities, setShowAllActivities] = useState(false);
@@ -60,23 +60,24 @@ export default function Dashboard() {
   const [activeConsignmentId, setActiveConsignmentId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user?.email) return;
+    if (!user?.uid) return;
 
     return subscribeToConsignments(
-      { traderEmail: user.email },
+      { traderId: user.uid },
       setConsignments,
-      (error) => console.error('Failed to load consignments:', error)
+      () => setConsignmentLoadError(true)
     );
-  }, [user?.email]);
+  }, [user?.uid]);
 
   const sortedConsignments = useMemo(
     () => [...consignments].sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis()),
     [consignments]
   );
 
-  const allActivities = useMemo<Activity[]>(
+  const allActivities = useMemo(
     () =>
       sortedConsignments.map((c) => ({
+        consignmentId: c.id,
         id: c.declarationNumber || c.id,
         category: c.documentType,
         date: c.createdAt.toDate().toISOString().split('T')[0],
@@ -177,7 +178,6 @@ export default function Dashboard() {
 
           <div className="flex flex-wrap gap-4">
             {[
-              { icon: FaUpload, label: 'Upload', action: () => setIsUploadModalOpen(true) },
               { icon: FaBox, label: 'Create Consignment', action: () => setIsConsignmentModalOpen(true) },
               { icon: FaDownload, label: 'Download Report', action: downloadActivitiesReport },
             ].map((card) => (
@@ -313,7 +313,9 @@ export default function Dashboard() {
                 )}
               </div>
 
-              {visibleActivities.length === 0 ? (
+              {consignmentLoadError ? (
+                <p role="alert" className="py-6">Unable to load consignments. Refresh and try again.</p>
+              ) : visibleActivities.length === 0 ? (
                 <p className="text-sm text-gray-500 dark:text-gray-400 py-6 text-center">
                   You haven't submitted any consignments yet.
                 </p>
@@ -335,7 +337,7 @@ export default function Dashboard() {
                     <tbody>
                       {visibleActivities.map((activity) => (
                         <tr
-                          key={activity.id}
+                          key={activity.consignmentId}
                           className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors border-b border-gray-100 dark:border-gray-700 last:border-b-0"
                         >
                           <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">{activity.id}</td>
@@ -348,6 +350,10 @@ export default function Dashboard() {
                           </td>
                           <td className="px-4 py-3 whitespace-nowrap text-base text-gray-500 dark:text-gray-400">${activity.amount.toLocaleString()}</td>
                           <td className="px-4 py-3 whitespace-nowrap text-base text-gray-500 space-x-2">
+                            <button type="button" className="text-teal-700 underline dark:text-teal-300"
+                              onClick={() => setActiveConsignmentId(activity.consignmentId)}>
+                              Document packet
+                            </button>
                             <InvoiceViewButton
                               onClick={() => viewInvoiceDetails(activity)}
                               hasInvoice={true}
@@ -364,11 +370,10 @@ export default function Dashboard() {
       </div>
 
       {/* Modals */}
-      <UploadModal
-        isOpen={isUploadModalOpen}
-        onClose={() => setIsUploadModalOpen(false)}
-        consignmentId={activeConsignmentId}
-      />
+      {activeConsignmentId && (
+        <PacketDialog key={activeConsignmentId} consignmentId={activeConsignmentId} mode="trader"
+          onClose={() => setActiveConsignmentId(null)} />
+      )}
       <InvoiceDetailModal
         invoice={selectedInvoice ?? EMPTY_INVOICE}
         isOpen={isInvoiceModalOpen}
@@ -380,10 +385,7 @@ export default function Dashboard() {
       <ConsignmentCreationModal
         isOpen={isConsignmentModalOpen}
         onClose={() => setIsConsignmentModalOpen(false)}
-        onCreated={(consignmentId) => {
-          setActiveConsignmentId(consignmentId);
-          setIsUploadModalOpen(true);
-        }}
+        onCreated={setActiveConsignmentId}
       />
     </div>
   );

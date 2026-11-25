@@ -5,6 +5,7 @@ import { db } from '../firebase/firebaseConfig';
 import { subscribeToConsignments } from '../firebase/consignmentService';
 import { useAuth } from './AuthContext';
 import TraderDetailsModal from './TraderDetailsModal';
+import PacketDialog from './DocumentPacket/PacketDialog';
 import { Activity, Consignment, ConsignmentStatus, DashboardState, NewConsignmentFormData, NotificationType, TimelineEvent } from './CustomsDashboard/types';
 import { dashboardReducer } from './CustomsDashboard/reducer';
 import ConsignmentCard from './CustomsDashboard/ConsignmentCard';
@@ -151,6 +152,7 @@ export const CustomsDashboard: React.FC = () => {
   }, []);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [packetId, setPacketId] = useState<string | null>(null);
   const [selectedTrader, setSelectedTrader] = useState<{ id: string; name: string; email: string; goodsOrdered: string[]; goodsStatus: string } | null>(null);
 
   const handleViewDetails = useCallback((consignment: Consignment) => {
@@ -242,10 +244,18 @@ export const CustomsDashboard: React.FC = () => {
             </div>
           )}
 
+          {user?.uid && (
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Share this reviewer ID with traders who need to send you a document packet: {' '}
+              <code className="select-all break-all">{user.uid}</code>
+            </p>
+          )}
+
           <QuickActions
             consignments={state.consignments}
             selectedItems={state.selectedItems}
             onSubmitNewConsignment={handleSubmitNewConsignment}
+            onReviewPacket={setPacketId}
           />
         </section>
 
@@ -293,6 +303,7 @@ export const CustomsDashboard: React.FC = () => {
                   consignment={consignment}
                   onStatusChange={handleStatusChange}
                   onViewDetails={handleViewDetails}
+                  onReviewPacket={setPacketId}
                   isSelected={state.selectedItems.includes(consignment.id)}
                   onSelect={(id) => dispatch({ type: 'TOGGLE_SELECTED_ITEM', payload: id })}
                 />
@@ -355,6 +366,9 @@ export const CustomsDashboard: React.FC = () => {
         }}
       />
 
+      {packetId && (
+        <PacketDialog key={packetId} consignmentId={packetId} mode="reviewer" onClose={() => setPacketId(null)} />
+      )}
       <HelpButton />
     </div>
   );

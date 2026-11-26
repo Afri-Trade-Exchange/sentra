@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { IconType } from 'react-icons';
-import { FaArrowLeft, FaBars, FaBoxOpen, FaChartPie, FaCog, FaHistory, FaHome, FaSignOutAlt, FaTimes } from 'react-icons/fa';
+import { FaArrowLeft, FaBars, FaBoxOpen, FaChartPie, FaClipboardList, FaCog, FaHistory, FaHome, FaSignOutAlt, FaTimes } from 'react-icons/fa';
 import sentraLogo from '../assets/images/Sentralogo.png';
 import { useAuth } from './AuthContext';
 
@@ -14,6 +14,7 @@ interface NavItem {
 
 const CUSTOMS_NAV: NavItem[] = [
   { label: 'Overview', icon: FaHome, href: '#overview' },
+  { label: 'Reviewer queue', icon: FaClipboardList, href: '#review-queue' },
   { label: 'Consignments', icon: FaBoxOpen, href: '#consignments' },
   { label: 'Analytics', icon: FaChartPie, href: '#analytics' },
   { label: 'Activity', icon: FaHistory, href: '#activity' },

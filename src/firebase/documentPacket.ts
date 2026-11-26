@@ -1,4 +1,4 @@
-import { collection, doc, onSnapshot, orderBy, query, runTransaction, serverTimestamp } from 'firebase/firestore';
+import { collection, collectionGroup, doc, onSnapshot, orderBy, query, runTransaction, serverTimestamp, where } from 'firebase/firestore';
 import type { Timestamp } from 'firebase/firestore';
 import { deleteObject, getBlob, ref, uploadBytes } from 'firebase/storage';
 import { auth, db, storage } from './firebaseConfig';
@@ -37,6 +37,26 @@ export const watchPacket = (id: string, receive: (packet: DocumentPacket | null)
 export const watchPacketRevisions = (id: string, receive: (revisions: PacketRevision[]) => void, error: (e: Error) => void) =>
   onSnapshot(query(revisionList(id), orderBy('version', 'desc')), (snapshot) =>
     receive(snapshot.docs.map((item) => ({ ...item.data(), id: item.id }) as PacketRevision)), error);
+
+export interface AssignedPacket extends Pick<DocumentPacket, 'version' | 'status'> {
+  consignmentId: string;
+}
+
+export function watchAssignedPackets(
+  reviewerId: string, receive: (packets: AssignedPacket[]) => void, error: (e: Error) => void,
+) {
+  const assigned = query(collectionGroup(db, 'packet'), where('reviewerId', '==', reviewerId));
+  return onSnapshot(assigned, (snapshot) => {
+    receive(snapshot.docs.flatMap((item) => {
+      const [collectionId, consignmentId, packetCollection, packetId, ...tail] = item.ref.path.split('/');
+      if (collectionId !== 'consignments' || packetCollection !== 'packet' || packetId !== 'current' || tail.length) {
+        return [];
+      }
+      const { version, status } = item.data() as DocumentPacket;
+      return [{ consignmentId, version, status }];
+    }));
+  }, error);
+}
 
 export function validatePacketFiles(files: File[]) {
   if (!files.length || files.length > MAX_PACKET_FILES) throw new Error('Select 1 to 10 files.');

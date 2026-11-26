@@ -66,6 +66,12 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Collection group reads back the assigned reviewer queue. Direct
+    // packet reads and writes remain governed by the consignment rules below.
+    match /{path=**}/packet/{packetId} {
+      allow list: if isCustoms() && resource.data.reviewerId == request.auth.uid;
+    }
+
     match /consignments/{consignmentId}/packet/{packetId} {
       function packetPath() {
         return /databases/$(database)/documents/consignments/$(consignmentId)/packet/current;

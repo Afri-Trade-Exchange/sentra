@@ -6,6 +6,7 @@ import { subscribeToConsignments } from '../firebase/consignmentService';
 import { useAuth } from './AuthContext';
 import TraderDetailsModal from './TraderDetailsModal';
 import PacketDialog from './DocumentPacket/PacketDialog';
+import ReviewerQueue from './CustomsDashboard/ReviewerQueue';
 import { Activity, Consignment, ConsignmentStatus, DashboardState, NewConsignmentFormData, NotificationType, TimelineEvent } from './CustomsDashboard/types';
 import { dashboardReducer } from './CustomsDashboard/reducer';
 import ConsignmentCard from './CustomsDashboard/ConsignmentCard';
@@ -46,7 +47,7 @@ const initialState: DashboardState = {
 };
 
 export const CustomsDashboard: React.FC = () => {
-  const { user } = useAuth();
+  const { user, role } = useAuth();
 
   const [state, dispatch] = useReducer(dashboardReducer, initialState);
   const [isLoading, setIsLoading] = useState(true);
@@ -259,6 +260,13 @@ export const CustomsDashboard: React.FC = () => {
           />
         </section>
 
+        {user && role === 'customs' && (
+          <section id="review-queue" className="scroll-mt-20 space-y-4">
+            <SectionHeader title="Reviewer queue" />
+            <ReviewerQueue key={user.uid} reviewerId={user.uid} consignments={state.consignments} onOpen={setPacketId} />
+          </section>
+        )}
+
         <section id="consignments" className="scroll-mt-20 space-y-6">
           <SectionHeader title="Consignments" />
 
@@ -303,7 +311,6 @@ export const CustomsDashboard: React.FC = () => {
                   consignment={consignment}
                   onStatusChange={handleStatusChange}
                   onViewDetails={handleViewDetails}
-                  onReviewPacket={setPacketId}
                   isSelected={state.selectedItems.includes(consignment.id)}
                   onSelect={(id) => dispatch({ type: 'TOGGLE_SELECTED_ITEM', payload: id })}
                 />

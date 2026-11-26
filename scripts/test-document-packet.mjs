@@ -3,12 +3,18 @@ import assert from 'node:assert/strict';
 import { initializeApp, deleteApp } from 'firebase/app';
 import { connectAuthEmulator, createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
 import {
-  collection, connectFirestoreEmulator, doc, getDoc, getDocs, getFirestore, query, serverTimestamp,
+  collection, collectionGroup, connectFirestoreEmulator, doc, getDoc, getDocs, getFirestore, query, serverTimestamp,
   setDoc, terminate, where, writeBatch,
 } from 'firebase/firestore';
 import { connectStorageEmulator, getBytes, getStorage, ref, uploadBytes } from 'firebase/storage';
 
-const projectId = 'demo-sentra';
+const projectId = process.env.GCLOUD_PROJECT ?? 'demo-sentra';
+if (!projectId.startsWith('demo-')) throw new Error('Run against a demo Firebase project only.');
+const authHost = process.env.FIREBASE_AUTH_EMULATOR_HOST ?? '127.0.0.1:9099';
+const firestoreHost = process.env.FIRESTORE_EMULATOR_HOST ?? '127.0.0.1:8080';
+const storageHost = process.env.FIREBASE_STORAGE_EMULATOR_HOST ?? '127.0.0.1:9199';
+const [firestoreAddress, firestorePort] = firestoreHost.split(':');
+const [storageAddress, storagePort] = storageHost.split(':');
 const apps = [];
 const suffix = Date.now();
 const storageMetadata = { contentType: 'application/pdf', contentDisposition: 'attachment' };
@@ -20,12 +26,12 @@ async function account(name, role = 'trader') {
   apps.push({ app, db });
   const auth = getAuth(app);
   const storage = getStorage(app);
-  connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: true });
-  connectFirestoreEmulator(db, '127.0.0.1', 8080);
-  connectStorageEmulator(storage, '127.0.0.1', 9199);
+  connectAuthEmulator(auth, `http://${authHost}`, { disableWarnings: true });
+  connectFirestoreEmulator(db, firestoreAddress, Number(firestorePort));
+  connectStorageEmulator(storage, storageAddress, Number(storagePort));
   const { user } = await createUserWithEmailAndPassword(auth, `${name}-${suffix}@example.test`, 'emulator-only');
   if (role === 'customs') {
-    const endpoint = `http://127.0.0.1:8080/v1/projects/${projectId}/databases/(default)/documents/users/${user.uid}`;
+    const endpoint = `http://${firestoreHost}/v1/projects/${projectId}/databases/(default)/documents/users/${user.uid}`;
     const response = await fetch(endpoint, {
       method: 'PATCH',
       headers: { Authorization: 'Bearer owner', 'Content-Type': 'application/json' },
@@ -71,7 +77,32 @@ try {
     await batch.commit();
   }
 
+  const assigned = (actor, reviewerId = actor.uid) =>
+    query(collectionGroup(actor.db, 'packet'), where('reviewerId', '==', reviewerId));
+  async function assertQueue(actor, expectedConsignment, status, version) {
+    const snapshot = await getDocs(assigned(actor));
+    assert.deepEqual(snapshot.docs.map((item) => ({
+      path: item.ref.path, status: item.data().status, version: item.data().version,
+    })), [{ path: expectedConsignment.path + '/packet/current', status, version }]);
+  }
+
+  // A second packet belongs to a different reviewer.
+  const otherConsignment = doc(collection(trader.db, 'consignments'));
+  await setDoc(otherConsignment, { traderId: trader.uid, status: 'Pending' });
+  const otherPacket = doc(otherConsignment, 'packet', 'current');
+  const otherRevision = doc(collection(otherPacket, 'revisions'));
+  const otherBatch = writeBatch(trader.db);
+  const otherParties = { ownerId: trader.uid, reviewerId: otherReviewer.uid };
+  otherBatch.set(otherPacket, { ...otherParties, revisionId: otherRevision.id, version: 1, status: 'submitted' });
+  otherBatch.set(otherRevision, { ...otherParties, version: 1, fileNames: ['example.pdf'], submittedAt: serverTimestamp() });
+  await otherBatch.commit();
+
   await submit(versionOne, 1);
+  await assertQueue(reviewer, consignment, 'submitted', 1);
+  await assertQueue(otherReviewer, otherConsignment, 'submitted', 1);
+  await assert.rejects(getDocs(collectionGroup(reviewer.db, 'packet')), { code: 'permission-denied' });
+  await assert.rejects(getDocs(assigned(otherReviewer, reviewer.uid)), { code: 'permission-denied' });
+  await assert.rejects(getDocs(assigned(trader, reviewer.uid)), { code: 'permission-denied' });
   assert.deepEqual(new Uint8Array(await getBytes(file(reviewer, versionOne))), bytes);
   await assert.rejects(getDoc(packet(stranger)), { code: 'permission-denied' });
   await assert.rejects(getDoc(packet(otherReviewer)), { code: 'permission-denied' });
@@ -79,16 +110,19 @@ try {
   await assert.rejects(decide(trader, versionOne, 'ready_to_file', ''), { code: 'permission-denied' });
   await assert.rejects(decide(reviewer, versionOne, 'correction_requested', ''), { code: 'permission-denied' });
   await decide(reviewer, versionOne, 'correction_requested', 'Replace the invoice.');
+  await assertQueue(reviewer, consignment, 'correction_requested', 1);
   assert.equal((await getDoc(revision(trader, versionOne))).data().decision.reason, 'Replace the invoice.');
 
   await submit(versionTwo, 2);
+  await assertQueue(reviewer, consignment, 'submitted', 2);
   await assert.rejects(decide(reviewer, versionOne, 'ready_to_file', ''), { code: 'permission-denied' });
   await decide(reviewer, versionTwo, 'ready_to_file', '');
+  await assertQueue(reviewer, consignment, 'ready_to_file', 2);
   assert.equal((await getDoc(packet(trader))).data().status, 'ready_to_file');
   assert.equal((await getDocs(collection(packet(reviewer), 'revisions'))).size, 2);
   assert.deepEqual(new Uint8Array(await getBytes(file(reviewer, versionOne))), bytes);
   assert.deepEqual(new Uint8Array(await getBytes(file(reviewer, versionTwo))), bytes);
-  console.log('Document packet lifecycle and access rules passed.');
+  console.log('Document packet lifecycle, reviewer queue isolation, and access rules passed.');
 } finally {
   await Promise.all(apps.map(async ({ db, app }) => {
     await terminate(db);

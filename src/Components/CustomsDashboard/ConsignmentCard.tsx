@@ -8,10 +8,9 @@ const ConsignmentCard: React.FC<{
   consignment: Consignment;
   onStatusChange: (id: string, status: ConsignmentStatus) => void;
   onViewDetails: (consignment: Consignment) => void;
-  onReviewPacket: (id: string) => void;
   isSelected: boolean;
   onSelect: (id: string) => void;
-}> = ({ consignment, onStatusChange, onViewDetails, onReviewPacket, isSelected, onSelect }) => {
+}> = ({ consignment, onStatusChange, onViewDetails, isSelected, onSelect }) => {
   return (
     <motion.div
       layout
@@ -56,13 +55,6 @@ const ConsignmentCard: React.FC<{
           View Details
         </button>
       </div>
-      <button type="button" className="text-sm text-teal-700 underline dark:text-teal-300"
-        onClick={(event) => {
-          event.stopPropagation();
-          onReviewPacket(consignment.id);
-        }}>
-        Review document packet
-      </button>
     </motion.div>
   );
 };
